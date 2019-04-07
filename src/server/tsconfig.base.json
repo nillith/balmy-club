@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "types": [
+      "reflect-metadata",
+      "jasmine",
+      "node"
+    ],
+    "lib": [
+      "es2017"
+    ],
+    "baseUrl": "./",
+    "target": "ES2017",
+    "module": "commonjs",
+    "strict": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+}

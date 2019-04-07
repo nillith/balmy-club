@@ -1,0 +1,28 @@
+{
+  "check-coverage": true,
+  "per-file": true,
+  "extensions": [
+    ".ts"
+  ],
+  "include": [
+    "src/server/**/*.ts",
+    "src/shared/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ],
+  "ignore-class-method": "methodToIgnore",
+  "temp-directory": "./coverage/server/.nyc_output",
+  "extension": [
+    ".ts"
+  ],
+  "require": [
+    "ts-node/register"
+  ],
+  "reporter": [
+    "cobertura",
+    "html",
+    "text",
+    "text-summary"
+  ]
+}
