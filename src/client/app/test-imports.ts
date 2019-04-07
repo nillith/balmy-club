@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {FlexLayoutModule} from "@angular/flex-layout";
 import {
   MatButtonModule,
   MatCheckboxModule,
@@ -7,11 +7,15 @@ import {
   MatSidenavModule,
   MatToolbarModule
 } from "@angular/material";
-import {FlexLayoutModule} from "@angular/flex-layout";
-import {LayoutModule} from "@angular/cdk/layout";
 import {RouterTestingModule} from "@angular/router/testing";
+import {LayoutModule} from "@angular/cdk/layout";
+import {NoopAnimationsModule} from "@angular/platform-browser/animations";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
 
-const modules = [
+export const testImports = [
+  RouterTestingModule,
+  NoopAnimationsModule,
+  HttpClientTestingModule,
   LayoutModule,
   MatButtonModule,
   MatIconModule,
@@ -23,11 +27,3 @@ const modules = [
   MatCheckboxModule,
   FlexLayoutModule,
 ];
-
-@NgModule({
-  declarations: [],
-  imports: [...modules],
-  exports: modules,
-})
-export class MatImportModule {
-}

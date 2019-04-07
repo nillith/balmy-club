@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { UserService } from './user.service';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {UserService} from './user.service';
+import {testImports} from "../../test-imports";
 
 describe('UserService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule]
+    imports: [...testImports]
   }));
 
   it('should be created', () => {

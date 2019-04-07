@@ -1,23 +1,22 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {LoginComponent} from './login.component';
 import {testImports} from "../../test-imports";
+import {MainNavViewComponent} from './main-nav-view.component';
 
-
-describe('LoginComponent', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
+describe('MainNavViewComponent', () => {
+  let component: MainNavViewComponent;
+  let fixture: ComponentFixture<MainNavViewComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [LoginComponent],
-      imports: [...testImports]
+      declarations: [MainNavViewComponent],
+      imports: [...testImports],
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(MainNavViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

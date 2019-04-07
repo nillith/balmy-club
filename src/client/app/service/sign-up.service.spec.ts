@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SignUpService } from './sign-up.service';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {SignUpService} from './sign-up.service';
+import {testImports} from "../test-imports";
 
 describe('SignUpService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule]
+    imports: [...testImports]
   }));
 
   it('should be created', () => {

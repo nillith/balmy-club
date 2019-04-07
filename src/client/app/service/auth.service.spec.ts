@@ -1,11 +1,11 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AuthService } from './auth.service';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {AuthService} from './auth.service';
+import {testImports} from "../test-imports";
 
 describe('AuthService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule]
+    imports: [...testImports]
   }));
 
   it('should be created', () => {
