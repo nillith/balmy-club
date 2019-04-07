@@ -10,7 +10,7 @@
       "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "sass"
+          "style": "scss"
         }
       },
       "architect": {
@@ -27,7 +27,7 @@
               "src/client/assets"
             ],
             "styles": [
-              "src/client/styles.sass"
+              "src/client/styles.scss"
             ],
             "scripts": [],
             "es5BrowserSupport": true
@@ -85,7 +85,7 @@
             "tsConfig": "src/client/tsconfig.spec.json",
             "karmaConfig": "src/client/karma.conf.js",
             "styles": [
-              "src/client/styles.sass"
+              "src/client/styles.scss"
             ],
             "scripts": [],
             "assets": [

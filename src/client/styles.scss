@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.app-fill-space {
+  flex: 1 1 auto;
+}
+
+.app-align-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-align-icon.app-icon-spacing > :not(:last-child) {
+  margin-right: 0.2em;
+}

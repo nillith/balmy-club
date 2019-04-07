@@ -10,10 +10,14 @@ import {HttpClientModule} from "@angular/common/http";
 import {JwtModule} from '@auth0/angular-jwt';
 import {environment} from "../environments/environment";
 import {getAccessToken} from "../utils/auth";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { MatImportModule } from './mat-import.module';
+import {MainNavComponent} from "./components/main-nav/main-nav.component";
 
 
 @NgModule({
   declarations: [
+    MainNavComponent,
     AppComponent,
     LoginComponent,
     SignUpComponent
@@ -23,13 +27,15 @@ import {getAccessToken} from "../utils/auth";
     RouterModule,
     AppRoutingModule,
     HttpClientModule,
+    BrowserAnimationsModule,
     JwtModule.forRoot({
       config: {
         tokenGetter: getAccessToken,
         whitelistedDomains: environment.jwtModule.whitelistedDomains,
         blacklistedRoutes: environment.jwtModule.blacklistedRoutes
       }
-    })
+    }),
+    MatImportModule
   ],
   providers: [
     // uncomment this for "hash-bang" routing
