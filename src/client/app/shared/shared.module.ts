@@ -2,10 +2,12 @@ import {NgModule, Optional, SkipSelf} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {
   MatButtonModule,
-  MatCheckboxModule,
+  MatCardModule,
+  MatCheckboxModule, MatDialogModule,
   MatIconModule,
-  MatListModule,
-  MatSidenavModule,
+  MatInputModule,
+  MatListModule, MatMenuModule, MatProgressSpinnerModule,
+  MatSidenavModule, MatTableModule,
   MatToolbarModule
 } from "@angular/material";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -16,6 +18,8 @@ import {RouterModule} from "@angular/router";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {BrowserModule} from "@angular/platform-browser";
 import {MainNavViewComponent} from './main-nav-view/main-nav-view.component';
+import {LoginViewComponent} from './login-view/login-view.component';
+import {FormsModule} from "@angular/forms";
 
 const modules = [
   BrowserModule,
@@ -34,14 +38,23 @@ const modules = [
   MatButtonModule,
   MatCheckboxModule,
   FlexLayoutModule,
+  MatCardModule,
+  MatInputModule,
+  MatSidenavModule,
+  FormsModule,
+  MatDialogModule,
+  MatTableModule,
+  MatMenuModule,
+  MatProgressSpinnerModule
 ];
 
 const components = [
-  MainNavViewComponent
+  MainNavViewComponent,
+  LoginViewComponent,
 ];
 
 @NgModule({
-  declarations: [...components,],
+  declarations: [...components],
   imports: [...modules],
   exports: [...modules, ...components],
 })
