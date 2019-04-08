@@ -4,6 +4,7 @@ import {SignUpComponent} from "./sign-up/sign-up.component";
 import {SharedModule} from "../shared/shared.module";
 import {RouterModule, Routes} from "@angular/router";
 import {DashboardComponent} from './dashboard/dashboard.component';
+import {HomeComponent} from "./home/home.component";
 
 const routes: Routes = [
   {path: 'login', component: LoginComponent},
@@ -13,6 +14,7 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
+    HomeComponent,
     LoginComponent,
     SignUpComponent,
     DashboardComponent

@@ -1,9 +1,9 @@
 import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
-import mailService from "../../service/mailer";
+import mailService from "../../service/mailer.service";
 import validator from 'validator';
-import {authService, SignUpPayload, signUpService} from "../../service/auth";
-import {isValidPassword, isValidUsername, UserCreateInfo, UserModel} from "../../models/user-model";
+import {authService, SignUpPayload, signUpService} from "../../service/auth.service";
+import {isValidPassword, isValidUsername, UserCreateInfo, UserModel} from "../../models/user.model";
 
 const getSignUpInfo = async function(body: any): Promise<UserCreateInfo | undefined> {
   const {username, password} = body;

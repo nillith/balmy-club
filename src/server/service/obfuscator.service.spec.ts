@@ -6,7 +6,7 @@ import {
   postObfuscator,
   unsignedIntegerToBuffer,
   userObfuscator,
-} from "./obfuscator";
+} from "./obfuscator.service";
 
 function randomUnsigned(): number {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);

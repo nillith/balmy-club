@@ -1,7 +1,7 @@
 import {Router} from "express";
 import user from './users';
 import i from './i';
-import {requireAdmin, requireLogin} from "../service/auth";
+import {requireAdmin, requireLogin} from "../service/auth.service";
 import signUp from "./sign-up";
 
 const router = Router();

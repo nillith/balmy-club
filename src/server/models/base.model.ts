@@ -1,5 +1,5 @@
 import {$id, $obfuscator, $toJsonFields} from '../constants/symbols';
-import {UnsignedIntegerObfuscator} from "../service/obfuscator";
+import {UnsignedIntegerObfuscator} from "../service/obfuscator.service";
 import {isSymbol} from "util";
 
 export interface ToJsonField {

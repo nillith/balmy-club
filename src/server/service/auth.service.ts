@@ -1,6 +1,6 @@
 import config from '../config';
 import jwt from 'jsonwebtoken';
-import {UserModel} from '../models/user-model';
+import {UserModel} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {constants} from "../constants/index";
 import {asyncMiddleware, cloneFields, respondWith} from "../utils/index";
@@ -71,7 +71,7 @@ export class AuthService extends JwtHelper<UserModel> {
       return;
     }
     const payload = await this.verify(token);
-    return UserModel.findById(payload.id);
+    return UserModel.findById(payload.id!);
   }
 
   requireRole(role): RequestHandler {

@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {jsonStringifyByFields, makeToJsonFields} from "./base-model";
+import {jsonStringifyByFields, makeToJsonFields} from "./base.model";
 
 describe('BaseModel', () => {
   it('should create string field name from symbol', () => {

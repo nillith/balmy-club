@@ -2,7 +2,7 @@ import nodeMailer from 'nodemailer';
 import config from '../config';
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail, {Address} from "nodemailer/lib/mailer";
-import {SignUpPayload, signUpService} from "./auth";
+import {SignUpPayload, signUpService} from "./auth.service";
 
 const mailerSecrets = config.secrets.mailer;
 const mailerOptions = {

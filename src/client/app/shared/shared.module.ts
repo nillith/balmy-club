@@ -24,7 +24,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {MainNavViewComponent} from './main-nav-view/main-nav-view.component';
 import {LoginViewComponent} from './login-view/login-view.component';
 import {FormsModule} from "@angular/forms";
-import {MarkdownViewerComponent} from './markdown-viewer/markdown-viewer.component';
+import {HomeComponent} from "../pages/home/home.component";
 
 const modules = [
   BrowserModule,

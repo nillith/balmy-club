@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {isValidPassword, isValidUsername} from "./user-model";
+import {isValidPassword, isValidUsername} from "./user.model";
 import {maxUsernameLength, minPasswordLength} from "../../shared/constants";
 
 describe('user', () => {

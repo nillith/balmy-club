@@ -1,10 +1,10 @@
 import db from '../persistence';
-import passwordService from '../service/password';
-import {BaseModel, makeToJsonFields} from "./base-model";
+import passwordService from '../service/password.service';
+import {BaseModel, makeToJsonFields} from "./base.model";
 import {$id, $obfuscator, $toJsonFields} from "../constants/symbols";
 import {maxUsernameLength, minPasswordLength, usernamePattern} from "../../shared/constants";
-import {InvalidResult, isValidObfuscatedString, userObfuscator} from "../service/obfuscator";
-import {JwtSignable} from "../service/auth";
+import {InvalidResult, isValidObfuscatedString, userObfuscator} from "../service/obfuscator.service";
+import {JwtSignable} from "../service/auth.service";
 import {makeInstance} from "../utils/index";
 import {isNumber, isString} from "util";
 
