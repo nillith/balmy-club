@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {LoginComponent} from './login.component';
-import {testImports} from "../../test-imports";
+import {pageTestImports, testImports} from "../../test-imports";
 
 
 describe('LoginComponent', () => {
@@ -11,7 +11,7 @@ describe('LoginComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [...testImports]
+      imports: [...pageTestImports]
     })
       .compileComponents();
   }));
