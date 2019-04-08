@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer";
 import validator from 'validator';
-import {AuthPayload, authService, signUpService} from "../../service/auth";
+import {authService, SignUpPayload, signUpService} from "../../service/auth";
 import {isValidPassword, isValidUsername, UserCreateInfo, UserModel} from "../../models/user";
 
 const getSignUpInfo = async function(body: any): Promise<UserCreateInfo | undefined> {
@@ -26,13 +26,13 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
       return respondWith(res, 400);
     }
     const user = await UserModel.create(signUpInfo);
-    return respondWith(res, 200, await authService.sign(user as AuthPayload));
+    return respondWith(res, 200, await authService.sign(user));
   } else {
     const email = body.email && body.email.trim();
     if (!email || !validator.isEmail(email) || await UserModel.emailUsed(email)) {
       return respondWith(res, 400);
     }
-    await mailService.sendSignUpMail({email});
+    await mailService.sendSignUpMail(new SignUpPayload(email));
     respondWith(res, 200);
   }
 };

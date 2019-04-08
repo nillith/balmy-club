@@ -42,3 +42,7 @@ export const respondErrorPage = function(res: Response, errorCode: number) {
     res.send(html);
   });
 };
+
+export const makeInstance = function <T>(obj: object, t: { new(...arg: any[]): T }): T {
+  return Object.setPrototypeOf(obj, t.prototype) as T;
+};

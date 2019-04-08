@@ -2,6 +2,7 @@ import {assert} from 'chai';
 import {
   bufferToUnsignedInteger,
   circleObfuscator,
+  isValidObfuscatedString,
   postObfuscator,
   unsignedIntegerToBuffer,
   userObfuscator,
@@ -22,6 +23,24 @@ describe('obfuscator', () => {
       check(randomUnsigned());
     }
   };
+
+  it('should return validity of input string', () => {
+    const invalidValues = [null, undefined, '', true, 333, 444.4,
+      '3a2a2c20465685e1ed86dbfa8f649ce'];
+    for (const v of invalidValues) {
+      assert.isFalse(isValidObfuscatedString(v));
+    }
+
+    const validValues = [
+      '19aeb21dddbd969565d7ed38bd896d97',
+      'D9AE9894F5D41B34082FE79DE6DA4D1A',
+      '26010cae2fb7e5ba19eaf10dbdf103fa',
+    ];
+
+    for (const v of validValues) {
+      assert.isTrue(isValidObfuscatedString(v));
+    }
+  });
 
   it('should return Buffer', () => {
     applyCheck(function(n: number) {
@@ -53,5 +72,29 @@ describe('obfuscator', () => {
     applyCheckToObfuscator((obfuscator, n) => {
       assert.strictEqual(n, obfuscator.unObfuscate(obfuscator.obfuscate(n)));
     });
+  });
+
+  it('should unObfuscate back UpperCase hex string', () => {
+    applyCheckToObfuscator((obfuscator, n) => {
+      assert.strictEqual(n, obfuscator.unObfuscate(obfuscator.obfuscate(n).toUpperCase()));
+    });
+  });
+
+  it('should throw when obfuscate negative number', () => {
+    assert.throw(function() {
+      for (const obf of obfuscators) {
+        obf.obfuscate(-1);
+      }
+    });
+  });
+
+  it('should return -1 when unobfuscate invalid input', () => {
+
+    const invalidInput = [null, undefined, 1, 'daa948f1ab7b2d60c95507effb355f7a'];
+    for (const obf of obfuscators) {
+      for (const v of invalidInput) {
+        assert.strictEqual(-1, obf.unObfuscate(v));
+      }
+    }
   });
 });

@@ -18,15 +18,18 @@ const getToken = (() => {
   };
 })();
 
+export interface JwtSignable {
+  getJwtPayload(): string | Buffer | object;
+}
 
-export class JwtHelper<TPayload> {
+export class JwtHelper<TPayload extends JwtSignable> {
   constructor(private secret: string, private defaultExpire: string | number) {
 
   }
 
   async sign(payload: TPayload, expire?: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      return jwt.sign(payload as any as object, this.secret, {
+      return jwt.sign(payload.getJwtPayload(), this.secret, {
         expiresIn: expire || this.defaultExpire
       }, (err, token) => {
         if (err) {
@@ -55,20 +58,10 @@ const keys = function(T: { new(): any }) {
   return Object.keys(new T());
 };
 
-export class AuthPayload {
-  readonly id: string = 'dummy';
-  readonly role: string = 'dummy';
-}
 
-const Auth_Payload_Keys = keys(AuthPayload);
+export class AuthService extends JwtHelper<UserModel> {
 
-export class AuthService extends JwtHelper<AuthPayload> {
-
-  async sign(payload: AuthPayload): Promise<string> {
-    return super.sign(cloneFields(payload, Auth_Payload_Keys));
-  }
-
-  async setTokenCookie(user: AuthPayload, res: Response) {
+  async setTokenCookie(user: UserModel, res: Response) {
     res.cookie(accessTokenCookieKey, await this.sign(user));
   }
 
@@ -120,16 +113,14 @@ export const requireLogin = asyncMiddleware(async function(req: Request, res: Re
 });
 
 
-export class SignUpPayload {
-  readonly email = 'dummy';
-}
+export class SignUpPayload implements JwtSignable {
+  constructor(readonly email: string) {
+  }
 
-const SignUp_Payload_Keys = keys(SignUpPayload);
-
-export class SignUpService extends JwtHelper<SignUpPayload> {
-  async sign(payload: SignUpPayload): Promise<string> {
-    return super.sign(cloneFields(payload, SignUp_Payload_Keys));
+  getJwtPayload(): string | Buffer | object {
+    return this;
   }
 }
 
-export const signUpService = new SignUpService(config.secrets.signUp!, '2d');
+
+export const signUpService = new JwtHelper<SignUpPayload>(config.secrets.signUp!, '2d');

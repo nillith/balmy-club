@@ -1,5 +1,6 @@
 import config from "../config/index";
 import crypto from 'crypto';
+
 const ALGORITHM = 'aes-256-ecb';
 const HEX = 'HEX';
 const RADIX = 16;
@@ -16,10 +17,15 @@ export const bufferToUnsignedInteger = function(buf: Buffer): number {
   return parseInt(buf.toString('HEX'), RADIX);
 };
 
+export const isValidObfuscatedString = function(str: any): boolean {
+  return !!str && 32 === str.length && /^[0-9a-fA-F]{32}$/.test(str);
+};
+
 const $key = Symbol();
 
-class UnsignedIntegerObfuscator {
+export const InvalidResult = -1;
 
+export class UnsignedIntegerObfuscator {
   constructor(key) {
     this[$key] = Buffer.from(key, HEX);
   }
@@ -35,11 +41,18 @@ class UnsignedIntegerObfuscator {
   }
 
   obfuscate(n: number): string {
+    if (!Number.isInteger(n) || n < 0) {
+      throw new Error('unsigned integer required!');
+    }
     return this.encrypt(unsignedIntegerToBuffer(n)).toString(HEX);
   }
 
   unObfuscate(hexStr): number {
-    return bufferToUnsignedInteger(this.decrypt(Buffer.from(hexStr, HEX)));
+    try {
+      return bufferToUnsignedInteger(this.decrypt(Buffer.from(hexStr, HEX)));
+    } catch (e) {
+      return InvalidResult;
+    }
   }
 }
 
