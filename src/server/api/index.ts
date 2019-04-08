@@ -1,5 +1,5 @@
 import {Router} from "express";
-import user from './user';
+import user from './users';
 import i from './i';
 import {requireAdmin, requireLogin} from "../service/auth";
 import signUp from "./sign-up";
