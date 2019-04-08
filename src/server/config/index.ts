@@ -1,5 +1,5 @@
+import '../env';
 import path from 'path';
-
 function toNumber(envName: string) {
   return parseFloat(env[envName]!);
 }
@@ -41,6 +41,11 @@ export const config = {
       from: env.MAILER_FROM,
       user: env.MAILER_USER,
       password: env.MAILER_PASSWORD
+    },
+    obfuscator: {
+      user: env.OBFUSCATOR_SECRET_USER,
+      post: env.OBFUSCATOR_SECRET_POST,
+      circle: env.OBFUSCATOR_SECRET_CIRCLE,
     }
   },
   password: {
