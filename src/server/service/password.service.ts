@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import config from '../config';
+import {passwordFormatIsValid} from "../models/user.model";
 
 export class PasswordOptions {
   constructor(readonly saltBytes: number,
@@ -36,6 +37,10 @@ class PasswordService extends PasswordOptions {
         }
       });
     });
+  }
+
+  async verifyPassword(salt: Buffer, hash: Buffer, password: string): Promise<boolean> {
+    return passwordFormatIsValid(password) && hash.equals(await passwordService.passwordHash(salt, password));
   }
 }
 

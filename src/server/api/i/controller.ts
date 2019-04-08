@@ -1,11 +1,11 @@
 import {NextFunction, Request, Response} from "express";
 import {$user} from "../../constants/symbols";
 import {respondWith} from "../../utils/index";
-import {isValidPassword} from "../../models/user.model";
+import {passwordFormatIsValid} from "../../models/user.model";
 
 export const changePassword = async function(req: Request, res: Response, next: NextFunction) {
   const password = req.body && req.body.password;
-  if (!isValidPassword(password)) {
+  if (!passwordFormatIsValid(password)) {
     respondWith(res, 400);
   }
   const user = req[$user];

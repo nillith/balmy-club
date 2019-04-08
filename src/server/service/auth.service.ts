@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import {UserModel} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {constants} from "../constants/index";
-import {asyncMiddleware, cloneFields, respondWith} from "../utils/index";
+import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status, $user} from "../constants/symbols";
 import {accessTokenCookieKey, accessTokenKey} from "../../shared/constants";
 
@@ -19,7 +19,7 @@ const getToken = (() => {
 })();
 
 export interface JwtSignable {
-  getJwtPayload(): string | Buffer | object;
+  getJwtPayload(): object;
 }
 
 export class JwtHelper<TPayload extends JwtSignable> {
@@ -53,11 +53,6 @@ export class JwtHelper<TPayload extends JwtSignable> {
     });
   }
 }
-
-const keys = function(T: { new(): any }) {
-  return Object.keys(new T());
-};
-
 
 export class AuthService extends JwtHelper<UserModel> {
 
@@ -117,7 +112,7 @@ export class SignUpPayload implements JwtSignable {
   constructor(readonly email: string) {
   }
 
-  getJwtPayload(): string | Buffer | object {
+  getJwtPayload(): object {
     return this;
   }
 }

@@ -1,10 +1,10 @@
 import {assert} from 'chai';
-import {jsonStringifyByFields, makeToJsonFields} from "./base.model";
+import {jsonStringifyByFields, makeFieldMaps} from "./base.model";
 
 describe('BaseModel', () => {
   it('should create string field name from symbol', () => {
     const a = Symbol('a');
-    const fields = makeToJsonFields([a, 'b']);
+    const fields = makeFieldMaps([a, 'b']);
     assert.strictEqual(fields[0].from, a);
     assert.strictEqual(fields[0].to, 'a');
     assert.strictEqual(fields[1].from, 'b');
@@ -14,20 +14,20 @@ describe('BaseModel', () => {
   it('should throw if result in duplicate key', () => {
     const a = Symbol('a');
     assert.throw(() => {
-      makeToJsonFields([a, 'a']);
+      makeFieldMaps([a, 'a']);
     });
   });
 
   it('should throw if symbol have no description', () => {
     const a = Symbol();
     assert.throw(() => {
-      makeToJsonFields([a]);
+      makeFieldMaps([a]);
     });
   });
 
   it('should only stringify specified fields', () => {
     const a = Symbol('a');
-    const fields = makeToJsonFields([a, 'b']);
+    const fields = makeFieldMaps([a, 'b']);
     const obj = {
       [a]: '$a',
       a: 'a',

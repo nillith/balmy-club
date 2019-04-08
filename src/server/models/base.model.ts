@@ -2,20 +2,20 @@ import {$id, $obfuscator, $toJsonFields} from '../constants/symbols';
 import {UnsignedIntegerObfuscator} from "../service/obfuscator.service";
 import {isSymbol} from "util";
 
-export interface ToJsonField {
+export interface FieldMap {
   from: string | symbol;
   to: string;
 }
 
-type ToJsonFields = ToJsonField[];
+type FieldMaps = FieldMap[];
 
 
-export const makeToJsonFields = function(fields: Array<string | symbol>): ToJsonFields {
+export const makeFieldMaps = function(fields: Array<string | symbol>): FieldMaps {
   const toMap: any = {};
   return fields.map(from => {
     const to = isSymbol(from) ? (from as any).description : from;
     if (!to) {
-      throw Error('Invalid ToJsonField');
+      throw Error('Invalid FieldMap');
     }
     if (toMap[to]) {
       throw Error(`Duplicate key: ${to}`);
@@ -25,7 +25,7 @@ export const makeToJsonFields = function(fields: Array<string | symbol>): ToJson
   });
 };
 
-export const cloneByToJsonFields = function(obj: any, fields: ToJsonFields) {
+export const cloneByFieldMaps = function(obj: any, fields: FieldMaps) {
   const result: any = {};
   for (const {from, to} of fields) {
     if (undefined !== obj[from]) {
@@ -35,12 +35,12 @@ export const cloneByToJsonFields = function(obj: any, fields: ToJsonFields) {
   return result;
 };
 
-export const jsonStringifyByFields = function(obj: any, fields: ToJsonFields) {
-  return JSON.stringify(cloneByToJsonFields(obj, fields));
+export const jsonStringifyByFields = function(obj: any, fields: FieldMaps) {
+  return JSON.stringify(cloneByFieldMaps(obj, fields));
 };
 
 export abstract class BaseModel {
-  static [$toJsonFields]: ToJsonFields = [];
+  static [$toJsonFields]: FieldMaps = [];
   id?: number | string;
   [$id]?: string;
 
@@ -63,6 +63,6 @@ export abstract class BaseModel {
   toJSON() {
     const self = this;
     self.obfuscate();
-    return JSON.stringify(cloneByToJsonFields(self, self.constructor[$toJsonFields]));
+    return cloneByFieldMaps(self, self.constructor[$toJsonFields]);
   }
 }
