@@ -1,6 +1,6 @@
 import config from '../config';
 import jwt from 'jsonwebtoken';
-import {UserModel} from '../models/user';
+import {UserModel} from '../models/user-model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {constants} from "../constants/index";
 import {asyncMiddleware, cloneFields, respondWith} from "../utils/index";

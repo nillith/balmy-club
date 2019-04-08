@@ -3,7 +3,7 @@ import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer";
 import validator from 'validator';
 import {authService, SignUpPayload, signUpService} from "../../service/auth";
-import {isValidPassword, isValidUsername, UserCreateInfo, UserModel} from "../../models/user";
+import {isValidPassword, isValidUsername, UserCreateInfo, UserModel} from "../../models/user-model";
 
 const getSignUpInfo = async function(body: any): Promise<UserCreateInfo | undefined> {
   const {username, password} = body;

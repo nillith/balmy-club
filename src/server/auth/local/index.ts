@@ -2,7 +2,7 @@ import {Router} from 'express';
 import passport from 'passport';
 import {authService} from '../../service/auth';
 import {Strategy as LocalStrategy} from 'passport-local';
-import {UserModel} from "../../models/user";
+import {UserModel} from "../../models/user-model";
 
 
 passport.use(new LocalStrategy({
