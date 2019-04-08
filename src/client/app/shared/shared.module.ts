@@ -3,11 +3,15 @@ import {CommonModule} from '@angular/common';
 import {
   MatButtonModule,
   MatCardModule,
-  MatCheckboxModule, MatDialogModule,
+  MatCheckboxModule,
+  MatDialogModule,
   MatIconModule,
   MatInputModule,
-  MatListModule, MatMenuModule, MatProgressSpinnerModule,
-  MatSidenavModule, MatTableModule,
+  MatListModule,
+  MatMenuModule,
+  MatProgressSpinnerModule,
+  MatSidenavModule,
+  MatTableModule,
   MatToolbarModule
 } from "@angular/material";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -20,6 +24,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {MainNavViewComponent} from './main-nav-view/main-nav-view.component';
 import {LoginViewComponent} from './login-view/login-view.component';
 import {FormsModule} from "@angular/forms";
+import {MarkdownViewerComponent} from './markdown-viewer/markdown-viewer.component';
 
 const modules = [
   BrowserModule,
@@ -45,7 +50,7 @@ const modules = [
   MatDialogModule,
   MatTableModule,
   MatMenuModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
 ];
 
 const components = [

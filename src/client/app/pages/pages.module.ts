@@ -1,5 +1,4 @@
 import {NgModule} from '@angular/core';
-import {HomeComponent} from './home/home.component';
 import {LoginComponent} from "./login/login.component";
 import {SignUpComponent} from "./sign-up/sign-up.component";
 import {SharedModule} from "../shared/shared.module";
@@ -14,7 +13,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    HomeComponent,
     LoginComponent,
     SignUpComponent,
     DashboardComponent
