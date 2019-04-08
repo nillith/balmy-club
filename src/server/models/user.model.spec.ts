@@ -15,7 +15,7 @@ const randomPassword = (function() {
 })();
 
 
-describe('pass', () => {
+describe('user', () => {
 
   it('should return false for invalid password', () => {
     assert.isFalse(passwordFormatIsValid('1'));
@@ -33,8 +33,8 @@ describe('pass', () => {
 
   it('should return false for invalid username', () => {
     assert.isFalse(usernameFormatIsValid('1'));
-    assert.isFalse(usernameFormatIsValid('short'));
-    assert.isFalse(usernameFormatIsValid('1blah'));
+    assert.isFalse(usernameFormatIsValid('shrt'));
+    assert.isFalse(usernameFormatIsValid('1blh'));
     assert.isFalse(usernameFormatIsValid('aoetu+anosteu'));
     assert.isFalse(usernameFormatIsValid('aoetu)(*&%]anosteu'));
     assert.isFalse(usernameFormatIsValid('a'.repeat(maxUsernameLength + 1)));

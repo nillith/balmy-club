@@ -21,7 +21,7 @@ export interface UserCreateInfo {
   username: string;
   password: string;
   email: string;
-  role?: string;
+  role?: number;
 }
 
 const JWT_PAYLOAD_FIELD_MAPS = makeFieldMaps([

@@ -2,10 +2,9 @@ import config from '../config';
 import jwt from 'jsonwebtoken';
 import {UserModel} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
-import {constants} from "../constants/index";
 import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status, $user} from "../constants/symbols";
-import {accessTokenCookieKey, accessTokenKey} from "../../shared/constants";
+import {accessTokenCookieKey, accessTokenKey, Roles, UserRanks} from "../../shared/constants";
 
 const getToken = (() => {
   const Bearer = 'Bearer ';
@@ -69,19 +68,14 @@ export class AuthService extends JwtHelper<UserModel> {
     return UserModel.findById(payload.id!);
   }
 
-  requireRole(role): RequestHandler {
+  requireRole(requiredRole: string): RequestHandler {
     const self = this;
-    const {userRoleRanks} = constants;
-    const requiredRoleRank = userRoleRanks[role];
-    if (!requiredRoleRank) {
-      throw new Error('Required role needs to be set');
-    }
+    const requiredRank = UserRanks[requiredRole];
     return asyncMiddleware(async function(req: Request, res: Response, next: NextFunction) {
       const user = await self.getRequestUser(req);
       if (user) {
         req[$user] = user;
-        const userRoleRank = userRoleRanks[req[$user].role];
-        if (userRoleRank >= requiredRoleRank) {
+        if (req[$user].role >= requiredRank) {
           return next();
         }
       }
@@ -92,7 +86,7 @@ export class AuthService extends JwtHelper<UserModel> {
 
 export const authService = new AuthService(config.secrets.auth!, '5h');
 
-export const requireAdmin = authService.requireRole('admin');
+export const requireAdmin = authService.requireRole(Roles.Admin);
 
 export const requireLogin = asyncMiddleware(async function(req: Request, res: Response, next: NextFunction) {
   try {
