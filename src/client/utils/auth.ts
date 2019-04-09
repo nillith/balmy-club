@@ -4,7 +4,7 @@ export function getAccessToken() {
   return localStorage.getItem(accessTokenKey);
 }
 
-export function setAssessToken(token: string) {
+export function setAccessToken(token: string) {
   return localStorage.setItem(accessTokenKey, token);
 }
 

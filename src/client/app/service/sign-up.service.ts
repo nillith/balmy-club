@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {setAssessToken} from "../../utils/auth";
+import {setAccessToken} from "../../utils/auth";
 
 const Url = 'api/sign-up';
 
@@ -22,7 +22,7 @@ export class SignUpService {
   }
 
   async signUp(token: string, username: string, password: string) {
-    setAssessToken(await this.postSignUp({
+    setAccessToken(await this.postSignUp({
       token, username, password
     }));
   }

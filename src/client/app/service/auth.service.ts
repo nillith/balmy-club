@@ -1,6 +1,6 @@
 import {HttpClient} from "@angular/common/http";
 import {SignUpTypes} from "../../../shared/constants";
-import {getAccessToken, removeAccessToken, setAssessToken} from "../../utils/auth";
+import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
 import {AccessTokenContent, AuthPayload} from "../../../shared/interf";
 import {Injectable} from "@angular/core";
 import {JwtHelperService} from "@auth0/angular-jwt";
@@ -28,8 +28,11 @@ export class AuthService {
       return;
     }
     const {jwtHelper} = self;
-    if (!jwtHelper.isTokenExpired(token)) {
+    if (jwtHelper.isTokenExpired(token)) {
+      removeAccessToken();
+    } else {
       self.tokenContent = jwtHelper.decodeToken(token);
+      setAccessToken(token);
     }
   }
 
@@ -63,7 +66,7 @@ export class AuthService {
   private async signUpWithPayload(payload: AuthPayload) {
     const self = this;
     const token = await self.postSignUpPayload(payload);
-    setAssessToken(token);
+    setAccessToken(token);
     self.setToken(token);
   }
 
