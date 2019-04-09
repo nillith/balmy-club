@@ -16,19 +16,9 @@ export interface NavEntry {
 export class MainNavViewComponent implements OnInit {
   @Input() entries: NavEntry[];
 
-  // loginDialog: MatDialogRef<LoginDialogComponent>;
-
   constructor(public authService: AuthService, public loginGuard: LoginGuardService) {
   }
 
   ngOnInit(): void {
-    // const self = this;
-    // if (!self.authService.isLoggedIn()) {
-    //   setTimeout(() => {
-    //     self.loginDialog = self.dialog.open(LoginDialogComponent, {
-    //       disableClose: true
-    //     });
-    //   });
-    // }
   }
 }
