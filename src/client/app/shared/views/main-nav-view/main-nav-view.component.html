@@ -29,6 +29,6 @@
         </button>
       </div>
     </mat-toolbar>
-    <ng-content *ngIf="authService.isLoggedIn()"></ng-content>
+    <ng-content *ngIf="loginGuard.isLoggedIn()"></ng-content>
   </mat-sidenav-content>
 </mat-sidenav-container>

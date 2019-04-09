@@ -161,11 +161,11 @@ export class LoginDialogComponent implements OnInit {
       switch (dialogType) {
         case DialogTypes.Login:
           await authService.login(dialogModel);
-          this.dialogRef.close();
+          this.closeDialog();
           break;
         case DialogTypes.SignUp:
           await authService.signUpWithEmail(dialogModel);
-          this.dialogRef.close();
+          this.closeDialog();
           break;
         case DialogTypes.PasswordRecoverRequest:
           break;

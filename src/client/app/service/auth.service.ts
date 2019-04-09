@@ -4,6 +4,8 @@ import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/aut
 import {AccessTokenContent, AuthPayload} from "../../../shared/interf";
 import {Injectable} from "@angular/core";
 import {JwtHelperService} from "@auth0/angular-jwt";
+import {MatDialog, MatDialogRef} from "@angular/material";
+import {LoginDialogComponent} from "../shared/dialogs/login-dialog/login-dialog.component";
 
 const ACCOUNT_URL = 'api/account';
 const LOGIN_URL = 'auth/local';
@@ -15,8 +17,9 @@ export class AuthService {
 
   private token: string;
   private tokenContent: AccessTokenContent;
+  loginDialog: MatDialogRef<LoginDialogComponent>;
 
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService, public dialog: MatDialog) {
     this.setToken(getAccessToken());
   }
 
@@ -35,6 +38,7 @@ export class AuthService {
       setAccessToken(token);
     }
   }
+
 
   async logout() {
     const self = this;
