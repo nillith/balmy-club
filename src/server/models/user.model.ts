@@ -2,7 +2,7 @@ import db from '../persistence';
 import passwordService from '../service/password.service';
 import {BaseModel, cloneByFieldMaps, makeFieldMaps} from "./base.model";
 import {$id, $obfuscator, $toJsonFields} from "../constants/symbols";
-import {maxUsernameLength, minPasswordLength, usernamePattern} from "../../shared/constants";
+import {maxUsernameLength, minPasswordLength, Roles, usernamePattern, UserRanks} from "../../shared/constants";
 import {InvalidResult, isValidObfuscatedString, userObfuscator} from "../service/obfuscator.service";
 import {JwtSignable} from "../service/auth.service";
 import {makeInstance} from "../utils/index";
@@ -64,11 +64,11 @@ export class UserModel extends BaseModel implements JwtSignable {
       email: body.email,
       username: body.username,
       password: body.password,
-      role: body.role || 'user'
+      role: body.role || UserRanks[Roles.User]
     }) as UserModel;
     console.assert(passwordFormatIsValid(user.password));
     console.assert(usernameFormatIsValid(user.username));
-    console.assert(isEmail(user.email!));
+    console.assert(!user.email || isEmail(user.email));
     await user.hashPassword();
     const [result] = await db.query(`INSERT INTO Users (username, email, role, salt, hash) VALUES(:username, :email, :role, :salt, :hash)`, user);
     user.id = (result as any).insertId;
@@ -79,6 +79,12 @@ export class UserModel extends BaseModel implements JwtSignable {
   static async emailUsed(email: string): Promise<boolean> {
     console.assert(isEmail(email));
     const [rows] = await db.query(`SELECT id FROM Users WHERE email = :email LIMIT 1`, {email});
+    return !!rows && !!(rows as any).length;
+  }
+
+  static async usernameUsed(username: string): Promise<boolean> {
+    console.assert(usernameFormatIsValid(username));
+    const [rows] = await db.query(`SELECT id FROM Users WHERE username = :username LIMIT 1`, {username});
     return !!rows && !!(rows as any).length;
   }
 
@@ -94,7 +100,7 @@ export class UserModel extends BaseModel implements JwtSignable {
     if (!usernameFormatIsValid(userName) || !passwordFormatIsValid(password)) {
       return;
     }
-    const [rows] = await db.query(`SELECT id, username, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
+    const [rows] = await db.query(`SELECT id, username, role, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
     if (rows && (rows as any).length) {
       const user = UserModel.from(rows[0]) as UserModel;
       if (await user!.verifyPassword(password)) {

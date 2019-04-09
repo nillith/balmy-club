@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {sideNav} from "./app-constants";
-import {NavEntry} from "./shared/main-nav-view/main-nav-view.component";
+import {appConstants} from "./app-constants";
+import {NavEntry} from "./shared/views/main-nav-view/main-nav-view.component";
 
 @Component({
   selector: 'app-root',
@@ -9,5 +9,5 @@ import {NavEntry} from "./shared/main-nav-view/main-nav-view.component";
 })
 
 export class AppComponent {
-  navEntries: NavEntry[] = sideNav;
+  navEntries: NavEntry[] = appConstants.sideNav;
 }

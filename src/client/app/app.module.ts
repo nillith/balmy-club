@@ -28,7 +28,7 @@ const appRoutes: Routes = [
     }),
     RouterModule.forRoot(
       appRoutes,
-      {enableTracing: !environment.production} // <-- debugging purposes only
+      {enableTracing: environment.production} // <-- debugging purposes only
     )
   ],
   providers: [

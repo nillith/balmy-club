@@ -54,6 +54,7 @@
       true,
       "ignore-params"
     ],
+    "one-variable-per-declaration": false,
     "no-non-null-assertion": false,
     "no-redundant-jsdoc": true,
     "no-switch-case-fall-through": false,

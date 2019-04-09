@@ -15,7 +15,7 @@ passport.use(new LocalStrategy({
         return done(null, user);
       } else {
         return done(null, false, {
-          message: 'UserModel name or password is not correct!'
+          message: 'Username or password is not correct!'
         });
       }
     })
@@ -35,8 +35,9 @@ router.post('/', (req, res, next) => {
       return res.status(404).json({message: 'Something went wrong, please try again.'});
     }
     res.json({
-      token: await authService.sign(user)
-    });
+      token: await authService.sign(user, req.body.rememberMe ? '2w' : undefined)
+    })
+    ;
   })(req, res, next);
 });
 

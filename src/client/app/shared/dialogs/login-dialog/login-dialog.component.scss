@@ -1,0 +1,74 @@
+form {
+  width: 400px;
+  height: 100%;
+  font-size: medium;
+}
+
+mat-radio-button:nth-child(1) {
+  margin-right: 20px;
+}
+
+.login-main-content {
+  height: 170px;
+}
+
+.sign-up-main-content {
+  height: 280px;
+}
+
+.mat-button, .mat-raised-button {
+  font-size: medium;
+  background-color: #dc4141;
+  color: white;
+
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 42px;
+  span {
+    display: inline-flex !important;
+    align-items: center !important;
+    mat-spinner {
+      margin: 10px 8px 10px 0;
+    }
+    mat-icon {
+      font-size: inherit;
+      margin-right: 8px;
+      padding-top: 8px;
+    }
+  }
+}
+
+.mat-button:disabled, .mat-raised-button:disabled {
+  background-color: #926868;
+  color: white;
+}
+
+.center-row {
+  display: flex;
+  justify-content: center;
+}
+
+.button-link {
+  background: none !important;
+  color: blue;
+  border: none;
+  padding: 0 !important;
+  font: normal normal 400 normal 16px / 24px Roboto, "Helvetica Neue", sans-serif;
+  font-style: italic;
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
+}
+
+.button-link:disabled {
+  color: lightblue;
+  cursor: default;
+  text-decoration: none;
+}
+
+.submit-error {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  min-height: 2.2em;
+}

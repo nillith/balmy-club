@@ -27,7 +27,6 @@ export class SignUpComponent implements OnInit {
   async signUp(username: string, password: string, confirm: string) {
     if (password === confirm) {
       const token = await this.signUpService.signUp(this.signUpToken, username, password);
-      console.log(token);
     }
   }
 }

@@ -11,7 +11,6 @@ export class LoginComponent {
   }
 
   async login(username: string, password: string) {
-    return this.authService.login(username, password);
+    return this.authService.login({username, password});
   }
-
 }

@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {testImports} from "../../test-imports";
+import {testImports} from "../../../test-imports";
 import {MainNavViewComponent} from './main-nav-view.component';
 
 describe('MainNavViewComponent', () => {

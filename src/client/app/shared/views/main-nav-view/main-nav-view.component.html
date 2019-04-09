@@ -5,7 +5,7 @@
                [opened]="false">
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
-      <a *ngFor="let entry of entries" mat-list-item class="app-align-icon app-icon-spacing"
+      <a *ngFor="let entry of entries" mat-list-item
          [routerLink]="entry.link">
         <mat-icon class="icon">{{entry.icon}}</mat-icon>
         <span class="label">{{entry.name}}</span>
@@ -23,12 +23,12 @@
       </button>
       <span class="app-fill-space"></span>
       <div>
-        <a [routerLink]="['/login']" class="app-align-icon app-icon-spacing">
-          <mat-icon class="icon">input</mat-icon>
-          <span class="label">Login</span>
-        </a>
+        <button mat-button mat-icon-button (click)="authService.logout()" class="app-align-icon app-icon-spacing" style="color: white;margin-right: 2em;">
+          <mat-icon class="icon" style="margin-right: 0.15em">input</mat-icon>
+          <span class="label">Logout</span>
+        </button>
       </div>
     </mat-toolbar>
-    <ng-content></ng-content>
+    <ng-content *ngIf="authService.isLoggedIn()"></ng-content>
   </mat-sidenav-content>
 </mat-sidenav-container>

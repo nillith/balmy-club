@@ -5,6 +5,7 @@ import {NextFunction, Request, RequestHandler, Response} from "express";
 import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status, $user} from "../constants/symbols";
 import {accessTokenCookieKey, accessTokenKey, Roles, UserRanks} from "../../shared/constants";
+import {AccessTokenContent} from "../../shared/interf";
 
 const getToken = (() => {
   const Bearer = 'Bearer ';
@@ -21,12 +22,12 @@ export interface JwtSignable {
   getJwtPayload(): object;
 }
 
-export class JwtHelper<TPayload extends JwtSignable> {
+export class JwtHelper<TPayload extends JwtSignable, TResult = TPayload> {
   constructor(private secret: string, private defaultExpire: string | number) {
 
   }
 
-  async sign(payload: TPayload, expire?: number): Promise<string> {
+  async sign(payload: TPayload, expire?: string | number): Promise<string> {
     return new Promise((resolve, reject) => {
       return jwt.sign(payload.getJwtPayload(), this.secret, {
         expiresIn: expire || this.defaultExpire
@@ -40,20 +41,20 @@ export class JwtHelper<TPayload extends JwtSignable> {
     });
   }
 
-  async verify(token: string): Promise<TPayload> {
+  async verify(token: string): Promise<TResult> {
     return new Promise((resolve, reject) => {
       jwt.verify(token, this.secret, (err, payload) => {
         if (err) {
           reject(err);
         } else {
-          resolve(payload as any as TPayload);
+          resolve(payload as any as TResult);
         }
       });
     });
   }
 }
 
-export class AuthService extends JwtHelper<UserModel> {
+export class AuthService extends JwtHelper<UserModel, AccessTokenContent> {
 
   async setTokenCookie(user: UserModel, res: Response) {
     res.cookie(accessTokenCookieKey, await this.sign(user));
