@@ -36,3 +36,42 @@ body {
   width: 100px;
   height: 100px;
 }
+
+@mixin avatar($dim) {
+  background: white;
+  outline : none;
+  width: $dim;
+  height: $dim;
+  border-radius: 50%;
+  border: none;
+  padding: 0 !important;
+  overflow: hidden;
+  margin: 10px;
+  cursor: pointer;
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  &:disabled {
+    cursor: default;
+  }
+}
+.app-avatar-tiny {
+  @include avatar(24px);
+}
+
+.app-avatar-small {
+  @include avatar(32px);
+}
+
+.app-avatar-median {
+  @include avatar(48px);
+}
+
+.app-avatar-large {
+  @include avatar(72px);
+}
+
+.app-avatar-larger {
+  @include avatar(108px);
+}

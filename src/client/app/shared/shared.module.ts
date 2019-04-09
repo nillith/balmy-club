@@ -54,6 +54,7 @@ import {CdkTreeModule} from "@angular/cdk/tree";
 import {DragDropModule} from "@angular/cdk/drag-drop";
 import {PortalModule} from "@angular/cdk/portal";
 import {ScrollingModule} from "@angular/cdk/scrolling";
+import { MarkdownViewerComponent } from './views/markdown-viewer/markdown-viewer.component';
 
 const modules = [
   BrowserModule,
@@ -114,11 +115,12 @@ const modules = [
 const components = [
   MainNavViewComponent,
   LoginViewComponent,
-  LoginDialogComponent
+  LoginDialogComponent,
+  MarkdownViewerComponent,
 ];
 
 @NgModule({
-  declarations: [...components,],
+  declarations: [...components, ],
   imports: [...modules],
   exports: [...modules, ...components],
   entryComponents: [

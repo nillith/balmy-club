@@ -58,12 +58,11 @@ mat-radio-button:nth-child(1) {
   cursor: pointer;
   text-decoration: underline;
   float: right;
-}
-
-.button-link:disabled {
-  color: lightblue;
-  cursor: default;
-  text-decoration: none;
+  &:disabled {
+    color: lightblue;
+    cursor: default;
+    text-decoration: none;
+  }
 }
 
 .submit-error {
