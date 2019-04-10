@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {LoginDialogComponent} from "../shared/dialogs/login-dialog/login-dialog.component";
-import {AuthService} from "./auth.service";
+import {IService} from "./api/i.service";
 
 @Injectable({
   providedIn: 'root'
@@ -9,16 +9,19 @@ import {AuthService} from "./auth.service";
 export class LoginGuardService {
 
   loginDialog: MatDialogRef<LoginDialogComponent>;
-  private pending = false;
+  private guarding = false;
 
-  constructor(public dialog: MatDialog, private authService: AuthService) {
+  constructor(public dialog: MatDialog, private iService: IService) {
   }
 
   isLoggedIn() {
     const self = this;
-    const loggedIn = self.authService.isLoggedIn();
-    if (!loggedIn && !self.pending && !self.loginDialog) {
-      self.pending = true;
+    if (self.guarding) {
+      return false;
+    }
+    const loggedIn = self.iService.isLoggedIn();
+    if (!loggedIn) {
+      self.guarding = true;
       setTimeout(() => {
         self.loginDialog = self.dialog.open(LoginDialogComponent, {
           disableClose: true
@@ -27,9 +30,9 @@ export class LoginGuardService {
         self.loginDialog.afterClosed().subscribe(() => {
           setTimeout(() => {
             self.loginDialog = null;
+            self.guarding = false;
           }, 300);
         });
-        self.pending = false;
       });
     }
     return loggedIn;

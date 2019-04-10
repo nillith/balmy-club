@@ -1,13 +1,11 @@
 import {TestBed} from '@angular/core/testing';
 
 import {LoginGuardService} from './login-guard.service';
-import {testImports} from "../test-imports";
-import {LoginDialogComponent} from "../shared/dialogs/login-dialog/login-dialog.component";
+import {SharedTestingModule} from "../shared/shared-testing.module.spec";
 
 describe('LoginGuardService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    declarations: [LoginDialogComponent],
-    imports: [...testImports]
+    imports: [SharedTestingModule]
   }));
 
   it('should be created', () => {

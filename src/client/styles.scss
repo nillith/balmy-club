@@ -75,3 +75,8 @@ body {
 .app-avatar-larger {
   @include avatar(108px);
 }
+
+
+.mat-dialog-container {
+ padding: 0;
+}

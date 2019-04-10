@@ -1,4 +1,8 @@
-import {FlexLayoutModule} from "@angular/flex-layout";
+import {RouterTestingModule} from "@angular/router/testing";
+import {BrowserAnimationsModule, NoopAnimationsModule} from "@angular/platform-browser/animations";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {FormsModule} from "@angular/forms";
+import {LayoutModule} from "@angular/cdk/layout";
 import {
   MatAutocompleteModule,
   MatBadgeModule,
@@ -9,7 +13,8 @@ import {
   MatCheckboxModule,
   MatChipsModule,
   MatDatepickerModule,
-  MatDialogModule, MatDialogRef,
+  MatDialogModule,
+  MatDialogRef,
   MatDividerModule,
   MatExpansionModule,
   MatGridListModule,
@@ -36,12 +41,7 @@ import {
   MatTooltipModule,
   MatTreeModule
 } from "@angular/material";
-import {RouterTestingModule} from "@angular/router/testing";
-import {LayoutModule} from "@angular/cdk/layout";
-import {NoopAnimationsModule} from "@angular/platform-browser/animations";
-import {HttpClientTestingModule} from "@angular/common/http/testing";
-import {FormsModule} from "@angular/forms";
-import {SharedModule} from "./shared/shared.module";
+import {FlexLayoutModule} from "@angular/flex-layout";
 import {A11yModule} from "@angular/cdk/a11y";
 import {CdkStepperModule} from "@angular/cdk/stepper";
 import {CdkTableModule} from "@angular/cdk/table";
@@ -49,12 +49,18 @@ import {CdkTreeModule} from "@angular/cdk/tree";
 import {DragDropModule} from "@angular/cdk/drag-drop";
 import {PortalModule} from "@angular/cdk/portal";
 import {ScrollingModule} from "@angular/cdk/scrolling";
-import {JwtModule} from "@auth0/angular-jwt";
-import {getAccessToken} from "../utils/auth";
-import {environment} from "../environments/environment";
 import {NgModule} from "@angular/core";
-
-
+import {BrowserModule} from "@angular/platform-browser";
+import {CommonModule} from "@angular/common";
+import {RouterModule} from "@angular/router";
+import {HttpClientModule} from "@angular/common/http";
+import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
+import {BrowserTestingModule} from "@angular/platform-browser/testing";
+import {LoginDialogComponent} from "./dialogs/login-dialog/login-dialog.component";
+import {AvatarSettingDialogComponent} from "./dialogs/avatar-setting-dialog/avatar-setting-dialog.component";
+import {MarkdownViewerComponent} from "./views/markdown-viewer/markdown-viewer.component";
+import {LoginViewComponent} from "./views/login-view/login-view.component";
+import {MainNavViewComponent} from "./views/main-nav-view/main-nav-view.component";
 
 @NgModule({
   imports: [
@@ -65,13 +71,25 @@ import {NgModule} from "@angular/core";
     {provide: MatDialogRef, useValue: {}},
   ],
 })
-export class MyMatDialogRefProvideModule {
+export class MyTestingHelperModule {
 }
 
-export const testImports = [
-  RouterTestingModule,
+const appSpecificImports = [
+  BrowserModule,
+  BrowserAnimationsModule,
+  RouterModule,
+  HttpClientModule,
+];
+
+const testingSpecificImports = [
   NoopAnimationsModule,
+  RouterTestingModule,
   HttpClientTestingModule,
+  MyTestingHelperModule,
+];
+
+const commonImports = [
+  CommonModule,
   FormsModule,
   LayoutModule,
   MatButtonModule,
@@ -79,12 +97,12 @@ export const testImports = [
   MatListModule,
   MatSidenavModule,
   MatToolbarModule,
-  RouterTestingModule,
   MatButtonModule,
   MatCheckboxModule,
   FlexLayoutModule,
   MatCardModule,
   MatInputModule,
+  MatSidenavModule,
   MatDialogModule,
   MatTableModule,
   MatMenuModule,
@@ -119,14 +137,22 @@ export const testImports = [
   MatTreeModule,
   PortalModule,
   ScrollingModule,
-  MyMatDialogRefProvideModule,
-  JwtModule.forRoot({
-    config: {
-      tokenGetter: getAccessToken,
-      whitelistedDomains: environment.jwtModule.whitelistedDomains,
-      blacklistedRoutes: environment.jwtModule.blacklistedRoutes
-    }
-  }),
 ];
 
-export const pageTestImports = [...testImports, SharedModule];
+
+export const sharedImports = [...appSpecificImports, ...commonImports];
+
+export const sharedTestingImports = [...testingSpecificImports, ...commonImports];
+
+export const sharedComponents = [
+  MainNavViewComponent,
+  LoginViewComponent,
+  LoginDialogComponent,
+  MarkdownViewerComponent,
+  AvatarSettingDialogComponent,
+];
+
+export const sharedEntryComponents = [
+  LoginDialogComponent,
+  AvatarSettingDialogComponent
+];

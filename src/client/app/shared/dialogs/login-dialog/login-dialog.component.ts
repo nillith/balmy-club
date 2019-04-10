@@ -2,9 +2,10 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatDialogRef} from "@angular/material";
 import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
-import {appConstants} from "../../../app-constants";
-import {AuthService} from "../../../service/auth.service";
+import {appConstants} from "../../../app.constants";
 import {AuthPayload} from "../../../../../shared/interf";
+import {AccountService} from "../../../service/api/account.service";
+import {IService} from "../../../service/api/i.service";
 
 enum DialogTypes {
   Login,
@@ -37,6 +38,18 @@ const PasswordToggleTexts = {
   [DialogTypes.PasswordRecover]: 'Login?',
 };
 
+interface UiConfig {
+  username?: boolean;
+  password?: boolean;
+  mainExtra?: boolean;
+  rememberMe?: boolean;
+  passwordToggle?: boolean;
+  signUpToggle?: boolean;
+  email?: boolean;
+  emailRequired?: boolean;
+  passwordConfirm?: boolean;
+}
+
 const UiConfigs = {
   [DialogTypes.Login]: {
     username: true,
@@ -45,20 +58,20 @@ const UiConfigs = {
     rememberMe: true,
     passwordToggle: true,
     signUpToggle: true
-  },
+  } as UiConfig,
   [DialogTypes.SignUp]: {
     username: true,
     email: true,
     password: true,
     passwordConfirm: true,
     signUpToggle: true
-  },
+  } as UiConfig,
   [DialogTypes.PasswordRecoverRequest]: {
     email: true,
     emailRequired: true,
     mainExtra: true,
     passwordToggle: true,
-  }
+  } as UiConfig,
 };
 
 
@@ -87,7 +100,11 @@ export class LoginDialogComponent implements OnInit {
   error = '';
   redirect: string | null = null;
 
-  constructor(public dialogRef: MatDialogRef<LoginDialogComponent>, private activeRoute: ActivatedRoute, private authService: AuthService, private router: Router) {
+  constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
+              private activeRoute: ActivatedRoute,
+              private router: Router,
+              private accountService: AccountService,
+              private iService: IService) {
   }
 
   ngOnInit() {
@@ -156,15 +173,15 @@ export class LoginDialogComponent implements OnInit {
     const self = this;
     try {
       self.error = '';
-      const {dialogType, dialogModel, authService} = self;
+      const {dialogType, dialogModel, accountService, iService} = self;
       self.loading = true;
       switch (dialogType) {
         case DialogTypes.Login:
-          await authService.login(dialogModel);
+          await iService.login(dialogModel);
           this.closeDialog();
           break;
         case DialogTypes.SignUp:
-          await authService.signUpWithEmail(dialogModel);
+          await accountService.signUpWithEmail(dialogModel);
           this.closeDialog();
           break;
         case DialogTypes.PasswordRecoverRequest:

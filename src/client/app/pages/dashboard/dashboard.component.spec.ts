@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {DashboardComponent} from './dashboard.component';
-import {pageTestImports} from "../../test-imports";
+import {SharedTestingModule} from "../../shared/shared-testing.module.spec";
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -10,7 +10,7 @@ describe('DashboardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [DashboardComponent],
-      imports: [...pageTestImports],
+      imports: [SharedTestingModule],
     })
       .compileComponents();
   }));

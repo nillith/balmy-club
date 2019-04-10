@@ -1,6 +1,9 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MarkdownViewerComponent } from './markdown-viewer.component';
+import {MarkdownViewerComponent} from './markdown-viewer.component';
+import {TestingImportsModule} from "../../testing-imports.module.spec";
+import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
+import {LoginDialogComponent} from "../../dialogs/login-dialog/login-dialog.component";
 
 describe('MarkdownViewerComponent', () => {
   let component: MarkdownViewerComponent;
@@ -8,9 +11,13 @@ describe('MarkdownViewerComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MarkdownViewerComponent ]
-    })
-    .compileComponents();
+      declarations: [MarkdownViewerComponent, LoginDialogComponent],
+      imports: [TestingImportsModule],
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LoginDialogComponent],
+      }
+    }).compileComponents();
   }));
 
   beforeEach(() => {

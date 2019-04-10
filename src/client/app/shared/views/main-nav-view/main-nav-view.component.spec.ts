@@ -1,7 +1,8 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-
-import {testImports} from "../../../test-imports";
 import {MainNavViewComponent} from './main-nav-view.component';
+import {TestingImportsModule} from "../../testing-imports.module.spec";
+import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
+import {LoginDialogComponent} from "../../dialogs/login-dialog/login-dialog.component";
 
 describe('MainNavViewComponent', () => {
   let component: MainNavViewComponent;
@@ -9,10 +10,13 @@ describe('MainNavViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MainNavViewComponent],
-      imports: [...testImports],
-    })
-      .compileComponents();
+      declarations: [MainNavViewComponent, LoginDialogComponent],
+      imports: [TestingImportsModule],
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [LoginDialogComponent],
+      }
+    }).compileComponents();
   }));
 
   beforeEach(() => {

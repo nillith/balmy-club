@@ -1,15 +1,13 @@
 import {async, TestBed} from '@angular/core/testing';
 import {AppComponent} from './app.component';
-import {testImports} from "./test-imports";
-import {MainNavViewComponent} from "./shared/views/main-nav-view/main-nav-view.component";
+import {SharedTestingModule} from "./shared/shared-testing.module.spec";
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [...testImports],
+      imports: [SharedTestingModule],
       declarations: [
         AppComponent,
-        MainNavViewComponent
       ],
     }).compileComponents();
   }));

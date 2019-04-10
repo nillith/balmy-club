@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {LoginComponent} from './login.component';
-import {pageTestImports, testImports} from "../../test-imports";
+import {SharedTestingModule} from "../../shared/shared-testing.module.spec";
 
 
 describe('LoginComponent', () => {
@@ -11,7 +11,7 @@ describe('LoginComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      imports: [...pageTestImports]
+      imports: [SharedTestingModule]
     })
       .compileComponents();
   }));

@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {LoginDialogComponent} from './login-dialog.component';
-import {testImports} from "../../../test-imports";
+import {TestingImportsModule} from "../../testing-imports.module.spec";
 
 describe('LoginDialogComponent', () => {
   let component: LoginDialogComponent;
@@ -10,7 +10,7 @@ describe('LoginDialogComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LoginDialogComponent],
-      imports: [...testImports]
+      imports: [TestingImportsModule]
     })
       .compileComponents();
   }));

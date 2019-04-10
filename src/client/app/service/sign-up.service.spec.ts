@@ -1,11 +1,10 @@
 import {TestBed} from '@angular/core/testing';
-
 import {SignUpService} from './sign-up.service';
-import {testImports} from "../test-imports";
+import {SharedTestingModule} from "../shared/shared-testing.module.spec";
 
 describe('SignUpService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    imports: [...testImports]
+    imports: [SharedTestingModule]
   }));
 
   it('should be created', () => {

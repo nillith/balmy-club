@@ -13,7 +13,7 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar class="page-header" color="primary">
       <button
         type="button"
         aria-label="Toggle sidenav"
@@ -22,10 +22,9 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span class="app-fill-space"></span>
-      <div>
-
-        <button (click)="authService.logout()" class="app-avatar-small">
-          <img src="../../../../assets/avatar.png" style="max-width:100%;max-height:100%">
+      <div class="comp-avatar-area">
+        <button *ngIf="loginGuard.isLoggedIn()" #button (click)="settingService.showAvatarSettingDialog(button)" class="app-avatar-small">
+          <img src="../../../../assets/avatar.png">
         </button>
       </div>
     </mat-toolbar>

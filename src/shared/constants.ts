@@ -16,9 +16,3 @@ export const UserRanks = {
   [Roles.User]: 1,
   [Roles.Admin]: 2,
 };
-
-export const SignUpTypes = {
-  Request: 1,
-  WithToken: 2,
-  Direct: 3
-};

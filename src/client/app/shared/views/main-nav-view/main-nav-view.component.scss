@@ -2,5 +2,12 @@
   height: 100%;
 }
 
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-
+.comp-avatar-area {
+  margin-right: 40px;
+}

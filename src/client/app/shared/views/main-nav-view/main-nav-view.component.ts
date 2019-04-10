@@ -1,6 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {AuthService} from "../../../service/auth.service";
 import {LoginGuardService} from "../../../service/login-guard.service";
+import {MatDialog} from "@angular/material";
+import {SettingService} from "../../../service/setting.service";
+import {IService} from "../../../service/api/i.service";
 
 export interface NavEntry {
   readonly name: string;
@@ -16,9 +18,13 @@ export interface NavEntry {
 export class MainNavViewComponent implements OnInit {
   @Input() entries: NavEntry[];
 
-  constructor(public authService: AuthService, public loginGuard: LoginGuardService) {
+  constructor(public dialog: MatDialog,
+              public loginGuard: LoginGuardService,
+              public settingService: SettingService,
+              public iService: IService) {
   }
 
   ngOnInit(): void {
   }
+
 }
