@@ -1,6 +1,7 @@
 import {Component, ElementRef, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {IService} from "../../../service/api/i.service";
+import {IService} from "../../../services/api/i.service";
+import {makeBackdropTransparent} from "../../../../utils/index";
 
 @Component({
   selector: 'app-avatar-setting-dialog',
@@ -16,7 +17,6 @@ export class AvatarSettingDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) data: { anchor: HTMLElement },
               public i: IService) {
     this.anchor = data.anchor;
-
   }
 
   ngOnInit() {
@@ -33,13 +33,7 @@ export class AvatarSettingDialogComponent implements OnInit {
       bottom: `${top + height}px`,
     });
 
-    nativeElement
-      .parentElement
-      .parentElement
-      .parentElement
-      .previousSibling
-      .style
-      .background = 'transparent';
+    makeBackdropTransparent(nativeElement);
   }
 
   logout() {

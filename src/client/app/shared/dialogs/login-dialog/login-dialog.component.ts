@@ -4,8 +4,8 @@ import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
 import {AuthPayload} from "../../../../../shared/interf";
-import {AccountService} from "../../../service/api/account.service";
-import {IService} from "../../../service/api/i.service";
+import {AccountService} from "../../../services/api/account.service";
+import {IService} from "../../../services/api/i.service";
 
 enum DialogTypes {
   Login,

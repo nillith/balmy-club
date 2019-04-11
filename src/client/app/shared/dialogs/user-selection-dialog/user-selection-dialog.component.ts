@@ -1,0 +1,113 @@
+import {Component, ElementRef, Inject, OnInit} from '@angular/core';
+import {UserNickname} from "../../../../../shared/interf";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {IService} from "../../../services/api/i.service";
+import {makeBackdropTransparent} from "../../../../utils/index";
+
+export interface UserSelectionListener {
+  onUserSelected(user: UserNickname): void;
+}
+
+const gap = 4;
+
+@Component({
+  selector: 'app-user-selection-dialog',
+  templateUrl: './user-selection-dialog.component.html',
+  styleUrls: ['./user-selection-dialog.component.scss']
+})
+export class UserSelectionDialogComponent implements OnInit {
+
+  allUsers: UserNickname[] = [
+    {
+      id: 'b1f7fe3e36e5802ea357744104734340',
+      nickname: 'Mike',
+    },
+    {
+      id: 'ec25aafdb1ca400b4f4b75cc33519b34',
+      nickname: 'Jim',
+    },
+    {
+      id: 'ff7dccafda927571b09a7e21bc4041ea',
+      nickname: 'Mary',
+    },
+    {
+      id: 'b1f7fe3e36e5802ea357744104734340',
+      nickname: 'Tom',
+    },
+    {
+      id: 'ec25aafdb1ca400b4f4b75cc33519b34',
+      nickname: 'Jay',
+    },
+    {
+      id: 'ff7dccafda927571b09a7e21bc4041ea',
+      nickname: 'Malina',
+    }
+  ];
+  filteredUsers?: UserNickname[];
+  private anchor: HTMLElement;
+  selectionListener?: UserSelectionListener;
+  selected = false;
+
+  constructor(public hostElement: ElementRef,
+              public dialogRef: MatDialogRef<UserSelectionDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) data: { anchor: HTMLElement },
+              public i: IService) {
+    this.anchor = data.anchor;
+    this.filteredUsers = this.allUsers;
+  }
+
+
+  ngOnInit() {
+    const {nativeElement} = this.hostElement;
+    const {width, height} = nativeElement.getBoundingClientRect();
+    const {anchor, dialogRef} = this;
+    const rect = anchor.getBoundingClientRect();
+
+    let right = Math.floor(rect.right) + width + gap;
+    let bottom = Math.floor(rect.bottom) + height;
+    const {innerWidth, innerHeight} = window;
+
+    if (right > innerWidth) {
+      right = innerWidth - gap;
+    }
+
+    if (bottom > innerHeight) {
+      bottom = innerHeight - gap;
+    }
+
+    dialogRef.updatePosition({
+      right: `${right}px`,
+      top: `${bottom - height}px`,
+      left: `${right - width}px`,
+      bottom: `${bottom}px`,
+    });
+
+    makeBackdropTransparent(nativeElement);
+  }
+
+  onInputChange(value) {
+    const self = this;
+    if (!value) {
+      self.filteredUsers = self.allUsers;
+      return;
+    }
+    const reg = new RegExp(value, 'i');
+    self.filteredUsers = self.allUsers.filter((u) => {
+      return reg.test(u.nickname);
+    });
+  }
+
+  onListButtonClick(user) {
+    const self = this;
+    if (self.selected) {
+      return;
+    }
+    self.selected = true;
+    self.dialogRef.close();
+    if (self.selectionListener) {
+      setTimeout(() => {
+        self.selectionListener.onUserSelected(user);
+      });
+    }
+  }
+}

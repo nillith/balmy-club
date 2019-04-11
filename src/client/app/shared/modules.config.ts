@@ -20,9 +20,9 @@ import {
   MatGridListModule,
   MatIconModule,
   MatInputModule,
-  MatListModule,
+  MatListModule, MatListOption,
   MatMenuModule,
-  MatNativeDateModule,
+  MatNativeDateModule, MatOptionModule,
   MatPaginatorModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
@@ -54,13 +54,14 @@ import {BrowserModule} from "@angular/platform-browser";
 import {CommonModule} from "@angular/common";
 import {RouterModule} from "@angular/router";
 import {HttpClientModule} from "@angular/common/http";
-import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
-import {BrowserTestingModule} from "@angular/platform-browser/testing";
 import {LoginDialogComponent} from "./dialogs/login-dialog/login-dialog.component";
 import {AvatarSettingDialogComponent} from "./dialogs/avatar-setting-dialog/avatar-setting-dialog.component";
 import {MarkdownViewerComponent} from "./views/markdown-viewer/markdown-viewer.component";
 import {LoginViewComponent} from "./views/login-view/login-view.component";
 import {MainNavViewComponent} from "./views/main-nav-view/main-nav-view.component";
+import {MarkdownEditorComponent} from "./views/markdown-editor/markdown-editor.component";
+import {UserSelectionDialogComponent} from "./dialogs/user-selection-dialog/user-selection-dialog.component";
+import {UserInfoDialogComponent} from "./dialogs/user-info-dialog/user-info-dialog.component";
 
 @NgModule({
   imports: [
@@ -137,6 +138,7 @@ const commonImports = [
   MatTreeModule,
   PortalModule,
   ScrollingModule,
+  MatOptionModule,
 ];
 
 
@@ -144,15 +146,19 @@ export const sharedImports = [...appSpecificImports, ...commonImports];
 
 export const sharedTestingImports = [...testingSpecificImports, ...commonImports];
 
-export const sharedComponents = [
-  MainNavViewComponent,
-  LoginViewComponent,
-  LoginDialogComponent,
-  MarkdownViewerComponent,
-  AvatarSettingDialogComponent,
-];
-
 export const sharedEntryComponents = [
   LoginDialogComponent,
-  AvatarSettingDialogComponent
+  AvatarSettingDialogComponent,
+  UserSelectionDialogComponent,
+  UserInfoDialogComponent,
 ];
+
+export const sharedComponents = [
+  ...sharedEntryComponents,
+  MainNavViewComponent,
+  LoginViewComponent,
+  MarkdownViewerComponent,
+  MarkdownEditorComponent,
+];
+
+

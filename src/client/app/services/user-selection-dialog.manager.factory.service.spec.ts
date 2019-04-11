@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MarkdownService } from './markdown.service';
+import { UserSelectionDialogManagerFactoryService } from './user-selection-dialog.manager.factory.service';
 import {SharedTestingModule} from "../shared/shared-testing.module.spec";
 
-describe('MarkdownService', () => {
+describe('UserSelectionDialogManagerFactoryService', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [SharedTestingModule]
   }));
 
   it('should be created', () => {
-    const service: MarkdownService = TestBed.get(MarkdownService);
+    const service: UserSelectionDialogManagerFactoryService = TestBed.get(UserSelectionDialogManagerFactoryService);
     expect(service).toBeTruthy();
   });
 });

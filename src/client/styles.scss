@@ -2,6 +2,8 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@angular/material/theming';
 
+$config: mat-typography-config();
+
 @include mat-core();
 
 $primary: mat-palette($mat-red, 200);
@@ -37,11 +39,48 @@ body {
   height: 100px;
 }
 
+.app-content-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: mat-font-family($config);
+  outline: none;
+  cursor: pointer;
+  &:disabled {
+    color: gray;
+    cursor: default;
+  }
+  &:hover{
+    background: aliceblue;
+  }
+}
+
+.app-button-link {
+  background: none !important;
+  color: lightcoral;
+  border: none;
+  padding: 0 !important;
+  // font-size: mat-font-size($config, body-1);
+  font-size: inherit;
+  font-family: mat-font-family($config);
+  font-style: italic;
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
+  &:disabled {
+    color: lightblue;
+    cursor: default;
+    text-decoration: none;
+  }
+}
+
 @mixin avatar($dim) {
   background: white;
-  outline : none;
+  outline: none;
   width: $dim;
   height: $dim;
+  max-width: 100%;
+  max-height: 100%;
   border-radius: 50%;
   border: none;
   padding: 0 !important;
@@ -56,6 +95,7 @@ body {
     cursor: default;
   }
 }
+
 .app-avatar-tiny {
   @include avatar(24px);
 }
@@ -76,7 +116,18 @@ body {
   @include avatar(108px);
 }
 
-
 .mat-dialog-container {
- padding: 0;
+  padding: 4px!important;
+}
+
+.tui-editor-contents {
+  font-size: mat-font-size($config, body-1);
+  font-family: mat-font-family($config);
+
+  .app-mention-user {
+    text-decoration: none;
+    margin-left: 0.1em;
+    margin-right: 0.1em;
+    font-weight: bold;
+  }
 }

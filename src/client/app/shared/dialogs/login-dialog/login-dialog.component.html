@@ -8,12 +8,12 @@
     fxLayout="column">
     <mat-form-field *ngIf="uiConfig.username">
       <input matInput placeholder="Username"
-             type="text" pattern="{{appConstants.usernamePattern}}"
+             type="text" pattern="^{{appConstants.usernamePattern}}$"
              name="username" required #username="ngModel"
              [(ngModel)]="dialogModel.username">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.email">
-      <input type="text" pattern="{{appConstants.emailAddressPattern}}" matInput placeholder="Email" id="email"
+      <input type="text" pattern="^{{appConstants.emailAddressPattern}}$" matInput placeholder="Email" id="email"
              name="email"
              [required]="uiConfig.emailRequired"
              #email="ngModel" [(ngModel)]="dialogModel.email">
@@ -38,7 +38,7 @@
       <mat-checkbox *ngIf="uiConfig.rememberMe" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
         Remember Me
       </mat-checkbox>
-      <button *ngIf="uiConfig.passwordToggle" class="button-link"
+      <button *ngIf="uiConfig.passwordToggle" class="app-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.PasswordRecoverRequest : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{passwordToggleText}}
@@ -47,7 +47,7 @@
   </mat-dialog-content>
   <mat-dialog-actions>
 
-    <div class="submit-error">
+    <div class="comp-submit-error">
       <mat-error>
         {{error}}
       </mat-error>
@@ -65,7 +65,7 @@
     </div>
     <div style="width:100%;padding-bottom: 20px;"
          *ngIf="uiConfig.signUpToggle">
-      <button class="button-link"
+      <button class="app-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.SignUp : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{signUpToggleText}}

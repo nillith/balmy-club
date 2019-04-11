@@ -10,7 +10,7 @@ import {isNumber, isString} from "util";
 import isEmail from "validator/lib/isEmail";
 
 export const usernameFormatIsValid = function(username: string | undefined): boolean {
-  return !!username && RegExp(usernamePattern).test(username) && Buffer.byteLength(username) <= maxUsernameLength;
+  return !!username && RegExp(`^${usernamePattern}$`).test(username) && Buffer.byteLength(username) <= maxUsernameLength;
 };
 
 export const passwordFormatIsValid = function(password: string | undefined): boolean {

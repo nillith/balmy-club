@@ -1,6 +1,7 @@
 form {
   width: 400px;
   height: 100%;
+  padding: 20px;
   font-size: medium;
 }
 
@@ -48,24 +49,7 @@ mat-radio-button:nth-child(1) {
   justify-content: center;
 }
 
-.button-link {
-  background: none !important;
-  color: blue;
-  border: none;
-  padding: 0 !important;
-  font: normal normal 400 normal 16px / 24px Roboto, "Helvetica Neue", sans-serif;
-  font-style: italic;
-  cursor: pointer;
-  text-decoration: underline;
-  float: right;
-  &:disabled {
-    color: lightblue;
-    cursor: default;
-    text-decoration: none;
-  }
-}
-
-.submit-error {
+.comp-submit-error {
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;

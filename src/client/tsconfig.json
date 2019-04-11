@@ -7,8 +7,10 @@
     "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "target": "es5",
     "typeRoots": [

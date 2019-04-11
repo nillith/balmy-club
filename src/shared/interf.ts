@@ -12,10 +12,16 @@ export interface AuthPayload {
 }
 
 export interface AccessTokenContent {
-  id: string,
-  username: string,
-  role: string,
-  iat: number,
-  exp: number
+  id: string;
+  username: string;
+  role: string;
+  iat: number;
+  exp: number;
 }
+
+export interface UserNickname {
+  id: string;
+  nickname: string;
+}
+
 

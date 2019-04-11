@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {LoginGuardService} from "../../../service/login-guard.service";
+import {LoginGuardService} from "../../../services/login-guard.service";
 import {MatDialog} from "@angular/material";
-import {SettingService} from "../../../service/setting.service";
-import {IService} from "../../../service/api/i.service";
+import {SettingService} from "../../../services/setting.service";
+import {IService} from "../../../services/api/i.service";
 
 export interface NavEntry {
   readonly name: string;

@@ -1,16 +1,16 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AvatarSettingDialogComponent } from './avatar-setting-dialog.component';
+import {UserSelectionDialogComponent} from './user-selection-dialog.component';
 import {TestingImportsModule} from "../../testing-imports.module.spec";
 import {MAT_DIALOG_DATA} from "@angular/material";
 
-describe('AvatarSettingDialogComponent', () => {
-  let component: AvatarSettingDialogComponent;
-  let fixture: ComponentFixture<AvatarSettingDialogComponent>;
+describe('UserSelectionDialogComponent', () => {
+  let component: UserSelectionDialogComponent;
+  let fixture: ComponentFixture<UserSelectionDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AvatarSettingDialogComponent ],
+      declarations: [UserSelectionDialogComponent],
       imports: [TestingImportsModule],
       providers: [
         {
@@ -21,11 +21,11 @@ describe('AvatarSettingDialogComponent', () => {
         }
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AvatarSettingDialogComponent);
+    fixture = TestBed.createComponent(UserSelectionDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

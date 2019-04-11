@@ -27,10 +27,17 @@
               "src/client/assets"
             ],
             "styles": [
+              "node_modules/codemirror/lib/codemirror.css",
+              "node_modules/tui-editor/dist/tui-editor.css",
+              "node_modules/tui-editor/dist/tui-editor-contents.css",
+              "node_modules/highlight.js/styles/github.css",
               "src/client/styles.scss"
             ],
             "scripts": [
-              "node_modules/markdown-it/index.js"
+              "node_modules/codemirror/lib/codemirror.js",
+              "node_modules/markdown-it/index.js",
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/tui-editor/dist/tui-editor-Editor-all.min.js"
             ],
             "es5BrowserSupport": true
           },
