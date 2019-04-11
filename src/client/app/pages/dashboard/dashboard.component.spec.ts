@@ -1,7 +1,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {DashboardComponent} from './dashboard.component';
-import {SharedTestingModule} from "../../shared/shared-testing.module.spec";
+import {SharedTestingModule} from "../../../modules/imports/shared-testing.module.spec";
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;

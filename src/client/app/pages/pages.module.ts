@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {LoginComponent} from "./login/login.component";
 import {SignUpComponent} from "./sign-up/sign-up.component";
-import {SharedModule} from "../shared/shared.module";
+import {ImportsModule} from "../../modules/imports/imports.module";
 import {RouterModule, Routes} from "@angular/router";
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {HomeComponent} from "./home/home.component";
@@ -20,7 +20,7 @@ const routes: Routes = [
     DashboardComponent
   ],
   imports: [
-    SharedModule,
+    ImportsModule,
     RouterModule.forChild(routes),
   ]
 })

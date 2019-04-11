@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MarkdownEditorComponent} from "../../shared/views/markdown-editor/markdown-editor.component";
+import {MarkdownEditorComponent} from "../../../modules/markdown/markdown-editor/markdown-editor.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
   }
 
-  onPost(str) {
+  onPost() {
   }
 
 }

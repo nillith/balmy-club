@@ -1,23 +1,22 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {SignUpComponent} from './sign-up.component';
+import {LoginDialogComponent} from './login-dialog.component';
 import {TestingImportsModule} from "../../../modules/imports/testing-imports.module.spec";
-import {SharedTestingModule} from "../../../modules/imports/shared-testing.module.spec";
 
-describe('SignUpComponent', () => {
-  let component: SignUpComponent;
-  let fixture: ComponentFixture<SignUpComponent>;
+describe('LoginDialogComponent', () => {
+  let component: LoginDialogComponent;
+  let fixture: ComponentFixture<LoginDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [SignUpComponent],
-      imports: [SharedTestingModule]
+      declarations: [LoginDialogComponent],
+      imports: [TestingImportsModule]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SignUpComponent);
+    fixture = TestBed.createComponent(LoginDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
