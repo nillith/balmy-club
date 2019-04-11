@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MarkdownEditorComponent} from "../../../modules/markdown/markdown-editor/markdown-editor.component";
+import {MarkdownEditorComponent} from "../../modules/markdown/markdown-editor/markdown-editor.component";
 
 @Component({
   selector: 'app-dashboard',

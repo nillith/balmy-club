@@ -1,9 +1,13 @@
 export const makeBackdropTransparent = function(elem: any) {
-  elem
-    .parentElement
-    .parentElement
-    .parentElement
-    .previousSibling
-    .style
-    .background = 'transparent';
+  try {
+    elem
+      .parentElement
+      .parentElement
+      .parentElement
+      .previousSibling
+      .style
+      .background = 'transparent';
+  } catch (e) {
+    // swallow
+  }
 };
