@@ -34,13 +34,14 @@ const appRoutes: Routes = [
     }),
     RouterModule.forRoot(
       appRoutes,
-      {enableTracing: !environment.production} // <-- debugging purposes only
+      {enableTracing: !environment.production && false} // <-- debugging purposes only
     )
   ],
   providers: [
     // uncomment this for "hash-bang" routing
     // { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],
+  entryComponents: [LoginDialogComponent, AvatarSettingDialogComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {

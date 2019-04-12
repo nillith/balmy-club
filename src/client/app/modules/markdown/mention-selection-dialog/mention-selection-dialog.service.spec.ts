@@ -1,12 +1,12 @@
 import {async, TestBed} from '@angular/core/testing';
 
-import {MentionSelectionDialogManagerFactoryService} from './mention-selection-dialog.manager.factory.service';
+import {MentionSelectionDialogService} from './mention-selection-dialog.service';
 import {MAT_DIALOG_DATA} from "@angular/material";
 import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
 import {MentionSelectionDialogComponent} from "./mention-selection-dialog.component";
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 
-describe('MentionSelectionDialogManagerFactoryService', () => {
+describe('MentionSelectionDialogService', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MentionSelectionDialogComponent],
@@ -28,7 +28,7 @@ describe('MentionSelectionDialogManagerFactoryService', () => {
   }));
 
   it('should be created', () => {
-    const service: MentionSelectionDialogManagerFactoryService = TestBed.get(MentionSelectionDialogManagerFactoryService);
+    const service: MentionSelectionDialogService = TestBed.get(MentionSelectionDialogService);
     expect(service).toBeTruthy();
   });
 });

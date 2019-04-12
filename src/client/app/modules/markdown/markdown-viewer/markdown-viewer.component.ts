@@ -23,7 +23,7 @@ export class MarkdownViewerComponent implements OnInit {
     const self = this;
     self.viewer = self.markdownService.createViewer({
       el: this.hostElement.nativeElement,
-      initialValue: this.content
+      initialValue: self.content
     });
   }
 

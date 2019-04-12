@@ -1,0 +1,3 @@
+<div class="post-group-container" #container [style.visibility]="isVisible ? 'visible' : 'hidden'">
+  <app-post-editor class="post-group-item" *ngFor="let p of posts" [post]="p" [limitCommentHeight]="true"></app-post-editor>
+</div>

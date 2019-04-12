@@ -1,14 +1,9 @@
-import {Component, ElementRef, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {I18nServiceService} from "../../../services/i18n-service.service";
 import {MarkdownEditor, MarkdownService} from "../markdown.service";
-import {
-  MentionSelectionDialogManager,
-  MentionSelectionDialogManagerFactoryService
-} from "../mention-selection-dialog/mention-selection-dialog.manager.factory.service";
-import {mentionTrigger} from "../../../../../shared/constants";
+import {MentionSelectionDialogService} from "../mention-selection-dialog/mention-selection-dialog.service";
 import {MentionSelectionListener} from "../mention-selection-dialog/mention-selection-dialog.component";
 import {UserNickname} from "../../../../../shared/interf";
-
 
 @Component({
   selector: 'app-markdown-editor',
@@ -21,52 +16,41 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
   }
 
   private editor: MarkdownEditor;
-  private userDialog?: MentionSelectionDialogManager;
-  private pressed = false;
-  private longPress = false;
+
+  @Input() noToolbar = false;
+  @Input() placeholder = '';
+  @Input() initialFocus = false;
+  @Input() content = '';
 
   constructor(private hostElement: ElementRef,
               private i18Service: I18nServiceService,
               private mk: MarkdownService,
-              private userDialogFactory: MentionSelectionDialogManagerFactoryService) {
+              private mentionSelectionDialogService: MentionSelectionDialogService) {
   }
 
-  onKeyUp(e) {
-    const self = this;
-    self.pressed = false;
-    if (self.longPress) {
-      return;
-    }
-    const {data} = e;
-    if (data && data.key === mentionTrigger) {
-      self.userDialog.tryPopup();
-    }
-  }
-
-  onKeyDown() {
-    const self = this;
-    self.longPress = self.pressed;
-    self.pressed = true;
-  }
 
   ngOnInit() {
     const self = this;
     const {nativeElement} = self.hostElement;
     (window as any).MD = self.editor = self.mk.createEditor({
       el: nativeElement,
-      events: {
-        keyup: self.onKeyUp.bind(self),
-        keydown: self.onKeyDown.bind(self),
-      },
-      placeholder: "Content",
+      events: self.mentionSelectionDialogService.createEditorListener(nativeElement, self),
+      initialValue: self.content,
+      toolbarItems: self.noToolbar ? [] : undefined,
+      placeholder: self.placeholder,
+      maxHeight: '300px',
     });
 
-    self.userDialog = self.userDialogFactory.create(nativeElement, self);
+    const sizer = nativeElement.querySelector('.CodeMirror-sizer');
+    sizer.style.minHeight = '1em';
+
+    if (self.initialFocus) {
+      self.editor.focus();
+    }
   }
 
 
   get markdown(): string {
     return this.editor.getMarkdown();
   }
-
 }

@@ -1,10 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
-@import '~@angular/material/theming';
+@import "styles/_mixin.scss";
 
-$config: mat-typography-config();
-
-@include mat-core();
+@include mat-core($app-font-config);
 
 $primary: mat-palette($mat-red, 200);
 $accent: mat-palette($mat-blue-grey, 200);
@@ -43,14 +40,14 @@ body {
   background: none;
   border: none;
   padding: 0;
-  font-family: mat-font-family($config);
+  font-family: mat-font-family($app-font-config);
   outline: none;
   cursor: pointer;
   &:disabled {
     color: gray;
     cursor: default;
   }
-  &:hover{
+  &:hover {
     background: aliceblue;
   }
 }
@@ -62,7 +59,7 @@ body {
   padding: 0 !important;
   // font-size: mat-font-size($config, body-1);
   font-size: inherit;
-  font-family: mat-font-family($config);
+  font-family: mat-font-family($app-font-config);
   font-style: italic;
   cursor: pointer;
   text-decoration: underline;
@@ -71,28 +68,6 @@ body {
     color: lightblue;
     cursor: default;
     text-decoration: none;
-  }
-}
-
-@mixin avatar($dim) {
-  background: white;
-  outline: none;
-  width: $dim;
-  height: $dim;
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 50%;
-  border: none;
-  padding: 0 !important;
-  overflow: hidden;
-  margin: 10px;
-  cursor: pointer;
-  img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  &:disabled {
-    cursor: default;
   }
 }
 
@@ -117,17 +92,54 @@ body {
 }
 
 .mat-dialog-container {
-  padding: 4px!important;
+  padding: 4px !important;
+}
+
+$post-padding: 1em;
+
+.tui-editor-defaultUI {
+  border: none!important;
+  margin-top:6px;
+  margin-bottom: 2px;
 }
 
 .tui-editor-contents {
-  font-size: mat-font-size($config, body-1);
-  font-family: mat-font-family($config);
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
 
+  margin: 0;
+  padding: $post-padding;
   .app-mention-user {
     text-decoration: none;
     margin-left: 0.1em;
     margin-right: 0.1em;
     font-weight: bold;
   }
+
+  p, table, ul, menu, ol, dir {
+    color: #222;
+  }
+}
+
+
+.CodeMirror-scroll, .te-preview {
+  max-height: 35vh;
+  height: 35vh;
+}
+.CodeMirror-code {
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
+}
+
+.tui-editor-defaultUI .CodeMirror-line {
+  padding: $post-padding;
+}
+
+.te-md-container .te-preview {
+  padding: 0;
+}
+
+.te-markdown-tab-section .te-tab {
+  margin: 1px -7px 0 0px;
+  background: #fff;
 }

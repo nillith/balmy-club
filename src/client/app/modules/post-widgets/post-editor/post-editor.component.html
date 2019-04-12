@@ -1,0 +1,59 @@
+<mat-card>
+  <mat-card-header fxLayout="row" fxLayoutAlign="left center">
+    <button class="app-avatar-small">
+      <img src="assets/default-avatar.png">
+    </button>
+    <div>My Awesome Name</div>
+    <mat-icon>navigate_next</mat-icon>
+    <div>Public</div>
+    <div class="app-fill-space"></div>
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item *ngFor="let m of enabledActions" (click)="onMenu(m.action)">
+        <mat-icon>{{m.icon}}</mat-icon>
+        <span>{{m.name}}</span>
+      </button>
+    </mat-menu>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content fxLayout="column">
+    <div *ngIf="editMode">
+      <app-markdown-editor #markdownEditor [content]="post.content"></app-markdown-editor>
+      <mat-divider></mat-divider>
+      <mat-card-actions align="end">
+        <button mat-raised-button (click)="cancelEdit()">Cancel</button>
+        <button mat-raised-button (click)="saveEdit()">Save</button>
+      </mat-card-actions>
+    </div>
+    <app-markdown-viewer *ngIf="!editMode" [content]="post.content"></app-markdown-viewer>
+  </mat-card-content>
+  <mat-card-actions align="end" style="padding:1em;">
+    <button mat-icon-button color="accent">
+      <mat-icon>plus_one</mat-icon>
+    </button>
+    <button mat-icon-button color="warn">
+      <mat-icon>share</mat-icon>
+    </button>
+  </mat-card-actions>
+  <mat-divider></mat-divider>
+
+  <div *ngIf="post.comments && post.comments.length">
+    <mat-expansion-panel (opened)="notifyParent()" (closed)="notifyParent()">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Show all {{post.comments.length}} comments
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div [ngClass]="{'limit-comment-height':limitCommentHeight}">
+        <div *ngFor="let comment of post.comments; let i = index">
+          <hr class="comment-hr">
+          <app-comment-editor [comment]="comment"></app-comment-editor>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </div>
+  <mat-divider></mat-divider>
+  <app-comment-editor [comment]="comment"></app-comment-editor>
+</mat-card>

@@ -1,0 +1,36 @@
+<div fxLayout="row" fxLayoutAlign="left up">
+  <div class="comment-editor-avatar">
+    <img src="assets/default-avatar.png">
+  </div>
+  <div class="app-fill-space">
+    <div *ngIf="editMode && comment">
+      <app-markdown-editor [initialFocus]="true" [content]="comment.content"></app-markdown-editor>
+      <mat-card-actions align="end">
+        <button mat-raised-button (click)="cancelEdit()">Cancel</button>
+        <button mat-raised-button (click)="saveEdit()">Save</button>
+      </mat-card-actions>
+    </div>
+    <div *ngIf="!editMode && comment">
+      <app-markdown-viewer [content]="comment.content"></app-markdown-viewer>
+    </div>
+    <div *ngIf="!editMode && !comment" (click)="createComment()" class="comment-editor-fake"
+         style="cursor: text!important;">
+      Add a comment...
+    </div>
+    <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
+      <div class="app-fill-space"></div>
+      <button mat-icon-button color="accent">
+        <mat-icon>plus_one</mat-icon>
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item *ngFor="let m of enabledActions" (click)="onMenu(m.action)">
+          <mat-icon>{{m.icon}}</mat-icon>
+          <span>{{m.name}}</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</div>

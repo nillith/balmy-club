@@ -22,6 +22,9 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span class="app-fill-space"></span>
+      <button mat-icon-button color="warn">
+        <mat-icon matBadge="99" matBadgeColor="warn" matBadgeSize="small" matBadgeOverlap="true" role="img">notifications</mat-icon>
+      </button>
       <div class="comp-avatar-area">
         <button *ngIf="loginWallService.isLoggedIn()" #button (click)="settingService.showAvatarSettingDialog(button)" class="app-avatar-small">
           <img src="assets/default-avatar.png">

@@ -11,3 +11,10 @@
 .comp-avatar-area {
   margin-right: 40px;
 }
+
+mat-icon {
+  span{
+    top: -4px !important;
+    right: -4px !important;
+  }
+}

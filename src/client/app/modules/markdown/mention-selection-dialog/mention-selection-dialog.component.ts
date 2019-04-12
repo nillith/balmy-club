@@ -91,10 +91,14 @@ export class MentionSelectionDialogComponent implements OnInit {
       self.filteredUsers = self.allUsers;
       return;
     }
-    const reg = new RegExp(value, 'i');
-    self.filteredUsers = self.allUsers.filter((u) => {
-      return reg.test(u.nickname);
-    });
+    try {
+      const reg = new RegExp(value, 'i');
+      self.filteredUsers = self.allUsers.filter((u) => {
+        return reg.test(u.nickname);
+      });
+    } catch (e) {
+
+    }
   }
 
   onListButtonClick(user) {

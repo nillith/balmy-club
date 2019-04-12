@@ -1,17 +1,14 @@
-.time-line-container {
+.post-group-container {
   padding: 5em;
 }
 
-/* clearfix */
-.time-line-container:after {
+.post-group-container:after {
   content: '';
   display: block;
   clear: both;
 }
 
-/* ---- grid-item ---- */
-
-.time-line-item {
+.post-group-item {
   float: left;
   width: 34em;
   margin-bottom: 4em;

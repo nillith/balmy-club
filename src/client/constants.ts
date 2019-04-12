@@ -8,5 +8,10 @@ export const sideNav = [
     name: 'Dashboard',
     icon: 'dashboard',
     link: '/dashboard',
-  }
+  },
+  {
+    name: 'People',
+    icon: 'people',
+    link: '/people',
+  },
 ];

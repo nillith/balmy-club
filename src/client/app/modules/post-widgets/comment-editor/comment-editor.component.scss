@@ -1,0 +1,19 @@
+@import "../../../../styles/mixin";
+
+.comment-editor-avatar {
+  @include avatar(2.5em, false);
+}
+
+.comment-editor-fake {
+  height: 3em;
+  padding: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  font-size: 14px;
+  box-sizing: border-box;
+  border: 1px solid #e3e4e5;
+  color: #666;
+  overflow: hidden;
+  cursor: text;
+  text-align: left;
+}

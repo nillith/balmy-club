@@ -1,0 +1,34 @@
+@import "../../../../styles/mixin";
+
+.mat-card {
+  width: 30em;
+  margin: 0;
+  padding: 0;
+}
+.comment-hr {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.mat-expansion-panel:not([class*=mat-elevation-z]) {
+  box-shadow: none;
+}
+
+/deep/ .mat-card-header-text {
+  display: none !important;
+}
+
+mat-divider {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/deep/ .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+.limit-comment-height {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+

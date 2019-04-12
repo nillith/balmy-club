@@ -24,4 +24,16 @@ export interface UserNickname {
   nickname: string;
 }
 
+export interface Comment {
+  id?: string;
+  authorId?: string;
+  postId?: string;
+  content?: string;
+  postTime?: number;
+}
 
+export interface Post {
+  id: string;
+  content: string;
+  comments: Post[];
+}
