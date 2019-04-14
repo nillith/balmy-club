@@ -5,6 +5,7 @@ import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/aut
 import {AccessTokenData, AuthData, UserData} from "../../../shared/interf";
 import {API_URLS} from "../../constants";
 import {UserModel} from "../models/user.model";
+import {CircleModel} from "../models/circle.model";
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,14 @@ export class IService {
   private token: string;
   private tokenContent: AccessTokenData;
   private user: UserModel;
+  private _circles: CircleModel[] = [];
 
   get me() {
     return this.user;
+  }
+
+  get circles() {
+    return this._circles;
   }
 
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
@@ -66,5 +72,9 @@ export class IService {
   isLoggedIn() {
     const {token, jwtHelper} = this;
     return !!token && !jwtHelper.isTokenExpired(token);
+  }
+
+  buildCircle() {
+    return new CircleModel(this.http, this.me.id);
   }
 }

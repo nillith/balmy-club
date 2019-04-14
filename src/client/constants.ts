@@ -20,6 +20,7 @@ export const DEFAULT_AVATAR_URL = 'assets/default-avatar.png';
 
 export const API_URLS = {
   POST: 'api/posts',
+  CIRCLE: 'api/i/circles',
   USER: 'api/users',
-  LOGIN: 'auth/local'
+  LOGIN: 'auth/local',
 };

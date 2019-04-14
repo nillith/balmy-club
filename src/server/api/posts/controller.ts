@@ -36,7 +36,7 @@ const filterShareCircleIds = function(circleIds: any) {
 };
 
 
-const getPayloadOrErr = function(body: any) {
+const getNewPostPayloadOrErr = function(body: any) {
   let {reShareFromPostId, visibility, content, visibleCircleIds} = body;
   content = String(content || '').trim();
   if (reShareFromPostId) {
@@ -72,7 +72,7 @@ const getPayloadOrErr = function(body: any) {
 export const publishNewPost = async function(req: Request, res: Response, next: NextFunction) {
   const {body} = req;
 
-  const data = getPayloadOrErr(body);
+  const data = getNewPostPayloadOrErr(body);
   if (isString(data)) {
     return respondWith(res, 400, data);
   }

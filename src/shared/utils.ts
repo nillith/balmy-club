@@ -1,4 +1,4 @@
-import {MAX_POST_LENGTH} from "./constants";
+import {CIRCLE_NAME_PATTERN, MAX_POST_LENGTH} from "./constants";
 
 export const noop = function(...args: any[]): any {
 };
@@ -37,4 +37,10 @@ export const makeInstance = function <T>(obj: object, t: { new(...arg: any[]): T
   return Object.setPrototypeOf(obj, t.prototype) as T;
 };
 
+export const patternCheckFun = function(pattern) {
+  return function(arg: string): boolean {
+    return !!arg && RegExp(`^${pattern}$`).test(arg);
+  };
+};
 
+export const isValidCircleName = patternCheckFun(CIRCLE_NAME_PATTERN);

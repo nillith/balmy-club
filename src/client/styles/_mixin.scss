@@ -9,6 +9,7 @@ $app-font-config: mat-typography-config(
 @mixin avatar($dim, $clickable:true) {
   background: white;
   outline: none;
+  display: block;
   width: $dim;
   height: $dim;
   border-radius: 50%;

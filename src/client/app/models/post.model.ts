@@ -12,12 +12,12 @@ export class PostModel extends TextContentModel {
   visibleCircleIds?: string[];
 
   constructor(http: HttpClient) {
-    super(http, API_URLS.POST);
+    super(http);
   }
 
   protected async create(): Promise<void> {
     const self = this;
-    const data = await self.http.post(self.apiUrl, self.cloneFields([
+    const data = await self.http.post(API_URLS.POST, self.cloneFields([
       'content',
       'reShareFromPostId',
       'visibility',

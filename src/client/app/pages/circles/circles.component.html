@@ -1,0 +1,15 @@
+<div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="flex-start">
+  <mat-card class="circle-summary" [ngClass]="{'circle-create-disabled':isCreatingNewCircle()}"  fxLayout="row" fxLayoutAlign="center center" (click)="createCircle()">
+    +
+  </mat-card>
+  <mat-card class="circle-summary" [ngClass]="{'circle-summary-selected': c=== selectedCircle}"
+            *ngFor="let c of circles; let i = index;" fxLayout="column" fxLayoutAlign="center center"
+            (click)="onSelectCircle(i)">
+    <div>c.name</div>
+    <div>c.users</div>
+  </mat-card>
+</div>
+<div>
+  <app-avatar [user]="iService.me"></app-avatar>
+
+</div>

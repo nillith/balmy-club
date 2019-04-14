@@ -1,0 +1,18 @@
+.circle-summary {
+  width: 150px;
+  height: 150px;
+  margin: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: hidden;
+  font-size: medium;
+}
+
+.circle-create-disabled {
+  cursor: default;
+  background-color: lightgray;
+}
+
+.circle-summary-selected {
+  background-color: #F6C6CE;
+}

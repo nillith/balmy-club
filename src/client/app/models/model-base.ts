@@ -4,7 +4,7 @@ import {cloneFields} from "../../../shared/utils";
 export abstract class ModelBase {
   id?: string;
 
-  constructor(protected readonly http: HttpClient, protected readonly apiUrl: string) {
+  constructor(protected readonly http: HttpClient) {
 
   }
 

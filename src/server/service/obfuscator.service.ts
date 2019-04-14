@@ -2,6 +2,7 @@ import config from "../config/index";
 import crypto from 'crypto';
 import {makeInstance} from "../../shared/utils";
 import {isString} from "util";
+import _ from 'lodash';
 
 const ALGORITHM = 'aes-256-ecb';
 const HEX = 'HEX';
@@ -75,7 +76,7 @@ export class BatchObfuscator {
 
   unObfuscate(arr: string[]): number[] {
     const {obfuscator} = this;
-    return arr.map((hex) => {
+    return _.map(arr, (hex) => {
       return obfuscator.unObfuscate(hex);
     }).filter((n) => INVALID_NUMERIC_ID !== n);
   }
@@ -85,6 +86,7 @@ export const userObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfus
 export const postObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.post);
 export const commentObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.comment);
 export const circleObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.circle);
+export const batchUserObfuscator = new BatchObfuscator(userObfuscator);
 export const batchCircleObfuscator = new BatchObfuscator(circleObfuscator);
 
 export class IdNameObfuscatorMap {
@@ -157,6 +159,7 @@ export const $authorId = Symbol('authorId');
 export const $ownerId = Symbol('ownerId');
 export const $circleId = Symbol('circleId');
 export const $userId = Symbol('userId');
+export const $userIds = Symbol('userIds');
 export const $reShareFromPostId = Symbol('reShareFromPostId');
 export const $subjectId = Symbol('subjectId');
 export const $objectId = Symbol('objectId');
@@ -178,11 +181,12 @@ const ID_COMMENT = new IdNameObfuscatorMap($id, commentObfuscator);
 const ID_CIRCLE = new IdNameObfuscatorMap($id, circleObfuscator);
 const CIRCLE_ID = new IdNameObfuscatorMap($circleId, circleObfuscator);
 const SHARE_CIRCLE_IDS = new IdNameObfuscatorMap($visibleCircleIds, batchCircleObfuscator);
+const USER_IDS = new IdNameObfuscatorMap($visibleCircleIds, batchUserObfuscator);
 
 export const USER_OBFUSCATE_MAPS = [ID_USER];
 export const POST_OBFUSCATE_MAPS = [ID_POST, AUTHOR_ID, RE_SHARE_FROM_POST_ID, SHARE_CIRCLE_IDS];
 export const COMMENT_OBFUSCATE_MAPS = [ID_COMMENT, POST_ID, AUTHOR_ID];
-export const CIRCLE_OBFUSCATE_MAPS = [ID_CIRCLE, OWNER_ID];
+export const CIRCLE_OBFUSCATE_MAPS = [ID_CIRCLE, OWNER_ID, USER_IDS];
 
 
 export interface JsonFieldMap {

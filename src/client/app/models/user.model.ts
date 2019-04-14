@@ -7,7 +7,7 @@ export class UserModel extends ModelBase {
   avatarUrl: string;
 
   constructor(http: HttpClient, userData?: UserData) {
-    super(http, API_URLS.USER);
+    super(http);
     if (userData) {
       this.assign(userData);
     }
@@ -23,6 +23,10 @@ export class UserModel extends ModelBase {
 
   get avatar() {
     return this.avatarUrl || DEFAULT_AVATAR_URL;
+  }
+
+  get link() {
+    return `u/${this.id}`;
   }
 
   assign(data: UserData) {
