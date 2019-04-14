@@ -75,6 +75,7 @@ export class IService {
   }
 
   buildCircle() {
-    return new CircleModel(this.http, this.me.id);
+    const self = this;
+    return new CircleModel(self.http, self.me.id, self);
   }
 }

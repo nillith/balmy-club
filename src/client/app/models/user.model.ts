@@ -5,6 +5,7 @@ import {UserData} from "../../../shared/interf";
 
 export class UserModel extends ModelBase {
   avatarUrl: string;
+  nickname: string;
 
   constructor(http: HttpClient, userData?: UserData) {
     super(http);

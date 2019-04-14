@@ -52,8 +52,6 @@ body {
   }
 }
 
-
-
 .app-button-link {
   @include button-text(lightcoral, lightblue);
   font-style: italic;
@@ -88,8 +86,8 @@ body {
 }
 
 .tui-editor-defaultUI {
-  border: none!important;
-  margin-top:6px;
+  border: none !important;
+  margin-top: 6px;
   margin-bottom: 2px;
 }
 
@@ -111,11 +109,11 @@ body {
   }
 }
 
-
 .CodeMirror-scroll, .te-preview {
   max-height: 35vh;
   height: 35vh;
 }
+
 .CodeMirror-code {
   font-size: mat-font-size($app-font-config, body-2);
   font-family: mat-font-family($app-font-config);
@@ -132,4 +130,14 @@ body {
 .te-markdown-tab-section .te-tab {
   margin: 1px -7px 0 0px;
   background: #fff;
+}
+
+.clearfix {
+
+}
+
+.clearfix:after {
+  content: '';
+  display: block;
+  clear: both;
 }

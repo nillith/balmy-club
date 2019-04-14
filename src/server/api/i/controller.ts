@@ -6,6 +6,7 @@ import {isValidCircleName} from "../../../shared/utils";
 import {isString} from "util";
 import {CircleModel} from "../../models/circle.model";
 import db from "../../persistence/index";
+import {$id} from "../../service/obfuscator.service";
 
 export const changePassword = async function(req: Request, res: Response, next: NextFunction) {
   const password = req.body && req.body.password;
@@ -37,9 +38,13 @@ export const createCircle = async function(req: Request, res: Response, next: Ne
   }
 
   const circle = CircleModel.unObfuscateFrom(data);
-
+  if (!circle) {
+    return respondWith(res, 400);
+  }
+  circle.ownerId = user.id;
   await circle.insertIntoDatabase(db);
-  return respondWith(res, 200);
+  circle.obfuscate();
+  return respondWith(res, 200, circle[$id]);
 };
 
 export const removeCircle = async function(req: Request, res: Response, next: NextFunction) {

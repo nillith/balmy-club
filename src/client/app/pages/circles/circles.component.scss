@@ -1,3 +1,4 @@
+
 .circle-summary {
   width: 150px;
   height: 150px;
@@ -15,4 +16,38 @@
 
 .circle-summary-selected {
   background-color: #F6C6CE;
+}
+
+.user-card-container {
+  height: 280px;
+  width:200px;
+  position:relative;
+}
+
+.user-remove-button {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.user-name {
+  position: absolute;
+  bottom: 10px;
+  width: 160px;
+  margin: auto;
+  a {
+    text-decoration: none;
+  }
+}
+
+.circle-users-panel {
+  margin: 10px;
+}
+
+.circle-user-container {
+  width: 126px;
+  height: 126px;
+  margin: 10px;
+  border-radius: 50%;
+  position: relative;
 }

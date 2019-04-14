@@ -181,7 +181,7 @@ const ID_COMMENT = new IdNameObfuscatorMap($id, commentObfuscator);
 const ID_CIRCLE = new IdNameObfuscatorMap($id, circleObfuscator);
 const CIRCLE_ID = new IdNameObfuscatorMap($circleId, circleObfuscator);
 const SHARE_CIRCLE_IDS = new IdNameObfuscatorMap($visibleCircleIds, batchCircleObfuscator);
-const USER_IDS = new IdNameObfuscatorMap($visibleCircleIds, batchUserObfuscator);
+const USER_IDS = new IdNameObfuscatorMap($userIds, batchUserObfuscator);
 
 export const USER_OBFUSCATE_MAPS = [ID_USER];
 export const POST_OBFUSCATE_MAPS = [ID_POST, AUTHOR_ID, RE_SHARE_FROM_POST_ID, SHARE_CIRCLE_IDS];

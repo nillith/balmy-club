@@ -11,6 +11,15 @@ if (!(Symbol.prototype as any)[DESCRIPTION]) {
   });
 }
 
+console.assert = function(v: boolean, msg?: string) {
+  if (!v) {
+    throw Error(msg || "MyAssertion failed!");
+  }
+};
+
+
+
+
 // process
 //   .on('unhandledRejection', (reason, p) => {
 //     console.error(reason, 'Unhandled Rejection at Promise', p);

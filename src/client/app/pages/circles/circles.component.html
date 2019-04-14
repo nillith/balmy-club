@@ -1,15 +1,47 @@
 <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="flex-start">
-  <mat-card class="circle-summary" [ngClass]="{'circle-create-disabled':isCreatingNewCircle()}"  fxLayout="row" fxLayoutAlign="center center" (click)="createCircle()">
+  <mat-card class="circle-summary" [ngClass]="{'circle-create-disabled':isCreatingNewCircle()}" fxLayout="row"
+            fxLayoutAlign="center center" (click)="createCircle()">
     +
   </mat-card>
   <mat-card class="circle-summary" [ngClass]="{'circle-summary-selected': c=== selectedCircle}"
             *ngFor="let c of circles; let i = index;" fxLayout="column" fxLayoutAlign="center center"
             (click)="onSelectCircle(i)">
-    <div>c.name</div>
-    <div>c.users</div>
+    <div>{{c.name}}</div>
+    <div>{{c.users && c.users.length || 0}}</div>
   </mat-card>
 </div>
-<div>
-  <app-avatar [user]="iService.me"></app-avatar>
-
+<div *ngIf="circleModifier">
+  <mat-card fxLayout="row wrap" fxLayoutAlign="left center" class="circle-users-panel clearfix">
+    <mat-card-title style="width:100%">
+      <mat-form-field style="width: 100%;">
+        <input matInput placeholder="Circle Name"
+               type="text" pattern="^{{appConstants.CIRCLE_NAME_PATTERN}}$"
+               name="name" required #name="ngModel"
+               [(ngModel)]="circleModifier.name">
+      </mat-form-field>
+    </mat-card-title>
+    <div class="user-card-container" fxLayout="column" fxLayoutAlign="center center"
+         *ngFor="let user of circleModifier.users; let i = index;">
+      <mat-card class="circle-user-container" fxLayout="column" fxLayoutAlign="center center">
+        <button [disabled]="!circleModifier || loading" class="user-remove-button" mat-icon-button color="warn"
+                (click)="onRemoveUser(i)">
+          <mat-icon>cancel</mat-icon>
+        </button>
+        <app-avatar [user]="user"></app-avatar>
+      </mat-card>
+      <mat-card class="user-name" fxLayout="row" fxLayoutAlign="center center">
+        <a href="{{user.link}}">{{user.nickname}}</a>
+      </mat-card>
+    </div>
+  </mat-card>
+  <mat-card class="circle-users-panel">
+    <mat-card-actions align="end">
+      <button [disabled]="!circleModifier || loading" mat-button mat-raised-button (click)="cancelEdit()">cancel
+      </button>
+      <button [disabled]="!circleModifier || !circleModifier.name || loading" mat-button mat-raised-button (click)="saveEdit()">
+        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [text]="saveButtonText"></app-spinner-switch>
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>
+

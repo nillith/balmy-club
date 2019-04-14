@@ -1,7 +1,7 @@
 import {DatabaseDriver, ModelBase} from "./model-base";
 import {devOnly, isNumericId} from "../utils/index";
 import _ from "lodash";
-import {$userIds} from "../service/obfuscator.service";
+import {$userIds, CIRCLE_OBFUSCATE_MAPS, obfuscatorFuns} from "../service/obfuscator.service";
 
 const INSERT_SQL = `INSERT INTO Circles (name, ownerId) VALUES (:name, :ownerId)`;
 
@@ -23,6 +23,7 @@ const assertValidUserIds = devOnly(function(model: CircleModel) {
   console.assert(userIds && userIds.length, `no userIds`);
   _.each(userIds, (id) => {
     console.assert(isNumericId(id), `invalid user id ${id}`);
+    console.assert(model.ownerId !== id, `can't add owner to circle!`);
   });
 });
 
@@ -85,4 +86,4 @@ export class CircleModel extends ModelBase {
 ({
   unObfuscateFrom: CircleModel.unObfuscateFrom,
   obfuscate: CircleModel.prototype.obfuscate
-} = obfuscatorFuns(USER_OBFUSCATE_MAPS, CircleModel));
+} = obfuscatorFuns(CIRCLE_OBFUSCATE_MAPS, CircleModel));
