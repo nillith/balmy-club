@@ -14,6 +14,11 @@ export const sideNav = [
     icon: 'people',
     link: '/circles',
   },
+  {
+    name: 'Settings',
+    icon: 'settings',
+    link: '/settings',
+  },
 ];
 
 export const DEFAULT_AVATAR_URL = 'assets/default-avatar.png';

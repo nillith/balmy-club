@@ -5,10 +5,12 @@ import {HomeComponent} from "./home/home.component";
 import {ProjectModulesImportsModule} from "../modules/imports/project-modules-imports.module";
 import { UserPageComponent } from './u/user-page.component';
 import { CirclesComponent } from './circles/circles.component';
+import { SettingComponent } from './setting/setting.component';
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'circles', component: CirclesComponent},
+  {path: 'settings', component: SettingComponent},
 ];
 
 @NgModule({
@@ -16,7 +18,8 @@ const routes: Routes = [
     HomeComponent,
     DashboardComponent,
     UserPageComponent,
-    CirclesComponent
+    CirclesComponent,
+    SettingComponent
   ],
   imports: [
     ProjectModulesImportsModule,

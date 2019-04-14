@@ -30,7 +30,7 @@ export class PostGroupViewComponent implements OnInit, AfterViewInit {
       setTimeout(() => {
         self.masonry.layout();
       });
-    }, 110);
+    }, 180);
     setTimeout(() => {
       self.masonry.layout();
       self.isVisible = true;
