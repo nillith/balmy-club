@@ -29,3 +29,17 @@ $app-font-config: mat-typography-config(
     }
   }
 }
+
+@mixin button-text($color:blue, $disabled-color:gray){
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  color: $color;
+  font-size: inherit;
+  font-family: mat-font-family($app-font-config);
+  &:disabled {
+    color: $disabled-color;
+    cursor: default;
+    text-decoration: none;
+  }
+}

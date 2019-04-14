@@ -3,6 +3,7 @@ import {PostData} from "../../../../shared/interf";
 import Masonry from 'masonry-layout';
 import {noop} from "../../../../shared/utils";
 import {debounce} from "lodash";
+import {PostEditorDialogService} from "../../modules/post-widgets/post-editor-dialog/post-editor-dialog.service";
 
 const randomInt = function(min, max) {
   const span = max - min;
@@ -20,7 +21,7 @@ export class HomeComponent implements OnInit {
 
   posts: PostData[] = [];
 
-  constructor() {
+  constructor(public postEditorDialogService: PostEditorDialogService) {
     const post = {
       id: 'soateutoatu',
       content: `## Typographic replacements

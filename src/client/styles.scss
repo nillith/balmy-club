@@ -52,23 +52,13 @@ body {
   }
 }
 
+
+
 .app-button-link {
-  background: none !important;
-  color: lightcoral;
-  border: none;
-  padding: 0 !important;
-  // font-size: mat-font-size($config, body-1);
-  font-size: inherit;
-  font-family: mat-font-family($app-font-config);
+  @include button-text(lightcoral, lightblue);
   font-style: italic;
   cursor: pointer;
   text-decoration: underline;
-  float: right;
-  &:disabled {
-    color: lightblue;
-    cursor: default;
-    text-decoration: none;
-  }
 }
 
 .app-avatar-tiny {
@@ -92,10 +82,10 @@ body {
 }
 
 .mat-dialog-container {
-  padding: 4px !important;
-}
+  padding: 0px !important;
+  display: inline-block;
 
-$post-padding: 1em;
+}
 
 .tui-editor-defaultUI {
   border: none!important;
@@ -108,7 +98,7 @@ $post-padding: 1em;
   font-family: mat-font-family($app-font-config);
 
   margin: 0;
-  padding: $post-padding;
+  padding: 0;
   .app-mention-user {
     text-decoration: none;
     margin-left: 0.1em;
@@ -132,7 +122,7 @@ $post-padding: 1em;
 }
 
 .tui-editor-defaultUI .CodeMirror-line {
-  padding: $post-padding;
+  padding: 0;
 }
 
 .te-md-container .te-preview {

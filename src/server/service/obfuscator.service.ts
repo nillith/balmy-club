@@ -1,6 +1,6 @@
 import config from "../config/index";
 import crypto from 'crypto';
-import {makeInstance} from "../utils/index";
+import {makeInstance} from "../../shared/utils";
 import {isString} from "util";
 
 const ALGORITHM = 'aes-256-ecb';

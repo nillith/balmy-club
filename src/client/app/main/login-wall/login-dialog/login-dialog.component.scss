@@ -2,6 +2,7 @@ form {
   width: 400px;
   height: 100%;
   padding: 20px;
+  margin: 5px;
   font-size: medium;
 }
 
@@ -54,4 +55,10 @@ mat-radio-button:nth-child(1) {
   margin-top: 10px;
   margin-bottom: 10px;
   min-height: 2.2em;
+}
+
+
+
+.login-wall-button-link{
+  float: right;
 }

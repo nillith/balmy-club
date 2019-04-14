@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatDialog, MatDialogRef} from "@angular/material";
-import {AvatarSettingDialogComponent} from "../main/avatar-setting-dialog/avatar-setting-dialog.component";
+import {AvatarSettingDialogComponent} from "./avatar-setting-dialog.component";
 
 @Injectable({
   providedIn: 'root'

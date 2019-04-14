@@ -2,10 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
-import {AccessTokenData, AuthData} from "../../../shared/interf";
-
-
-const LOGIN_URL = 'auth/local';
+import {AccessTokenData, AuthData, UserData} from "../../../shared/interf";
+import {API_URLS} from "../../constants";
+import {UserModel} from "../models/user.model";
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +12,20 @@ const LOGIN_URL = 'auth/local';
 export class IService {
   private token: string;
   private tokenContent: AccessTokenData;
+  private user: UserModel;
+
+  get me() {
+    return this.user;
+  }
+
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
-    this.onNewToken(getAccessToken());
+    const self = this;
+    self.onNewToken(getAccessToken());
+    self.user = new UserModel(http);
+    if (self.isLoggedIn()) {
+      const data = localStorage.getItem(self.tokenContent.id);
+      self.user.assign(JSON.parse(data) as UserData);
+    }
   }
 
   onNewToken(token: string) {
@@ -44,7 +55,7 @@ export class IService {
   async login(payload: AuthData) {
     const self = this;
     const {username, password, rememberMe} = payload;
-    const user = await self.http.post(LOGIN_URL, {
+    const user = await self.http.post(API_URLS.LOGIN, {
       username,
       password,
       rememberMe

@@ -1,0 +1,31 @@
+@import "../../../../styles/mixin";
+
+.post-editor-dialog-container {
+  width: 32em;
+  height: 100%;
+  font-size: medium;
+  margin: 15px;
+}
+
+.post-editor-dialog-content {
+  box-sizing: content-box;
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
+  width: 30em;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+mat-divider {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.post-editor-dialog-action {
+  padding-top: 8px;
+}
+
+.visibility-setting {
+  @include button-text(blue);
+}

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
+
 const enum PostActions {
   Edit,
   Delete,
@@ -47,14 +48,12 @@ export class PostEditorComponent implements OnInit {
 
   @Input() post: PostData;
   @Input() limitCommentHeight = false;
+  @Input() showComments = true;
 
   notifyParent = noop;
-  private editor: MarkdownEditorComponent;
 
   @ViewChild('markdownEditor')
-  set markdownEditor(editor: MarkdownEditorComponent) {
-    this.editor = editor;
-  }
+  private editor: MarkdownEditorComponent;
 
   enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete].map(action => ActionOption[action]);
 

@@ -1,0 +1,24 @@
+<div class="post-editor-dialog-container">
+  <div fxLayout="row" fxLayoutAlign="left center">
+    <button class="app-avatar-small">
+      <img src="{{iService.me.avatar}}">
+    </button>
+    <div>{{iService.me.nickname || 'Unknown'}}</div>
+    <mat-icon>navigate_next</mat-icon>
+    <div style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
+      <mat-select #visibilitySelector style="width:150px;" (selectionChange)="onVisibilityChange($event)">
+        <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name}}</mat-option>
+      </mat-select>
+    </div>
+    <button class="visibility-setting" (click)="showVisibilitySelector()">{{visibilityName}}</button>
+    <div class="app-fill-space"></div>
+  </div>
+  <mat-divider></mat-divider>
+  <app-markdown-editor class="post-editor-dialog-content" #markdownEditor [content]="post.content"></app-markdown-editor>
+  <mat-divider></mat-divider>
+  <div class="post-editor-dialog-action" fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="15px">
+    <div class="app-fill-space"></div>
+    <button mat-raised-button (click)="cancelEdit()">Cancel</button>
+    <button mat-raised-button (click)="saveEdit()">Save</button>
+  </div>
+</div>

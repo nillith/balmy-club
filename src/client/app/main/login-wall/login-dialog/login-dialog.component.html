@@ -38,7 +38,7 @@
       <mat-checkbox *ngIf="uiConfig.rememberMe" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
         Remember Me
       </mat-checkbox>
-      <button *ngIf="uiConfig.passwordToggle" class="app-button-link"
+      <button *ngIf="uiConfig.passwordToggle" class="app-button-link login-wall-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.PasswordRecoverRequest : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{passwordToggleText}}
@@ -65,7 +65,7 @@
     </div>
     <div style="width:100%;padding-bottom: 20px;"
          *ngIf="uiConfig.signUpToggle">
-      <button class="app-button-link"
+      <button class="app-button-link login-wall-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.SignUp : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{signUpToggleText}}

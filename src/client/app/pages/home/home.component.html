@@ -2,6 +2,6 @@
   <app-post-group-view [posts]="posts" style="margin: auto"></app-post-group-view>
 </div>
 
-<button mat-fab color="warn" class="post-fab">
+<button mat-fab color="warn" class="post-fab" (click)="postEditorDialogService.popup()">
   <mat-icon>edit</mat-icon>
 </button>

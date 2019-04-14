@@ -13,10 +13,11 @@ import {
 } from "../service/obfuscator.service";
 import {MAX_USERNAME_LENGTH, MIN_PASSWORD_LENGTH, Roles, USERNAME_PATTERN, UserRanks} from "../../shared/constants";
 import {JwtSignable} from "../service/auth.service";
-import {isNumericId, makeInstance} from "../utils/index";
+import {isNumericId} from "../utils/index";
 import {isNumber, isString} from "util";
 import isEmail from "validator/lib/isEmail";
 import {map} from 'lodash';
+import {makeInstance} from "../../shared/utils";
 
 export const usernameFormatIsValid = function(username: string | undefined): boolean {
   return !!username && RegExp(`^${USERNAME_PATTERN}$`).test(username) && Buffer.byteLength(username) <= MAX_USERNAME_LENGTH;

@@ -4,9 +4,12 @@ import {MarkdownModule} from "../markdown/markdown.module";
 import {PostEditorComponent} from './post-editor/post-editor.component';
 import {ImportsModule} from "../imports/imports.module";
 import { PostGroupViewComponent } from './post-group-view/post-group-view.component';
+import { PostEditorDialogComponent } from './post-editor-dialog/post-editor-dialog.component';
 
 
-export const exportedEntryComponents = [];
+export const exportedEntryComponents = [
+  PostEditorDialogComponent
+];
 const exportedComponents = [
   ...exportedEntryComponents,
   CommentEditorComponent,
