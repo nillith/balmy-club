@@ -57,8 +57,7 @@
               color="mat-red"
               (click)="onSubmit()" #button>
       <span>
-        <mat-icon class="material-icons" *ngIf="!loading">input</mat-icon>
-        <mat-spinner [diameter]="20" class="material-icons" *ngIf="loading"></mat-spinner>
+        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'"></app-spinner-switch>
         {{submitButtonText}}
       </span>
       </button>
