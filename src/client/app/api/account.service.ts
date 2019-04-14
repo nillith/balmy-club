@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AuthPayload, SignUpTypes} from "../../../shared/interf";
+import {AuthData, SignUpTypes} from "../../../shared/interf";
 import {HttpClient} from "@angular/common/http";
 import {IService} from "./i.service";
 
@@ -12,32 +12,32 @@ export class AccountService {
 
   constructor(private http: HttpClient, private iService: IService) { }
 
-  private async postSignUpPayload(payload: AuthPayload): Promise<string> {
+  private async postSignUpPayload(payload: AuthData): Promise<string> {
     return this.http.post(ACCOUNT_URL, payload, {responseType: 'text'}).toPromise();
   }
 
-  private async signUpWithPayload(payload: AuthPayload) {
+  private async signUpWithPayload(payload: AuthData) {
     const self = this;
     const token = await self.postSignUpPayload(payload);
     self.iService.onNewToken(token);
   }
 
-  async requestSignUp(payload: AuthPayload) {
+  async requestSignUp(payload: AuthData) {
     const {email} = payload;
     return this.postSignUpPayload({email});
   }
 
-  async signUpWithToken(payload: AuthPayload) {
+  async signUpWithToken(payload: AuthData) {
     const {token, username, password} = payload;
     return this.signUpWithPayload({
       token, username, password, type: SignUpTypes.WithToken
     });
   }
 
-  async signUpWithEmail(payload: AuthPayload) {
+  async signUpWithUsername(payload: AuthData) {
     const {email, username, password} = payload;
     return this.signUpWithPayload({
-      email, username, password, type: SignUpTypes.WithToken
+      email, username, password, type: SignUpTypes.Direct
     });
   }
 }

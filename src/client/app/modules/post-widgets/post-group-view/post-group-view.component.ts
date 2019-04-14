@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {Post} from "../../../../../shared/interf";
+import {PostData} from "../../../../../shared/interf";
 import Masonry from 'masonry-layout';
 import {debounce} from "lodash";
 import {noop} from "../../../../../shared/utils";
@@ -11,31 +11,34 @@ import {noop} from "../../../../../shared/utils";
 })
 export class PostGroupViewComponent implements OnInit, AfterViewInit {
 
-  @Input() posts: Post[] = [];
+  @Input() posts: PostData[] = [];
   masonry?: Masonry;
   isVisible = false;
   onChildSizeChange = noop;
 
-  @ViewChild('container') container: ElementRef;
+  @ViewChild('container')
+  container: ElementRef;
+
 
   ngAfterViewInit() {
-    // viewChildren is set
-    this.masonry = new Masonry(this.container.nativeElement, {
+    const self = this;
+    self.masonry = new Masonry(self.container.nativeElement, {
       itemSelector: ".post-group-item"
     });
 
-    this.onChildSizeChange = debounce(() => {
+    self.onChildSizeChange = debounce(() => {
       setTimeout(() => {
-        this.masonry.layout();
+        self.masonry.layout();
       });
     }, 110);
     setTimeout(() => {
-      this.masonry.layout();
-      this.isVisible = true;
+      self.masonry.layout();
+      self.isVisible = true;
     });
   }
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
 

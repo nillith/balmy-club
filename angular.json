@@ -34,7 +34,7 @@
               "src/client/styles.scss"
             ],
             "scripts": [
-              "node_modules/tui-editor/dist/tui-editor-Editor.min.js",
+              "node_modules/tui-editor/dist/tui-editor-Editor.js",
               "node_modules/masonry-layout/dist/masonry.pkgd.min.js"
             ],
             "es5BrowserSupport": true

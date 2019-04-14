@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {Comment} from "../../../../../shared/interf";
+import {CommentData} from "../../../../../shared/interf";
 import {PostEditorComponent} from "../post-editor/post-editor.component";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 
@@ -46,7 +46,7 @@ const ActionOption = {
 })
 export class CommentEditorComponent implements OnInit {
 
-  @Input() comment: Comment;
+  @Input() comment: CommentData;
   @Input() editMode = false;
   enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete, PostActions.Report].map(action => ActionOption[action]);
 

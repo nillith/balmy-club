@@ -2,7 +2,7 @@ import {assert} from 'chai';
 import {
   bufferToUnsignedInteger,
   circleObfuscator,
-  isValidObfuscatedString,
+  isValidObfuscatedIdFormat,
   postObfuscator,
   unsignedIntegerToBuffer,
   userObfuscator,
@@ -28,7 +28,7 @@ describe('obfuscator', () => {
     const invalidValues = [null, undefined, '', true, 333, 444.4,
       '3a2a2c20465685e1ed86dbfa8f649ce'];
     for (const v of invalidValues) {
-      assert.isFalse(isValidObfuscatedString(v));
+      assert.isFalse(isValidObfuscatedIdFormat(v));
     }
 
     const validValues = [
@@ -38,7 +38,7 @@ describe('obfuscator', () => {
     ];
 
     for (const v of validValues) {
-      assert.isTrue(isValidObfuscatedString(v));
+      assert.isTrue(isValidObfuscatedIdFormat(v));
     }
   });
 

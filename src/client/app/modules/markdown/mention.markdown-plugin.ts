@@ -2,10 +2,10 @@ import MarkdownIt from 'markdown-it';
 import Token from "markdown-it/lib/token";
 import Renderer from "markdown-it/lib/renderer";
 import StateInline from "markdown-it/lib/rules_inline/state_inline";
-import {mentionPattern} from "../../../../shared/constants";
+import {MENTION_PATTERN} from "../../../../shared/constants";
 
 const RULE_NAME = 'mention';
-const PATTERN = new RegExp(mentionPattern, 'y');
+const PATTERN = new RegExp(MENTION_PATTERN, 'y');
 
 export const MentionPlugin = function(markdownIt: MarkdownIt) {
   const mentionRenderer = function(tokens: Token[], index: number, options: any, env: any, self: Renderer) {

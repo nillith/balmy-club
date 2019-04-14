@@ -8,25 +8,25 @@
     fxLayout="column">
     <mat-form-field *ngIf="uiConfig.username">
       <input matInput placeholder="Username"
-             type="text" pattern="^{{appConstants.usernamePattern}}$"
+             type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
              name="username" required #username="ngModel"
              [(ngModel)]="dialogModel.username">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.email">
-      <input type="text" pattern="^{{appConstants.emailAddressPattern}}$" matInput placeholder="Email" id="email"
+      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="Email" id="email"
              name="email"
              [required]="uiConfig.emailRequired"
              #email="ngModel" [(ngModel)]="dialogModel.email">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.password">
-      <input type="password" matInput placeholder="Password" minlength="{{appConstants.minPasswordLength}}"
+      <input type="password" matInput placeholder="Password" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="password"
              name="password" required
              #password="ngModel" [(ngModel)]="dialogModel.password">
     </mat-form-field>
 
     <mat-form-field *ngIf="uiConfig.passwordConfirm">
-      <input type="password" matInput placeholder="Confirm" minlength="{{appConstants.minPasswordLength}}"
+      <input type="password" matInput placeholder="Confirm" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="passwordConfirm"
              name="passwordConfirm"
              [disabled]="confirmDisabled()"

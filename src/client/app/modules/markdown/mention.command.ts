@@ -1,4 +1,4 @@
-import {idPattern, nicknamePattern, mentionTrigger} from "../../../../shared/constants";
+import {ID_PATTERN, NICKNAME_PATTERN, MENTION_TRIGGER} from "../../../../shared/constants";
 import Editor from 'tui-editor';
 
 export const MentionCommandName = 'Mention';
@@ -19,8 +19,8 @@ const clonePos = (function() {
   };
 })();
 
-const nicknameRegExp = new RegExp(`^${nicknamePattern}$`);
-const idRegExp = new RegExp(`^${idPattern}$`);
+const nicknameRegExp = new RegExp(`^${NICKNAME_PATTERN}$`);
+const idRegExp = new RegExp(`^${ID_PATTERN}$`);
 const MentionCommandHandler = {
   name: MentionCommandName,
   exec(mde: any, mentionee: Mentionee) {
@@ -31,7 +31,7 @@ const MentionCommandHandler = {
     const cm = mde.getEditor();
     const doc = cm.getDoc();
     const {from, to} = mde.getCurrentRange();
-    let prefix = mentionTrigger;
+    let prefix = MENTION_TRIGGER;
     if (from.ch > 0) {
       const line = doc.getLine(from.line);
       if (line[from.ch - 1] === prefix) {

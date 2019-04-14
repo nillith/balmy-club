@@ -17,5 +17,5 @@
     "importHelpers": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
-  },
+  }
 }

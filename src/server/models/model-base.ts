@@ -1,6 +1,6 @@
-import {$id, $obfuscator, $toJsonFields} from '../constants/symbols';
-import {UnsignedIntegerObfuscator} from "../service/obfuscator.service";
-import {isSymbol} from "util";
+import {$id, $toJsonFields} from '../service/obfuscator.service';
+import {isNumber, isSymbol} from "util";
+import {Connection} from 'mysql2/promise';
 
 export interface FieldMap {
   from: string | symbol;
@@ -39,21 +39,20 @@ export const jsonStringifyByFields = function(obj: any, fields: FieldMaps) {
   return JSON.stringify(cloneByFieldMaps(obj, fields));
 };
 
-export abstract class BaseModel {
-  static [$toJsonFields]: FieldMaps = [];
+export abstract class ModelBase {
+  static unObfuscateFrom(obj: any): any {
+    throw Error('Not implemented');
+  }
+
   id?: number | string;
   [$id]?: string;
 
-  getObfuscator(): UnsignedIntegerObfuscator {
-    return this.constructor[$obfuscator];
+  isNew() {
+    return !this.id;
   }
 
   obfuscate() {
-    const self = this;
-    const obf = self.getObfuscator();
-    if (self.id) {
-      self[$id] = obf.obfuscate(self.id as number);
-    }
+    throw Error('Not implemented');
   }
 
   toString() {
@@ -65,4 +64,11 @@ export abstract class BaseModel {
     self.obfuscate();
     return cloneByFieldMaps(self, self.constructor[$toJsonFields]);
   }
+
+  protected async insertIntoDatabaseAndRetrieveId(conn: Connection, sql: string, replacements: any): Promise<void> {
+    const [result] = await conn.query(sql, replacements);
+    this.id = (result as any).insertId;
+    console.assert(isNumber(this.id));
+  }
+
 }

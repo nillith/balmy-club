@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
-import {Post} from "../../../../../shared/interf";
+import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 const enum PostActions {
   Edit,
@@ -45,7 +45,7 @@ export class PostEditorComponent implements OnInit {
 
   @Input() editMode = false;
 
-  @Input() post: Post;
+  @Input() post: PostData;
   @Input() limitCommentHeight = false;
 
   notifyParent = noop;

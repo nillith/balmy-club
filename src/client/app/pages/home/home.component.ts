@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {Post} from "../../../../shared/interf";
+import {PostData} from "../../../../shared/interf";
 import Masonry from 'masonry-layout';
 import {noop} from "../../../../shared/utils";
 import {debounce} from "lodash";
@@ -16,33 +16,9 @@ const randomInt = function(min, max) {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
 
-  posts: Post[] = [];
-  masonry?: Masonry;
-  isVisible = false;
-  notifyChildSizeChange = noop;
-
-  @ViewChild('container') container: ElementRef;
-
-  // @ViewChildren(PostCardComponent) viewChildren?: QueryList<PostCardComponent>;
-
-  ngAfterViewInit() {
-    // viewChildren is set
-    this.masonry = new Masonry(this.container.nativeElement, {
-      itemSelector: ".time-line-item"
-    });
-
-    this.notifyChildSizeChange = debounce(() => {
-      setTimeout(() => {
-        this.masonry.layout();
-      });
-    }, 110);
-    setTimeout(() => {
-      this.masonry.layout();
-      this.isVisible = true;
-    });
-  }
+  posts: PostData[] = [];
 
   constructor() {
     const post = {

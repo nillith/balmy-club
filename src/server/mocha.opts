@@ -1,7 +1,7 @@
 --require ts-node/register
 --require tsconfig-paths/register
 --require source-map-support/register
---require src/server/init.ts
+--require src/server/test-init.spec.ts
 --recursive
 src/server/**/*.spec.ts
 src/shared/**/*.spec.ts

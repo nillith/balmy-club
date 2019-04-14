@@ -1,20 +1,29 @@
 import db from '../persistence';
 import passwordService from '../service/password.service';
-import {BaseModel, cloneByFieldMaps, makeFieldMaps} from "./base.model";
-import {$id, $obfuscator, $toJsonFields} from "../constants/symbols";
-import {maxUsernameLength, minPasswordLength, Roles, usernamePattern, UserRanks} from "../../shared/constants";
-import {InvalidResult, isValidObfuscatedString, userObfuscator} from "../service/obfuscator.service";
+import {ModelBase, cloneByFieldMaps, makeFieldMaps} from "./model-base";
+import {
+  $id,
+  $obfuscator,
+  $toJsonFields,
+  INVALID_NUMERIC_ID,
+  isValidObfuscatedIdFormat,
+  obfuscatorFuns,
+  USER_OBFUSCATE_MAPS,
+  userObfuscator
+} from "../service/obfuscator.service";
+import {MAX_USERNAME_LENGTH, MIN_PASSWORD_LENGTH, Roles, USERNAME_PATTERN, UserRanks} from "../../shared/constants";
 import {JwtSignable} from "../service/auth.service";
-import {makeInstance} from "../utils/index";
+import {isNumericId, makeInstance} from "../utils/index";
 import {isNumber, isString} from "util";
 import isEmail from "validator/lib/isEmail";
+import {map} from 'lodash';
 
 export const usernameFormatIsValid = function(username: string | undefined): boolean {
-  return !!username && RegExp(`^${usernamePattern}$`).test(username) && Buffer.byteLength(username) <= maxUsernameLength;
+  return !!username && RegExp(`^${USERNAME_PATTERN}$`).test(username) && Buffer.byteLength(username) <= MAX_USERNAME_LENGTH;
 };
 
 export const passwordFormatIsValid = function(password: string | undefined): boolean {
-  return !!password && Buffer.byteLength(password) >= minPasswordLength;
+  return !!password && Buffer.byteLength(password) >= MIN_PASSWORD_LENGTH;
 };
 
 export interface UserCreateInfo {
@@ -24,11 +33,12 @@ export interface UserCreateInfo {
   role?: number;
 }
 
+
 const JWT_PAYLOAD_FIELD_MAPS = makeFieldMaps([
   $id, 'username', 'role'
 ]);
 
-export class UserModel extends BaseModel implements JwtSignable {
+export class UserModel extends ModelBase implements JwtSignable {
   static readonly [$toJsonFields] = makeFieldMaps([
     $id,
     'username',
@@ -50,9 +60,9 @@ export class UserModel extends BaseModel implements JwtSignable {
       return;
     }
     const result = makeInstance(obj, UserModel);
-    if (isString(result.id) && isValidObfuscatedString(result.id)) {
+    if (isString(result.id) && isValidObfuscatedIdFormat(result.id)) {
       result.id = userObfuscator.unObfuscate(result.id);
-      if (result.id === InvalidResult) {
+      if (result.id === INVALID_NUMERIC_ID) {
         return;
       }
     }
@@ -132,4 +142,29 @@ export class UserModel extends BaseModel implements JwtSignable {
     self.obfuscate();
     return cloneByFieldMaps(self, JWT_PAYLOAD_FIELD_MAPS);
   }
+
+  async getSubscriberIds() {
+    console.assert(isNumericId(this.id));
+    const [rows] = await db.query(`SELECT subscriberId FROM Subscriptions WHERE subscribeeId = :id`, this);
+    return map(rows as any[], e => e.subscriberId);
+  }
+
+  async getCirclerIds() {
+    console.assert(isNumericId(this.id));
+    const [rows] = await db.query(`SELECT DISTINCT(CircleUser.userId) FROM Circles LEFT JOIN CircleUser ON (Circles.id = CircleUser.circleId) WHERE Circles.ownerId = :id`, this);
+    return map(rows as any[], e => e.userId);
+  }
 }
+
+//
+// const {unObfuscateFrom, obfuscate} = obfuscatorFuns(USER_OBFUSCATE_MAPS, UserModel);
+//
+// UserModel.prototype.obfuscate = obfuscate;
+// UserModel.unObfuscateFrom = unObfuscateFrom;
+
+({
+  unObfuscateFrom: UserModel.unObfuscateFrom,
+  obfuscate: UserModel.prototype.obfuscate
+} = obfuscatorFuns(USER_OBFUSCATE_MAPS, UserModel));
+
+

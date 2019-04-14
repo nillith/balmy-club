@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {MatDialog} from "@angular/material";
 import {MentionSelectionDialogComponent, MentionSelectionListener} from "./mention-selection-dialog.component";
 import {IService} from "../../../api/i.service";
-import {mentionTrigger} from "../../../../../shared/constants";
+import {MENTION_TRIGGER} from "../../../../../shared/constants";
 
 
 interface MarkdownKeyboardEvent {
@@ -11,7 +11,7 @@ interface MarkdownKeyboardEvent {
 
 const isMentionTrigger = function(e: MarkdownKeyboardEvent) {
   const {data} = e;
-  return data && data.key === mentionTrigger;
+  return data && data.key === MENTION_TRIGGER;
 };
 
 interface MentionTriggerListener {

@@ -1,5 +1,6 @@
 import '../env';
 import path from 'path';
+
 function toNumber(envName: string) {
   return parseFloat(env[envName]!);
 }
@@ -32,7 +33,8 @@ export const config = {
       database: env.MYSQL_DATABASE,
       waitForConnections: true,
       connectionLimit: 10,
-      queueLimit: 0
+      queueLimit: 0,
+      debug: false,
     },
     mailer: {
       host: env.MAILER_HOST,
@@ -46,6 +48,7 @@ export const config = {
       user: env.OBFUSCATOR_SECRET_USER,
       post: env.OBFUSCATOR_SECRET_POST,
       circle: env.OBFUSCATOR_SECRET_CIRCLE,
+      comment: env.OBFUSCATOR_SECRET_COMMENT,
     }
   },
   password: {

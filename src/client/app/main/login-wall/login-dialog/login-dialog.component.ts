@@ -3,7 +3,7 @@ import {MatDialogRef} from "@angular/material";
 import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
-import {AuthPayload} from "../../../../../shared/interf";
+import {AuthData} from "../../../../../shared/interf";
 import {AccountService} from "../../../api/account.service";
 import {IService} from "../../../api/i.service";
 
@@ -75,7 +75,7 @@ const UiConfigs = {
 };
 
 
-interface LoginDialogModel extends AuthPayload {
+interface LoginDialogModel extends AuthData {
   passwordConfirm?: string;
 }
 
@@ -153,7 +153,7 @@ export class LoginDialogComponent implements OnInit {
 
   onConfirmChange() {
     const confirm = this.passwordConfirmModel.value;
-    if (!confirm || confirm.length < appConstants.minPasswordLength) {
+    if (!confirm || confirm.length < appConstants.MIN_PASSWORD_LENGTH) {
       return;
     }
     const password = this.passwordModel.value;
@@ -181,7 +181,7 @@ export class LoginDialogComponent implements OnInit {
           this.closeDialog();
           break;
         case DialogTypes.SignUp:
-          await accountService.signUpWithEmail(dialogModel);
+          await accountService.signUpWithUsername(dialogModel);
           this.closeDialog();
           break;
         case DialogTypes.PasswordRecoverRequest:

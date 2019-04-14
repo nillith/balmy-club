@@ -14,6 +14,7 @@
     "deprecation": {
       "severity": "warn"
     },
+    "prefer-const": false,
     "import-blacklist": [
       true,
       "rxjs/Rx"
@@ -23,13 +24,14 @@
     "max-classes-per-file": false,
     "max-line-length": false,
     "member-access": false,
+    "no-namespace": false,
     "member-ordering": [
       true,
       {
         "order": [
           "static-field",
-          "instance-field",
           "static-method",
+          "instance-field",
           "instance-method"
         ]
       }
@@ -48,6 +50,7 @@
       true,
       "ban-keywords"
     ],
+    "no-conditional-assignment": false,
     "no-string-literal": false,
     "no-empty": false,
     "no-inferrable-types": [

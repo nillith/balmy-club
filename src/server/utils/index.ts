@@ -1,6 +1,8 @@
 import {NextFunction, Request, RequestHandler, Response} from "express";
 
 import {STATUS_CODES} from 'http';
+import {identity, noop} from "../../shared/utils";
+import {isNumber} from "util";
 
 export const isAsyncFunction = (() => {
   const AsyncFunction = (async () => {
@@ -19,15 +21,6 @@ export const asyncMiddleware = function(fun: RequestHandler): RequestHandler {
   return fun;
 };
 
-export const cloneFields = function(obj: any, fields: string[]) {
-  const result: any = {};
-  for (const field of fields) {
-    if (undefined !== obj[field]) {
-      result[field] = obj[field];
-    }
-  }
-  return result;
-};
 
 export const respondWith = function(res: Response, status: number, msg?: string) {
   res.status(status).send(msg || STATUS_CODES[status]);
@@ -45,4 +38,20 @@ export const respondErrorPage = function(res: Response, errorCode: number) {
 
 export const makeInstance = function <T>(obj: object, t: { new(...arg: any[]): T }): T {
   return Object.setPrototypeOf(obj, t.prototype) as T;
+};
+
+export const getNoop = function <T extends Function>(f: T): T {
+  return noop as any as T;
+};
+
+export const devOnly = (function() {
+  if (process.env.NODE_ENV === 'production') {
+    return getNoop;
+  } else {
+    return identity;
+  }
+})();
+
+export const isNumericId = function(id?: any) {
+  return id > 0 && Number.isSafeInteger(id);
 };

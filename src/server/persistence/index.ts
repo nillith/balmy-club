@@ -1,25 +1,38 @@
 import config from '../config';
-import mysql from 'mysql2/promise';
-import {isObject} from "util";
+import mysql, {PoolConnection} from 'mysql2/promise';
+import {timeOfDay} from "../../shared/utils";
 
-const db = mysql.createPool(config.secrets.mysql);
-(db as any).pool.config.connectionConfig.namedPlaceholders = true;
+
 if (config.env === 'development') {
-
-
-  const printFun = function(obj, originalFun) {
-    return function(sql, replacements, ...rest) {
-      console.log(sql);
-      if (isObject(replacements)) {
-        console.log(replacements);
-      }
-      return originalFun.call(obj, sql, replacements, ...rest);
-    };
+  const ConnectionPrototype = require('mysql2').Connection.prototype;
+  const {addCommand} = ConnectionPrototype;
+  ConnectionPrototype.addCommand = function(cmd, ...rest) {
+    if (cmd.sql) {
+      console.log('\x1b[33m[%s]\x1b[0m: \x1b[36m%s\x1b[0m', timeOfDay(), cmd.sql);
+    }
+    return addCommand.call(this, cmd, ...rest);
   };
-
-  const db2: any = db;
-  const {execute, query} = db2;
-  db2.execute = printFun(db2, execute);
-  db2.query = printFun(db2, query);
 }
+
+type TransactionTask = (conn: mysql.PoolConnection) => Promise<void>;
+export interface MyPool extends mysql.Pool {
+  inTransaction(fun: TransactionTask): Promise<void>;
+}
+
+export const db = mysql.createPool(config.secrets.mysql) as MyPool;
+db.inTransaction = async function(this: MyPool, f: TransactionTask): Promise<void> {
+  const conn = await this.getConnection();
+  try {
+    await conn.beginTransaction();
+    await f(conn);
+    await conn.commit();
+  } catch (e) {
+    await conn.rollback();
+  } finally {
+    await conn.release();
+  }
+};
+
+(db as any).pool.config.connectionConfig.namedPlaceholders = true;
+
 export default db;

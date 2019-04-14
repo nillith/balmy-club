@@ -4,7 +4,7 @@ import mailService from "../../service/mailer.service";
 import validator from 'validator';
 import {authService, SignUpPayload, signUpService} from "../../service/auth.service";
 import {passwordFormatIsValid, UserCreateInfo, UserModel, usernameFormatIsValid} from "../../models/user.model";
-import {AuthPayload, SignUpTypes} from "../../../shared/interf";
+import {AuthData, SignUpTypes} from "../../../shared/interf";
 import {isString} from "util";
 
 const SignUpErrorMessages = {
@@ -16,7 +16,7 @@ const SignUpErrorMessages = {
   noToken: 'Token Required!',
 };
 
-const getSignUpInfo = async function(body: AuthPayload): Promise<UserCreateInfo | string> {
+const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | string> {
   let email, username, password;
   switch (body.type) {
     case SignUpTypes.Request:
@@ -59,7 +59,7 @@ const getSignUpInfo = async function(body: AuthPayload): Promise<UserCreateInfo 
 };
 
 export const signUp = async function(req: Request, res: Response, next: NextFunction) {
-  const body: AuthPayload = req.body;
+  const body: AuthData = req.body;
   const signUpInfo = await getSignUpInfo(body) as UserCreateInfo;
   if (isString(signUpInfo)) {
     return respondWith(res, 400, signUpInfo);

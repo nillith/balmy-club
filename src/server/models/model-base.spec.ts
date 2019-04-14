@@ -1,7 +1,7 @@
 import {assert} from 'chai';
-import {jsonStringifyByFields, makeFieldMaps} from "./base.model";
+import {jsonStringifyByFields, makeFieldMaps} from "./model-base";
 
-describe('BaseModel', () => {
+describe('ModelBase', () => {
   it('should create string field name from symbol', () => {
     const a = Symbol('a');
     const fields = makeFieldMaps([a, 'b']);

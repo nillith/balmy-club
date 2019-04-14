@@ -4,8 +4,8 @@ import {UserModel} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status, $user} from "../constants/symbols";
-import {accessTokenCookieKey, accessTokenKey, Roles, UserRanks} from "../../shared/constants";
-import {AccessTokenContent} from "../../shared/interf";
+import {ACCESS_TOKEN_COOKIE_KEY, ACCESS_TOKEN_KEY, Roles, UserRanks} from "../../shared/constants";
+import {AccessTokenData} from "../../shared/interf";
 
 const getToken = (() => {
   const Bearer = 'Bearer ';
@@ -13,7 +13,7 @@ const getToken = (() => {
     if (req.headers && req.headers.authorization && (req.headers.authorization as string).startsWith(Bearer)) {
       return (req.headers.authorization as string).substring(Bearer.length);
     } else {
-      return (req.query && req.query[accessTokenKey]) || req.cookies[accessTokenCookieKey];
+      return (req.query && req.query[ACCESS_TOKEN_KEY]) || req.cookies[ACCESS_TOKEN_COOKIE_KEY];
     }
   };
 })();
@@ -54,10 +54,10 @@ export class JwtHelper<TPayload extends JwtSignable, TResult = TPayload> {
   }
 }
 
-export class AuthService extends JwtHelper<UserModel, AccessTokenContent> {
+export class AuthService extends JwtHelper<UserModel, AccessTokenData> {
 
   async setTokenCookie(user: UserModel, res: Response) {
-    res.cookie(accessTokenCookieKey, await this.sign(user));
+    res.cookie(ACCESS_TOKEN_COOKIE_KEY, await this.sign(user));
   }
 
   async getRequestUser(req: Request): Promise<UserModel | undefined> {
