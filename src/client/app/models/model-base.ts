@@ -9,7 +9,7 @@ export abstract class ModelBase {
   }
 
   isNew() {
-    return !!this.id;
+    return !this.id;
   }
 
   toJSON() {

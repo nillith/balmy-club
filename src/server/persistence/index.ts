@@ -28,6 +28,8 @@ db.inTransaction = async function(this: MyPool, f: TransactionTask): Promise<voi
     await conn.commit();
   } catch (e) {
     await conn.rollback();
+    console.log(e);
+    throw e;
   } finally {
     await conn.release();
   }

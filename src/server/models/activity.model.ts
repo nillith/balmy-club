@@ -22,7 +22,7 @@ const assertValidNewModel = devOnly(function(model: ActivityModel) {
 });
 
 
-const INSERT_SQL = 'INSERT INTO `Activities` (subjectId, objectId, objectType, actionType, contextId, contextType, `timestamp`) VALUES (:subjectId, :objectId, :objectType, :actionType, :contextId, :contextType, `:timestamp`)';
+const INSERT_SQL = 'INSERT INTO `Activities` (subjectId, objectId, objectType, actionType, contextId, contextType, `timestamp`) VALUES (:subjectId, :objectId, :objectType, :actionType, :contextId, :contextType, :timestamp)';
 
 export class ActivityModel extends ModelBase {
   subjectId?: number | string;

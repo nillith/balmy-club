@@ -84,12 +84,12 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
 
   const user = req[$user];
   if (!user) {
-    return respondWith(res, 500);
+    return respondWith(res, 401);
   }
 
   const timestamp = utcTimestamp();
   post.authorId = user.id;
-  post.createAt = timestamp;
+  post.createdAt = timestamp;
 
   let mentions = post.extractMentionsFromContent();
   if (!_.isEmpty(mentions)) {
@@ -100,14 +100,14 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
 
   await db.inTransaction(async (connection) => {
     await post.insertIntoDatabase(connection);
-    const activity = new ActivityModel(user.id, post.id, Activity.ObjectTypes.Post, Activity.ContentActions.Create, timestamp);
+    const activity = new ActivityModel(user.id, post.id as number, Activity.ObjectTypes.Post, Activity.ContentActions.Create, timestamp);
     await activity.insertIntoDatabase(connection);
     if (subscriberIds && subscriberIds.length) {
       await NotificationModel.bulkInsertIntoDatabase(connection, subscriberIds, activity.id as number, timestamp);
     }
     if (!_.isEmpty(mentions)) {
       await (Promise as any).map(mentions, async (m) => {
-        const mentionActivity = new ActivityModel(user.id, m.id, Activity.ObjectTypes.User, Activity.UserActions.Mention, timestamp, post.id, Activity.ContextTypes.Post);
+        const mentionActivity = new ActivityModel(user.id, m.id, Activity.ObjectTypes.User, Activity.UserActions.Mention, timestamp, post.id as number, Activity.ContextTypes.Post);
         await mentionActivity.insertIntoDatabase(connection);
         const notification = new NotificationModel(m.id as number, mentionActivity.id as number, timestamp);
         await notification.insertIntoDatabase(connection);

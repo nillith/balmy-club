@@ -11,10 +11,6 @@ import {UserNickname} from "../../../../../shared/interf";
   styleUrls: ['./markdown-editor.component.scss']
 })
 export class MarkdownEditorComponent implements OnInit, MentionSelectionListener {
-  onUserSelected(user: UserNickname): void {
-    this.editor.mention(user);
-  }
-
   private editor: MarkdownEditor;
 
   @Input() noToolbar = false;
@@ -22,12 +18,69 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
   @Input() initialFocus = false;
   @Input() content = '';
 
+  private __disabled = false;
+
+  @Input()
+  set disabled(v: boolean) {
+    if (v) {
+      this.disableEditor();
+    } else {
+      this.enableEditor();
+    }
+  }
+
+  disableEditor() {
+    const self = this;
+    if (self.__disabled) {
+      return;
+    }
+    const {nativeElement} = self.hostElement;
+    if (!nativeElement) {
+      return;
+    }
+
+    const toolbar = nativeElement.querySelector('.te-toolbar-section');
+    if (toolbar) {
+      const buttons = toolbar.getElementsByTagName('button');
+      if (buttons && buttons[1]) {
+        buttons[1].click();
+      }
+      toolbar.style.display = 'none';
+      self.__disabled = true;
+    }
+  }
+
+  enableEditor() {
+    const self = this;
+    if (!self.__disabled) {
+      return;
+    }
+    const {nativeElement} = self.hostElement;
+    if (!nativeElement) {
+      return;
+    }
+
+    const toolbar = nativeElement.querySelector('.te-toolbar-section');
+    if (toolbar) {
+      const buttons = toolbar.getElementsByTagName('button');
+      if (buttons && buttons[0]) {
+        buttons[0].click();
+      }
+      toolbar.style.display = 'block';
+      self.__disabled = false;
+    }
+  }
+
   constructor(private hostElement: ElementRef,
               private i18Service: I18nServiceService,
               private mk: MarkdownService,
               private mentionSelectionDialogService: MentionSelectionDialogService) {
   }
 
+
+  onUserSelected(user: UserNickname): void {
+    this.editor.mention(user);
+  }
 
   ngOnInit() {
     const self = this;
@@ -52,5 +105,26 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
 
   get markdown(): string {
     return this.editor.getMarkdown();
+  }
+
+  isEmpty() {
+    try {
+      const {editor} = this;
+      const children = (editor as any).mdEditor.cm.doc.children as any[];
+      for (let i = 0; i < children.length; ++i) {
+        const {lines} = children[i];
+        let line;
+        for (let j = 0; j < lines.length; ++j) {
+          line = lines[j];
+          if (line && line.text) {
+            return false;
+          }
+        }
+      }
+      return true;
+    } catch (e) {
+      console.log(e);
+    }
+    return true;
   }
 }

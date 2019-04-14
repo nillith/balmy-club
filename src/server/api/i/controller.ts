@@ -12,3 +12,12 @@ export const changePassword = async function(req: Request, res: Response, next: 
   await user.changePassword(password);
   respondWith(res, 200);
 };
+
+
+export const createCircle = async function(req: Request, res: Response, next: NextFunction) {
+
+};
+
+export const removeCircle = async function(req: Request, res: Response, next: NextFunction) {
+
+};

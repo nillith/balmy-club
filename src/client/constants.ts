@@ -12,7 +12,7 @@ export const sideNav = [
   {
     name: 'People',
     icon: 'people',
-    link: '/people',
+    link: '/circles',
   },
 ];
 

@@ -1,3 +1,16 @@
 .non-spinner-icon {
   vertical-align: middle;
 }
+
+.spinner-switch-container {
+  display: inline-flex !important;
+  align-items: center !important;
+  mat-spinner {
+    margin: 10px 8px 10px 0;
+  }
+  mat-icon {
+    font-size: inherit;
+    margin-right: 8px;
+    padding-top: 8px;
+  }
+}

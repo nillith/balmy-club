@@ -1,5 +1,9 @@
 import {assert} from 'chai';
-import {jsonStringifyByFields, makeFieldMaps} from "./model-base";
+import {jsonStringifyByFields, makeFieldMaps, ModelBase} from "./model-base";
+
+class ModelBaseSpec extends ModelBase {
+
+}
 
 describe('ModelBase', () => {
   it('should create string field name from symbol', () => {
@@ -38,5 +42,27 @@ describe('ModelBase', () => {
     assert.strictEqual(Object.keys(clone).length, 2);
     assert.strictEqual(obj[a], clone.a);
     assert.strictEqual(obj.b, clone.b);
+  });
+
+  it('should return true for newly create obj', () => {
+    const model = new ModelBaseSpec();
+    assert.isTrue(model.isNew());
+  });
+
+  it('should throw if no $toJsonFields set when stringify', () => {
+    const model = new ModelBaseSpec();
+    assert.throw(() => {
+      JSON.stringify(model);
+    });
+  });
+
+  it('should throw when to string', () => {
+    const model = new ModelBaseSpec();
+    assert.throw(() => {
+      const t = model + '';
+    });
+    assert.throw(() => {
+      model.toString();
+    });
   });
 });

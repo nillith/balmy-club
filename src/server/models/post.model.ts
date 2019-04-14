@@ -4,11 +4,13 @@ import {
   $obfuscator,
   $reShareFromPostId,
   $visibleCircleIds,
+  obfuscatorFuns,
+  POST_OBFUSCATE_MAPS,
   postObfuscator,
 } from "../service/obfuscator.service";
 import {isValidPostVisibility, PostVisibilities} from "../../shared/interf";
 import {Connection} from 'mysql2/promise';
-import {devOnly, isNumericId} from "../utils/index";
+import {devOnly, isNumericId, undefinedToNull} from "../utils/index";
 import {TextContentModel} from "./text-content.model";
 import _ from 'lodash';
 
@@ -25,6 +27,11 @@ const INSERT_SQL = `INSERT INTO Posts (authorId, reShareFromPostId, content, cre
 
 export class PostModel extends TextContentModel {
   static readonly [$obfuscator] = postObfuscator;
+
+  static unObfuscateFrom(obj: any): PostModel | undefined {
+    throw Error('Not implemented');
+  }
+
   reShareFromPostId?: number | string;
   [$reShareFromPostId]?: string;
   visibility?: PostVisibilities;
@@ -37,15 +44,14 @@ export class PostModel extends TextContentModel {
     const self = this;
     assertValidNewModel(self);
 
-    let replacements: any;
-    if (_.isEmpty(self.mentionIds)) {
-      replacements = self;
-    } else {
-      replacements = Object.create(self);
-      replacements.mentionIds = JSON.stringify(self.mentionIds);
-    }
-
+    let replacements: any = Object.create(self);
+    replacements.mentionIds = JSON.stringify(self.mentionIds || []);
     await self.insertIntoDatabaseAndRetrieveId(con, INSERT_SQL, replacements);
   }
 }
 
+
+({
+  unObfuscateFrom: PostModel.unObfuscateFrom,
+  obfuscate: PostModel.prototype.obfuscate
+} = obfuscatorFuns(POST_OBFUSCATE_MAPS, PostModel));

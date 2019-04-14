@@ -4,16 +4,19 @@ import {DashboardComponent} from './dashboard/dashboard.component';
 import {HomeComponent} from "./home/home.component";
 import {ProjectModulesImportsModule} from "../modules/imports/project-modules-imports.module";
 import { UserPageComponent } from './u/user-page.component';
+import { CirclesComponent } from './circles/circles.component';
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
+  {path: 'circles', component: CirclesComponent},
 ];
 
 @NgModule({
   declarations: [
     HomeComponent,
     DashboardComponent,
-    UserPageComponent
+    UserPageComponent,
+    CirclesComponent
   ],
   imports: [
     ProjectModulesImportsModule,

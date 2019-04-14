@@ -3,6 +3,9 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {PostModel} from "../../../models/post.model";
 import {IService} from "../../../api/i.service";
 import {PostVisibilities} from "../../../../../shared/interf";
+import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
+import {ToastService} from "../../../services/toast.service";
+import {MAX_POST_LENGTH} from "../../../../../shared/constants";
 
 const VisibilityText = {
   [PostVisibilities.Public]: 'Public',
@@ -33,28 +36,17 @@ const VisibilityOptions = [
 export class PostEditorDialogComponent implements OnInit {
 
   post: PostModel;
-  PostVisibilities = PostVisibilities;
+  loading = false;
   @ViewChild('visibilitySelector') visibilitySelector;
   visibilityOptions = VisibilityOptions;
 
-  circleSelectOptions = [
-    {
-      id: 'oaeuaoeueoaua',
-      name: 'Friend',
-    },
-    {
-      id: 'aoeuoaeu',
-      name: 'Foe',
-    },
-    {
-      id: 'oeuaoeuoeuoeuoaeu',
-      name: 'Following'
-    }
-  ];
+  @ViewChild('markdownEditor')
+  private editor: MarkdownEditorComponent;
 
   constructor(public dialogRef: MatDialogRef<PostEditorDialogComponent>,
               @Inject(MAT_DIALOG_DATA) data: { post: PostModel },
-              public iService: IService) {
+              public iService: IService,
+              public toastService: ToastService) {
     this.post = data.post;
   }
 
@@ -77,5 +69,34 @@ export class PostEditorDialogComponent implements OnInit {
 
   onVisibilityChange(e) {
     this.post.visibility = e.value;
+  }
+
+
+  cancelPost() {
+    const self = this;
+    self.editor.disableEditor();
+    // self.dialogRef.close();
+  }
+
+  async publishPost() {
+    const self = this;
+    self.loading = true;
+    let content = self.editor.markdown;
+    if (content) {
+      content = content.trim();
+    }
+    if (!content) {
+      this.toastService.showToast('Empty post is not allowed!');
+      return;
+    }
+
+    if (content.length > MAX_POST_LENGTH) {
+      this.toastService.showToast(`Post exceeded max length: ${MAX_POST_LENGTH}!`);
+    }
+    const {post} = self;
+    post.content = content;
+    await post.save();
+    self.dialogRef.close();
+    self.loading = false;
   }
 }

@@ -2,6 +2,7 @@ import {NextFunction, Request, RequestHandler, Response} from "express";
 
 import {STATUS_CODES} from 'http';
 import {identity, noop} from "../../shared/utils";
+import {isUndefined} from "util";
 
 export const isAsyncFunction = (() => {
   const AsyncFunction = (async () => {
@@ -14,7 +15,10 @@ export const isAsyncFunction = (() => {
 export const asyncMiddleware = function(fun: RequestHandler): RequestHandler {
   if (isAsyncFunction(fun)) {
     return function(req: Request, res: Response, next: NextFunction) {
-      Promise.resolve(fun(req, res, next)).catch(next);
+      Promise.resolve(fun(req, res, next)).catch((e) => {
+        console.error(e);
+        next(e);
+      });
     };
   }
   return fun;
@@ -36,7 +40,6 @@ export const respondErrorPage = function(res: Response, errorCode: number) {
 };
 
 
-
 export const getNoop = function <T extends Function>(f: T): T {
   return noop as any as T;
 };
@@ -51,4 +54,12 @@ export const devOnly = (function() {
 
 export const isNumericId = function(id?: any) {
   return id > 0 && Number.isSafeInteger(id);
+};
+
+export const undefinedToNull = function(obj: any, keys: string[]) {
+  for (const key of keys) {
+    if (isUndefined(!obj[key])) {
+      obj[key] = null;
+    }
+  }
 };

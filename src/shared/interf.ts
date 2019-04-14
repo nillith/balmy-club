@@ -146,3 +146,16 @@ export interface PostData extends TextContentData {
   visibility?: number;
   visibleCircleIds?: string[];
 }
+
+export interface CircleData {
+  id?: string;
+  name?: string;
+  userIds?: string[];
+  newUserIds: string[];
+  deletedUserIds: string[];
+}
+
+export interface SyncCircleData {
+  circles?: CircleData[];
+  newCircles?: CircleData[];
+}

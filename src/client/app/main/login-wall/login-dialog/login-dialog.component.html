@@ -53,12 +53,11 @@
       </mat-error>
     </div>
     <div fxLayout="row" fxLayoutAlign="center center" style="width:100%">
-      <button [disabled]="!formRef.form.valid || loading" class="my-login-button" mat-button mat-raised-button
+      <button mat-button mat-raised-button
               color="mat-red"
               (click)="onSubmit()" #button>
       <span>
-        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'"></app-spinner-switch>
-        {{submitButtonText}}
+        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'" [text]="submitButtonText"></app-spinner-switch>
       </span>
       </button>
     </div>

@@ -56,22 +56,12 @@ export class UserModel extends ModelBase implements JwtSignable {
   password?: string;
   email?: string;
 
-  static from(obj: object): UserModel | undefined {
-    if (!obj) {
-      return;
-    }
-    const result = makeInstance(obj, UserModel);
-    if (isString(result.id) && isValidObfuscatedIdFormat(result.id)) {
-      result.id = userObfuscator.unObfuscate(result.id);
-      if (result.id === INVALID_NUMERIC_ID) {
-        return;
-      }
-    }
-    return result;
+  static unObfuscateFrom(obj: any): UserModel | undefined {
+    throw Error('Not implemented');
   }
 
   static async create(body: UserCreateInfo): Promise<UserModel | undefined> {
-    const user = UserModel.from({
+    const user = UserModel.unObfuscateFrom({
       email: body.email,
       username: body.username,
       password: body.password,
@@ -101,9 +91,9 @@ export class UserModel extends ModelBase implements JwtSignable {
 
   static async findById(id: number | string): Promise<UserModel | undefined> {
     console.assert(isFinite(id as number));
-    const [rows] = await db.query('SELECT * FROM Users WHERE id = :id', {id});
+    const [rows] = await db.query('SELECT * FROM Users WHERE id = :id LIMIT 1', {id});
     if (rows && (rows as any).length) {
-      return UserModel.from(rows[0]) as UserModel;
+      return makeInstance(rows[0], UserModel);
     }
   }
 
@@ -113,7 +103,7 @@ export class UserModel extends ModelBase implements JwtSignable {
     }
     const [rows] = await db.query(`SELECT id, username, role, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
     if (rows && (rows as any).length) {
-      const user = UserModel.from(rows[0]) as UserModel;
+      const user = makeInstance(rows[0], UserModel);
       if (await user!.verifyPassword(password)) {
         return user;
       }
@@ -156,12 +146,6 @@ export class UserModel extends ModelBase implements JwtSignable {
     return map(rows as any[], e => e.userId);
   }
 }
-
-//
-// const {unObfuscateFrom, obfuscate} = obfuscatorFuns(USER_OBFUSCATE_MAPS, UserModel);
-//
-// UserModel.prototype.obfuscate = obfuscate;
-// UserModel.unObfuscateFrom = unObfuscateFrom;
 
 ({
   unObfuscateFrom: UserModel.unObfuscateFrom,

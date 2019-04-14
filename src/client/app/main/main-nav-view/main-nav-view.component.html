@@ -6,6 +6,7 @@
     <mat-toolbar>Menu</mat-toolbar>
     <mat-nav-list>
       <a *ngFor="let entry of entries" mat-list-item
+         (click)="drawer.toggle()"
          [routerLink]="entry.link">
         <mat-icon class="icon">{{entry.icon}}</mat-icon>
         <span class="label">{{entry.name}}</span>

@@ -66,7 +66,7 @@ export class AuthService extends JwtHelper<UserModel, AccessTokenData> {
       return;
     }
     const payload = await this.verify(token);
-    return UserModel.findById(payload.id!);
+    return UserModel.unObfuscateFrom(payload);
   }
 
   requireRole(requiredRole: string): RequestHandler {
@@ -96,6 +96,7 @@ export const requireLogin = asyncMiddleware(async function(req: Request, res: Re
       return respondWith(res, 401);
     }
     req[$user] = user;
+    next();
   } catch (e) {
     (e as any)[$status] = 401;
     next(e);

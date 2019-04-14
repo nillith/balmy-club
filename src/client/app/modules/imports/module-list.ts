@@ -98,5 +98,5 @@ export const commonExternalModules = [
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
-  MatTreeModule
+  MatTreeModule,
 ];
