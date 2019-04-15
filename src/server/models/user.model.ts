@@ -124,7 +124,9 @@ export class UserModel extends ModelBase implements JwtSignable {
     const [rows] = await driver.query(`SELECT id, nickname, avatarUrl FROM Users WHERE id = :userId LIMIT 1`, {
       userId
     });
-    return rows && rows[0];
+    if (rows && rows[0]) {
+      return makeInstance(rows[0], UserModel);
+    }
   }
 
   static async findById(id: number | string): Promise<UserModel | undefined> {

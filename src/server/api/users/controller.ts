@@ -12,7 +12,7 @@ export const getUserById = async function(req: Request, res: Response, next: Nex
   if (isValidObfuscatedIdFormat(id)) {
     const userId = userObfuscator.unObfuscate(id);
     if (INVALID_NUMERIC_ID !== userId) {
-      const user = UserModel.getUserPublicDataById(userId);
+      const user = await UserModel.getUserPublicDataById(userId);
       if (user) {
         return res.json(user);
       }

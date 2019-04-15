@@ -15,6 +15,7 @@ export class UserModel extends ModelBase {
   nickname: string;
   username: string;
   email: string;
+  isMe?: boolean;
 
   constructor(http: HttpClient, userData?: UserData) {
     super(http);

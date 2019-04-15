@@ -83,6 +83,7 @@ export class IService {
     const self = this;
     self.me = new UserModel(self.http);
     self.me.assign(data);
+    self.me.isMe = true;
   }
 
   private unpackCircleData(circleData: any) {
@@ -233,6 +234,21 @@ export class IService {
     await self.signUpWithPayload({
       email, username, password, nickname, type: SignUpTypes.Direct
     });
+  }
+
+  private createUser() {
+    return new UserModel(this.http);
+  }
+
+  async viewUserById(id: string): Promise<UserModel> {
+    const self = this;
+    if (self.me.id === id) {
+      return self.me;
+    }
+    const data = await self.http.get(`${API_URLS.USERS}/${id}`).toPromise();
+    const user = self.createUser();
+    user.assign(data);
+    return user;
   }
 }
 

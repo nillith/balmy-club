@@ -1,4 +1,24 @@
-<p *ngIf="loading">Loading...</p>
-<div *ngIf="!loading">
-
+<div class="user-page-container">
+  <p *ngIf="loading">Loading...</p>
+  <div *ngIf="!loading">
+    <div class="user-page-header" fxLayout="column" fxLayoutAlign="center center">
+      <div class="user-banner-image">
+        <app-avatar class="user-header-avatar" [user]="user" [size]="'128px'"></app-avatar>
+        <div class="user-circle-button">
+          <div style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
+            <mat-select #circleSelector multiple style="width:100px;" (selectionChange)="onCircleSelectionChange($event)">
+              <mat-option *ngFor="let opt of iService.circles" [value]="opt.id">{{opt.name}}</mat-option>
+            </mat-select>
+          </div>
+          <button mat-raised-button (click)="onCircleButtonClick()">Circle</button>
+        </div>
+        <img
+          src="https://lh3.googleusercontent.com/MSvat8V3fkwIIwcY3j64pvr3j1kKYl42wWIDniyWbCD3uxdfqecmGA4UesFt8HrhONuh6b3m9RQ32lOng2ALru-FoDXKj1LrpCg"
+          #banner>
+      </div>
+    </div>
+    <div class="user-page-content">
+    </div>
+  </div>
 </div>
+

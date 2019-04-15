@@ -1,0 +1,39 @@
+.user-page-container {
+  height: 100%;
+}
+
+.user-page-header {
+  position: relative;
+}
+
+.user-page-content {
+
+}
+
+.user-banner-image {
+  width: 827px;
+  height: 468px;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+  .user-header-avatar {
+    position: absolute;
+    bottom: 10px;
+    left: 200px;
+    z-index: 1000;
+  }
+
+  .user-circle-button {
+    position: absolute;
+    bottom: 22px;
+    right: 200px;
+    z-index: 1000;
+  }
+
+}
