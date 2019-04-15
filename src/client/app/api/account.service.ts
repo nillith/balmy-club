@@ -20,7 +20,7 @@ export class AccountService {
   private async signUpWithPayload(payload: AuthData) {
     const self = this;
     const authData = await self.postSignUpPayload(payload);
-    self.iService.onAuthSucceed(JSON.parse(authData));
+    self.iService.onLogin(JSON.parse(authData));
     location.reload();
   }
 

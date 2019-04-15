@@ -43,7 +43,11 @@ export class AvatarSettingDialogComponent implements OnInit {
         self.i.logout();
       }, 200);
     });
-    self.dialogRef.close();
+    self.closeDialog();
+  }
+
+  closeDialog() {
+    this.dialogRef.close();
   }
 
 }

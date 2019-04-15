@@ -1,21 +1,19 @@
-<div style="width:300px;height: 150px;" id="my-id-id-id"
-     gdAreas="avatar avatar info info info | footer footer footer footer footer">
+<div class="setting-dialog-container"
+     gdAreas="avatar avatar info info info">
   <div gdArea="avatar">
-    <button class="app-avatar-larger">
-      <img src="../../../assets/default-avatar.png" style="max-width:100%;max-height:100%">
-    </button>
+    <app-avatar [user]="i.me" [size]="'128px'"></app-avatar>
   </div>
   <div gdArea="info">
-    <p>My Awesome Name</p>
-    <p>my@awsome.mail</p>
+    <p>{{i.me.nickname}}</p>
+    <p>{{i.me.username}}</p>
     <p>
-      <a [routerLink]="'sign-up'">
+      <a class="setting-link" (click)="closeDialog()" [routerLink]="'settings'" fxLayout="row" fxLayoutAlign="left center">
         <mat-icon class="icon">settings</mat-icon>
         <span class="label">Settings</span>
       </a>
     </p>
-  </div>
-  <div gdArea="footer">
-    <button (click)="logout()">logout</button>
+    <p>
+      <button mat-raised-button (click)="logout()">logout</button>
+    </p>
   </div>
 </div>

@@ -127,7 +127,7 @@ describe('user', () => {
       assert.notEqual(user.id, payload.id);
       assert.isTrue(isValidObfuscatedIdFormat(payload.id));
       assert.isObject(payload, typeof payload);
-      const clone = UserModel.from(payload);
+      const clone = UserModel.unObfuscateFrom(payload);
       assert.isDefined(clone);
       assert.strictEqual(user.id, clone!.id);
     });
@@ -140,7 +140,7 @@ describe('user', () => {
       assert.isTrue(isValidObfuscatedIdFormat(payload.id));
       assert.isObject(payload, typeof payload);
       payload.id = '554d8f9e22022b23994ecff49b5033d1';
-      const clone = UserModel.from(payload);
+      const clone = UserModel.unObfuscateFrom(payload);
       assert.isUndefined(clone);
     });
   });

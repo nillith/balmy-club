@@ -35,6 +35,11 @@ export const createCircle = async function(req: Request, res: Response, next: Ne
   return respondWith(res, 200, circle[$id]);
 };
 
+export const getAllMyCircles = async function(req: Request, res: Response, next: NextFunction) {
+  const user = req[$user];
+  const data = await CircleModel.getAllCircleForUser(user.id);
+  return res.json(data);
+};
 export const removeCircle = async function(req: Request, res: Response, next: NextFunction) {
 
 };

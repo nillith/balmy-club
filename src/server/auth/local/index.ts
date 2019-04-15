@@ -34,11 +34,7 @@ router.post('/', (req, res, next) => {
     if (!user) {
       return res.status(404).json({message: 'Something went wrong, please try again.'});
     }
-    const token = await authService.sign(user, req.body.rememberMe ? '2w' : undefined);
-    res.json({
-      token,
-      user
-    });
+    res.json(await user.getLoginData(req.body.rememberMe ? '2w' : undefined));
   })(req, res, next);
 });
 

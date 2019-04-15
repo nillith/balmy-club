@@ -1,8 +1,8 @@
 import {NextFunction, Request, RequestHandler, Response} from "express";
-
+import validator from 'validator';
 import {STATUS_CODES} from 'http';
 import {identity, noop} from "../../shared/utils";
-import {isUndefined} from "util";
+import {isString, isUndefined} from "util";
 import {MAX_URL_LENGTH} from "../../shared/constants";
 
 export const isAsyncFunction = (() => {
@@ -78,3 +78,27 @@ export const isValidURL = (function() {
     return url && url.length < MAX_URL_LENGTH && validator.isURL(url, options);
   };
 })();
+
+export const throwNotAllowed = function() {
+  throw Error('Not allowed');
+};
+
+export const disableStringify = function(obj: any) {
+  if (obj) {
+    obj.toString = throwNotAllowed;
+    obj.JSON = throwNotAllowed;
+  }
+};
+
+export const trimFields = function(obj: any) {
+  let keys = Object.keys(obj);
+  if (keys.length > 100) {
+    throw Error(`too many keys`);
+  }
+  for (const k of keys) {
+    const f = obj[k];
+    if (isString(f)) {
+      obj[k] = f.trim();
+    }
+  }
+};

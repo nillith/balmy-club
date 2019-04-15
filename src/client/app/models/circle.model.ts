@@ -45,11 +45,17 @@ export class CircleModelModifier {
 }
 
 export class CircleModel extends ModelBase {
+  static ASSIGN_FIELDS: string[] = [
+    'id',
+    'name',
+    'users',
+  ];
   name?: string;
-  users?: UserModel[] = [];
+  users: UserModel[] = [];
   userIds?: string[];
   addUserIds?: string[];
   removeUserIds?: string[];
+  userCount = 0;
 
   constructor(http: HttpClient, public ownerId: string, private iService: IService) {
     super(http);
@@ -62,8 +68,7 @@ export class CircleModel extends ModelBase {
       userIds: self.users && self.users.map(u => u.id)
 
     }, {responseType: 'text'}).toPromise();
-    self.iService.circles.push(self);
-    console.log(self.id);
+    self.iService.onCircleCreated(self);
   }
 
 

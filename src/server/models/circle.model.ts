@@ -1,7 +1,15 @@
 import {DatabaseDriver, ModelBase} from "./model-base";
-import {devOnly, isNumericId} from "../utils/index";
+import {devOnly, disableStringify, isNumericId} from "../utils/index";
 import _ from "lodash";
-import {$userIds, CIRCLE_OBFUSCATE_MAPS, obfuscatorFuns} from "../service/obfuscator.service";
+import {
+  $userIds,
+  CIRCLE_OBFUSCATE_MAPS,
+  circleObfuscator,
+  obfuscatorFuns,
+  userObfuscator
+} from "../service/obfuscator.service";
+import db from "../persistence/index";
+import {OtherUser} from "./user.model";
 
 const INSERT_SQL = `INSERT INTO Circles (name, ownerId) VALUES (:name, :ownerId)`;
 
@@ -27,6 +35,38 @@ const assertValidUserIds = devOnly(function(model: CircleModel) {
   });
 });
 
+export interface CircleUsers {
+  id: number | string;
+  name?: string;
+  userCount: number;
+  users: OtherUser[];
+}
+
+export class CirclePacker {
+  circles?: CircleUsers[];
+
+  toJSON() {
+    const {circles} = this;
+    if (!circles) {
+      return [];
+    }
+
+    return _.map(circles, (circle) => {
+      return {
+        id: circleObfuscator.obfuscate(circle.id as number),
+        name: circle.name,
+        userCount: circle.userCount,
+        users: _.map(circle.users || [], (user) => {
+          return {
+            id: userObfuscator.obfuscate(user.id as number),
+            nickname: user.nickname,
+            avatarUrl: user.avatarUrl
+          };
+        })
+      };
+    });
+  }
+}
 
 export class CircleModel extends ModelBase {
   userIds?: (number[]) | (string[]);
@@ -36,12 +76,28 @@ export class CircleModel extends ModelBase {
     throw Error('Not implemented');
   }
 
+  static async getAllCircleForUser(ownerId: number, driver: DatabaseDriver = db) {
+    const [circleRows] = await driver.query(`SELECT id, name, userCount FROM Circles WHERE ownerId = :ownerId`, {ownerId});
+    const data = await Promise.all(_.map((circleRows || []) as any[], async (circle) => {
+      const [userRows] = await driver.query(`SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :id)`, circle);
+      circle.users = userRows;
+      disableStringify(circle);
+      disableStringify(circle.users);
+      return circle as CircleUsers;
+    }));
+    disableStringify(data);
+    const pack = new CirclePacker();
+    pack.circles = data;
+    return pack;
+  }
+
+
   constructor(public name: string, public ownerId: number) {
     super();
   }
 
 
-  async insertIntoDatabase(driver: DatabaseDriver): Promise<void> {
+  async insertIntoDatabase(driver: DatabaseDriver = db): Promise<void> {
     const self = this;
     assertValidNewModel(self);
     await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, this);
@@ -50,7 +106,7 @@ export class CircleModel extends ModelBase {
     }
   }
 
-  async batchAddUser(driver: DatabaseDriver) {
+  async batchAddUser(driver: DatabaseDriver = db) {
     const self = this;
     assertValidUserIds(this);
     if (!isNumericId(self.id)) {
@@ -59,7 +115,7 @@ export class CircleModel extends ModelBase {
     await driver.query(`INSERT INTO CircleUser (circleId, userId) SELECT :circleId, Users.id FROM Users WHERE id IN (:userIds) AND id NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :ownerId)`, this);
   }
 
-  async addUserId(driver: DatabaseDriver, userId: number): Promise<void> {
+  async addUserId(userId: number, driver: DatabaseDriver = db): Promise<void> {
     const self = this;
     assertValidUserAction(self, userId);
     await driver.query(`INSERT INTO CircleUser (circleId, userId) VALUES (:circleId, :userId)`, {
@@ -68,7 +124,7 @@ export class CircleModel extends ModelBase {
     });
   }
 
-  async removeUserId(driver: DatabaseDriver, userId: number): Promise<void> {
+  async removeUserId(userId: number, driver: DatabaseDriver = db): Promise<void> {
     const self = this;
     assertValidUserAction(self, userId);
     await driver.query(`DELETE FROM CircleUser WHERE circleId = :circleId AND userId = :userId`, {
@@ -77,7 +133,7 @@ export class CircleModel extends ModelBase {
     });
   }
 
-  async removeSelf(driver: DatabaseDriver) {
+  async removeSelf(ownerId: number, driver: DatabaseDriver = db) {
     await driver.query(`DELETE FROM Circles WHERE id = :id`, this);
   }
 }

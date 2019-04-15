@@ -1,5 +1,5 @@
 import {assert} from 'chai';
-import {devOnly, getNoop, isAsyncFunction, isNumericId} from "./index";
+import {devOnly, getNoop, isAsyncFunction, isNumericId, isValidURL} from "./index";
 import {noop} from "../../shared/utils";
 
 
@@ -49,5 +49,17 @@ describe('Server.Utils', () => {
     assert.isFalse(isNumericId(0));
     assert.isFalse(isNumericId(-1));
     assert.isFalse(isNumericId(1.00001));
+  });
+
+  const INVALID_URLS = [
+    'javascript:alert(document.domain)',
+    'jAvasCrIPT:alert(document.domain)',
+    'JaVaScRiP%0at:alert(document.domain)',
+  ];
+
+  it('should return false for invalid url', () => {
+    for (const url of INVALID_URLS) {
+      assert.isFalse(isValidURL(url));
+    }
   });
 });

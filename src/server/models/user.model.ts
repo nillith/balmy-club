@@ -10,12 +10,13 @@ import {
   userObfuscator
 } from "../service/obfuscator.service";
 import {Roles, UserRanks} from "../../shared/constants";
-import {JwtSignable} from "../service/auth.service";
+import {authService, JwtSignable} from "../service/auth.service";
 import {devOnly, isNumericId} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
 import {map} from 'lodash';
 import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} from "../../shared/utils";
 import {SettingsData} from "../../shared/interf";
+import {CircleModel} from "./circle.model";
 
 
 export interface UserCreateInfo {
@@ -43,8 +44,8 @@ const createSaveSettingsSql = (function() {
   return function(data: SettingsData) {
     const updates = Object.keys(data).map((k) => {
       const col = AllowedDbColumnMap[k];
-      if (col) {
-        return `\`${col}\` = : ${k}`;
+      if (col && data[k]) {
+        return `\`${col}\` = :${k}`;
       }
     })
       .filter(Boolean)
@@ -63,6 +64,11 @@ const assertValidNewModel = devOnly(function(model: UserModel) {
 });
 const INSERT_SQL = `INSERT INTO Users (username, nickname, email, role, salt, hash) VALUES(:username, :nickname, :email, :role, :salt, :hash)`;
 
+export interface OtherUser {
+  id: string | number;
+  nickname: string;
+  avatarUrl: string;
+}
 
 export class UserModel extends ModelBase implements JwtSignable {
   static readonly [$toJsonFields] = makeFieldMaps([
@@ -70,7 +76,8 @@ export class UserModel extends ModelBase implements JwtSignable {
     'username',
     'nickname',
     'email',
-    'role'
+    'role',
+    'avatarUrl'
   ]);
 
   static readonly [$obfuscator] = userObfuscator;
@@ -184,6 +191,18 @@ export class UserModel extends ModelBase implements JwtSignable {
     if (data.password) {
       await self.changePassword(data.password, driver);
     }
+  }
+
+  async getLoginData(expire?: string | number) {
+    const self = this;
+    const token = await authService.sign(self, expire);
+    const circles = await CircleModel.getAllCircleForUser(self.id as number);
+
+    return {
+      token,
+      user: self,
+      circles,
+    };
   }
 }
 

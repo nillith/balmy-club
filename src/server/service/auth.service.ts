@@ -114,3 +114,4 @@ export class SignUpPayload implements JwtSignable {
 }
 
 export const signUpService = new JwtHelper<SignUpPayload>(config.secrets.signUp!, '2d');
+

@@ -169,3 +169,25 @@ export interface SettingsData {
   nickname?: string;
   avatarUrl?: string;
 }
+
+
+export interface LoginData {
+  token: string;
+  user: {
+    id: string,
+    email?: string,
+    username: string,
+    nickname: string,
+    avatarUrl: string
+  };
+  circles: {
+    id: string,
+    name: string,
+    userCount: number,
+    users: {
+      id: string,
+      nickname: string,
+      avatarUrl: string
+    }[]
+  }[];
+}

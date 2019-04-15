@@ -93,10 +93,7 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
     case SignUpTypes.Direct:
       const user = await UserModel.create(signUpInfo);
       if (user) {
-        return res.json({
-          token: await authService.sign(user),
-          user
-        });
+        return res.json(await user.getLoginData());
       }
       break;
     default:
