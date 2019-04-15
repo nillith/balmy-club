@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {LoginWallService} from "../login-wall/login-wall.service";
 import {MatDialog} from "@angular/material";
 import {SettingService} from "../avatar-setting-dialog/setting.service";
-import {IService} from "../../api/i.service";
+import {IService} from "../../services/i.service";
 
 export interface NavEntry {
   readonly name: string;

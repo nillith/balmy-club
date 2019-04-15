@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MatDialog} from "@angular/material";
 import {MentionSelectionDialogComponent, MentionSelectionListener} from "./mention-selection-dialog.component";
-import {IService} from "../../../api/i.service";
+import {IService} from "../../../services/i.service";
 import {MENTION_TRIGGER} from "../../../../../shared/constants";
 
 

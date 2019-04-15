@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {appConstants} from "../../app.constants";
 import {NgForm, NgModel} from "@angular/forms";
 import {SettingsData} from "../../../../shared/interf";
-import {IService} from "../../api/i.service";
+import {IService} from "../../services/i.service";
 import {ToastService} from "../../services/toast.service";
 
 @Component({

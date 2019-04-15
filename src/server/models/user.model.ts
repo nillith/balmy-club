@@ -120,6 +120,13 @@ export class UserModel extends ModelBase implements JwtSignable {
     return !!rows && !!(rows as any).length;
   }
 
+  static async getUserPublicDataById(userId: number, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query(`SELECT id, nickname, avatarUrl FROM Users WHERE id = :userId LIMIT 1`, {
+      userId
+    });
+    return rows && rows[0];
+  }
+
   static async findById(id: number | string): Promise<UserModel | undefined> {
     console.assert(isFinite(id as number));
     const [rows] = await db.query('SELECT * FROM Users WHERE id = :id LIMIT 1', {id});

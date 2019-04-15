@@ -20,14 +20,16 @@
   <mat-divider></mat-divider>
   <mat-card-content fxLayout="column">
     <div *ngIf="editMode">
-      <app-markdown-editor #markdownEditor [content]="post.content"></app-markdown-editor>
-      <mat-divider></mat-divider>
-      <mat-card-actions align="end">
-        <button mat-raised-button (click)="cancelEdit()">Cancel</button>
-        <button mat-raised-button (click)="saveEdit()">Save</button>
-      </mat-card-actions>
+      <div class="markdown-editor-container">
+        <app-markdown-editor #markdownEditor [content]="post.content"></app-markdown-editor>
+        <mat-divider></mat-divider>
+        <mat-card-actions align="end" class="post-editor-content-section">
+          <button mat-raised-button (click)="cancelEdit()">Cancel</button>
+          <button mat-raised-button (click)="saveEdit()">Save</button>
+        </mat-card-actions>
+      </div>
     </div>
-    <app-markdown-viewer *ngIf="!editMode" [content]="post.content"></app-markdown-viewer>
+    <app-markdown-viewer *ngIf="!editMode" [content]="post.content" class="post-editor-content-section"></app-markdown-viewer>
   </mat-card-content>
   <mat-card-actions align="end" style="padding:1em;">
     <button mat-icon-button color="accent">

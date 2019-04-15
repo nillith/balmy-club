@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {IService} from "../../api/i.service";
+import {IService} from "../../services/i.service";
 import {CircleModel, CircleModelModifier} from "../../models/circle.model";
 import {appConstants} from "../../app.constants";
 import {ToastService} from "../../services/toast.service";

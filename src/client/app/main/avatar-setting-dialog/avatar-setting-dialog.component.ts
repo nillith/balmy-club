@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {IService} from "../../api/i.service";
+import {IService} from "../../services/i.service";
 import {makeBackdropTransparent} from "../../../utils/index";
 
 @Component({

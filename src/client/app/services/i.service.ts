@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
-import {AccessTokenData, AuthData, LoginData, SettingsData, UserData} from "../../../shared/interf";
+import {AccessTokenData, AuthData, LoginData, SettingsData, SignUpTypes, UserData} from "../../../shared/interf";
 import {API_URLS} from "../../constants";
 import {UserModel} from "../models/user.model";
 import {CircleModel} from "../models/circle.model";
@@ -201,4 +201,39 @@ export class IService {
     }).toPromise();
     self.updateUserData(data as UserData);
   }
+
+
+  private async postSignUpPayload(payload: AuthData): Promise<string> {
+    return this.http.post(API_URLS.ACCOUNT, payload, {responseType: 'text'}).toPromise();
+  }
+
+  private async signUpWithPayload(payload: AuthData) {
+    const self = this;
+    const authData = await self.postSignUpPayload(payload);
+    self.onLogin(JSON.parse(authData));
+    location.reload();
+  }
+
+  async requestSignUp(payload: AuthData) {
+    const {email} = payload;
+    return this.postSignUpPayload({email});
+  }
+
+  async signUpWithToken(payload: AuthData) {
+    const self = this;
+    const {token, username, password, nickname} = payload;
+    await self.signUpWithPayload({
+      token, username, password, nickname, type: SignUpTypes.WithToken
+    });
+  }
+
+  async signUpWithUsername(payload: AuthData) {
+    const self = this;
+    const {email, username, password, nickname} = payload;
+    await self.signUpWithPayload({
+      email, username, password, nickname, type: SignUpTypes.Direct
+    });
+  }
 }
+
+

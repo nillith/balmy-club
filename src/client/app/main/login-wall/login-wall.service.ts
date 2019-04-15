@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {LoginDialogComponent} from "./login-dialog/login-dialog.component";
-import {IService} from "../../api/i.service";
+import {IService} from "../../services/i.service";
 
 @Injectable({
   providedIn: 'root'

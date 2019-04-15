@@ -17,7 +17,7 @@ export class PostModel extends TextContentModel {
 
   protected async create(): Promise<void> {
     const self = this;
-    const data = await self.http.post(API_URLS.POST, self.cloneModelFields([
+    const data = await self.http.post(API_URLS.POSTS, self.cloneModelFields([
       'content',
       'reShareFromPostId',
       'visibility',

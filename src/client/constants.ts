@@ -24,9 +24,10 @@ export const sideNav = [
 export const DEFAULT_AVATAR_URL = 'assets/default-avatar.png';
 
 export const API_URLS = {
-  POST: 'api/posts',
-  CIRCLE: 'api/i/circles',
+  POSTS: 'api/posts',
+  CIRCLES: 'api/i/circles',
   SETTINGS: 'api/i/settings',
-  USER: 'api/users',
+  USERS: 'api/users',
   LOGIN: 'auth/local',
+  ACCOUNT: 'api/account'
 };

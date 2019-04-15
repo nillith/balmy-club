@@ -4,8 +4,7 @@ import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
 import {AuthData} from "../../../../../shared/interf";
-import {AccountService} from "../../../api/account.service";
-import {IService} from "../../../api/i.service";
+import {IService} from "../../../services/i.service";
 
 enum DialogTypes {
   Login,
@@ -105,7 +104,6 @@ export class LoginDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
               private activeRoute: ActivatedRoute,
               private router: Router,
-              private accountService: AccountService,
               private iService: IService) {
   }
 
@@ -175,7 +173,7 @@ export class LoginDialogComponent implements OnInit {
     const self = this;
     try {
       self.error = '';
-      const {dialogType, dialogModel, accountService, iService} = self;
+      const {dialogType, dialogModel, iService} = self;
       self.loading = true;
       switch (dialogType) {
         case DialogTypes.Login:
@@ -183,7 +181,7 @@ export class LoginDialogComponent implements OnInit {
           this.closeDialog();
           break;
         case DialogTypes.SignUp:
-          await accountService.signUpWithUsername(dialogModel);
+          await iService.signUpWithUsername(dialogModel);
           this.closeDialog();
           break;
         case DialogTypes.PasswordRecoverRequest:

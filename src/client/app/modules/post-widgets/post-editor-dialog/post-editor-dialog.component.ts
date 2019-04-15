@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {PostModel} from "../../../models/post.model";
-import {IService} from "../../../api/i.service";
+import {IService} from "../../../services/i.service";
 import {PostVisibilities} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {ToastService} from "../../../services/toast.service";
@@ -74,29 +74,36 @@ export class PostEditorDialogComponent implements OnInit {
 
   cancelPost() {
     const self = this;
-    self.editor.disableEditor();
-    // self.dialogRef.close();
+    self.dialogRef.close();
   }
 
   async publishPost() {
     const self = this;
     self.loading = true;
-    let content = self.editor.markdown;
-    if (content) {
-      content = content.trim();
-    }
-    if (!content) {
-      this.toastService.showToast('Empty post is not allowed!');
-      return;
-    }
+    try {
+      let content = self.editor.markdown;
+      if (content) {
+        content = content.trim();
+      }
+      if (!content) {
+        self.toastService.showToast('Empty post is not allowed!');
+        return;
+      }
 
-    if (content.length > MAX_POST_LENGTH) {
-      this.toastService.showToast(`Post exceeded max length: ${MAX_POST_LENGTH}!`);
+      if (content.length > MAX_POST_LENGTH) {
+        self.toastService.showToast(`Post exceeded max length: ${MAX_POST_LENGTH}!`);
+      }
+      const {post} = self;
+      post.content = content;
+      self.editor.disableEditor();
+      await post.save();
+      self.dialogRef.close();
+      self.toastService.showToast(`Post Succeed!`);
+    } catch (e) {
+      self.toastService.showToast(e.error || e.message);
+      self.editor.enableEditor();
+    } finally {
+      self.loading = false;
     }
-    const {post} = self;
-    post.content = content;
-    await post.save();
-    self.dialogRef.close();
-    self.loading = false;
   }
 }

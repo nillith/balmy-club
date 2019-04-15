@@ -2,9 +2,9 @@ import {ModelBase} from "./model-base";
 import {HttpClient} from "@angular/common/http";
 import {API_URLS} from "../../constants";
 import {UserModel} from "./user.model";
-import {IService} from "../api/i.service";
+import {IService} from "../services/i.service";
 
-const API_URL = API_URLS.CIRCLE;
+const API_URL = API_URLS.CIRCLES;
 
 export class CircleModelModifier {
   users?: UserModel[] = [];
