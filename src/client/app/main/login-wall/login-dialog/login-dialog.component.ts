@@ -40,6 +40,7 @@ const PasswordToggleTexts = {
 
 interface UiConfig {
   username?: boolean;
+  nickname?: boolean;
   password?: boolean;
   mainExtra?: boolean;
   rememberMe?: boolean;
@@ -61,6 +62,7 @@ const UiConfigs = {
   } as UiConfig,
   [DialogTypes.SignUp]: {
     username: true,
+    nickname: true,
     email: true,
     password: true,
     passwordConfirm: true,
@@ -190,7 +192,7 @@ export class LoginDialogComponent implements OnInit {
           break;
       }
     } catch (e) {
-      self.error = e.message;
+      self.error = e.error || e.message;
     } finally {
       setTimeout(() => {
         self.loading = false;

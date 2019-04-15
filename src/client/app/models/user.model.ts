@@ -1,11 +1,20 @@
 import {ModelBase} from "./model-base";
-import {API_URLS, DEFAULT_AVATAR_URL} from "../../constants";
+import {DEFAULT_AVATAR_URL} from "../../constants";
 import {HttpClient} from "@angular/common/http";
 import {UserData} from "../../../shared/interf";
 
 export class UserModel extends ModelBase {
+  static ASSIGN_FIELDS: string[] = [
+    'id',
+    'username',
+    'nickname',
+    'avatarUrl',
+    'email',
+  ];
   avatarUrl: string;
   nickname: string;
+  username: string;
+  email: string;
 
   constructor(http: HttpClient, userData?: UserData) {
     super(http);
@@ -28,9 +37,5 @@ export class UserModel extends ModelBase {
 
   get link() {
     return `u/${this.id}`;
-  }
-
-  assign(data: UserData) {
-
   }
 }

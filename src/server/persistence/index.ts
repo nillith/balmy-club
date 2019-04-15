@@ -1,6 +1,6 @@
 import config from '../config';
-import mysql, {PoolConnection} from 'mysql2/promise';
-import {timeOfDay} from "../../shared/utils";
+import mysql from 'mysql2/promise';
+import {localeTimeOfDay} from "../../shared/utils";
 
 
 if (config.env === 'development') {
@@ -8,13 +8,14 @@ if (config.env === 'development') {
   const {addCommand} = ConnectionPrototype;
   ConnectionPrototype.addCommand = function(cmd, ...rest) {
     if (cmd.sql) {
-      console.log('\x1b[33m[%s]\x1b[0m: \x1b[36m%s\x1b[0m', timeOfDay(), cmd.sql);
+      console.log('\x1b[33m[%s]\x1b[0m: \x1b[36m%s\x1b[0m', localeTimeOfDay(), cmd.sql);
     }
     return addCommand.call(this, cmd, ...rest);
   };
 }
 
 type TransactionTask = (conn: mysql.PoolConnection) => Promise<void>;
+
 export interface MyPool extends mysql.Pool {
   inTransaction(fun: TransactionTask): Promise<void>;
 }

@@ -1,0 +1,51 @@
+<mat-card>
+  <form name="form" #formRef="ngForm" fxLayout="column">
+    <mat-form-field>
+      <input matInput placeholder="Username"
+             type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
+             name="username" #username="ngModel"
+             [(ngModel)]="settingsData.username">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Nickname"
+             type="text" pattern="^{{appConstants.NICKNAME_PATTERN}}$"
+             name="nickname" #nickname="ngModel"
+             [(ngModel)]="settingsData.nickname">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Avatar Url"
+             type="url"
+             maxlength="{{appConstants.MAX_URL_LENGTH}}"
+             name="avatarUrl" #nickname="ngModel"
+             [(ngModel)]="settingsData.avatarUrl">
+    </mat-form-field>
+    <mat-form-field>
+      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="Email" id="email"
+             name="email"
+             #email="ngModel" [(ngModel)]="settingsData.email">
+    </mat-form-field>
+    <mat-form-field>
+      <input type="password" matInput placeholder="Password" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+             id="password"
+             name="password"
+             #password="ngModel" [(ngModel)]="settingsData.password">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input type="password" matInput placeholder="Confirm" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+             id="passwordConfirm"
+             name="passwordConfirm"
+             [disabled]="confirmDisabled()"
+             required
+             #passwordConfirm="ngModel" [(ngModel)]="settingsData.passwordConfirm"
+             (ngModelChange)="onConfirmChange()">
+    </mat-form-field>
+  </form>
+  <mat-card-actions align="end">
+    <button [disabled]="loading" mat-button mat-raised-button (click)="cancelSettings()">cancel
+    </button>
+    <button [disabled]="formRef.form.pristine || !formRef.form.valid || loading" mat-button mat-raised-button (click)="saveSettings()">
+      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [text]="'Save'"></app-spinner-switch>
+    </button>
+  </mat-card-actions>
+</mat-card>

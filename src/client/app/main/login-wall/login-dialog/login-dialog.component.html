@@ -12,6 +12,12 @@
              name="username" required #username="ngModel"
              [(ngModel)]="dialogModel.username">
     </mat-form-field>
+    <mat-form-field *ngIf="uiConfig.nickname">
+      <input matInput placeholder="Nickname"
+             type="text" pattern="^{{appConstants.NICKNAME_PATTERN}}$"
+             name="nickname" required #nickname="ngModel"
+             [(ngModel)]="dialogModel.nickname">
+    </mat-form-field>
     <mat-form-field *ngIf="uiConfig.email">
       <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="Email" id="email"
              name="email"
@@ -53,7 +59,7 @@
       </mat-error>
     </div>
     <div fxLayout="row" fxLayoutAlign="center center" style="width:100%">
-      <button mat-button mat-raised-button
+      <button [disabled]="!formRef.form.valid || loading" mat-button mat-raised-button
               color="mat-red"
               (click)="onSubmit()" #button>
       <span>

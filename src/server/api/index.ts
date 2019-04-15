@@ -4,12 +4,14 @@ import i from './i';
 import posts from './posts';
 import {requireAdmin, requireLogin} from "../service/auth.service";
 import account from "./account";
+import admin from "./admin";
 
 const router = Router();
 
 router.use('/account', account);
-router.use('/users', requireAdmin, users);
+router.use('/users', requireLogin, users);
 router.use('/i', requireLogin, i);
 router.use('/posts', requireLogin, posts);
+router.use('/admin', requireAdmin, admin);
 
 export default router;

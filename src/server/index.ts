@@ -10,7 +10,7 @@ function createMentionRegexp() {
 import {db} from './persistence';
 import {UserModel} from "./models/user.model";
 import {NotificationModel} from "./models/notification.model";
-import {utcTimestamp} from "../shared/utils";
+import {cloneFields, utcTimestamp} from "../shared/utils";
 import {TextContentModel} from "./models/text-content.model";
 import {MENTION_PATTERN} from "../shared/constants";
 
@@ -18,6 +18,7 @@ const usr = new UserModel();
 
 usr.id = 1;
 
+const b = cloneFields(usr, ['name']);
 
 (async () => {
  //  const t = new TextContentModel();

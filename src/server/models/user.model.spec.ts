@@ -1,8 +1,9 @@
 import {assert} from 'chai';
-import {passwordFormatIsValid, UserModel, usernameFormatIsValid} from "./user.model";
+import {UserModel} from "./user.model";
 import {MAX_USERNAME_LENGTH} from "../../shared/constants";
 import {isValidObfuscatedIdFormat} from "../service/obfuscator.service";
 import {authService} from "../service/auth.service";
+import {isValidPassword, isValidUsername} from "../../shared/utils";
 
 const randomPassword = (function() {
   function gen() {
@@ -18,35 +19,35 @@ const randomPassword = (function() {
 describe('user', () => {
 
   it('should return false for invalid password', () => {
-    assert.isFalse(passwordFormatIsValid('1'));
-    assert.isFalse(passwordFormatIsValid('@'));
-    assert.isFalse(passwordFormatIsValid('#$'));
-    assert.isFalse(passwordFormatIsValid('12'));
-    assert.isFalse(passwordFormatIsValid('123'));
+    assert.isFalse(isValidPassword('1'));
+    assert.isFalse(isValidPassword('@'));
+    assert.isFalse(isValidPassword('#$'));
+    assert.isFalse(isValidPassword('12'));
+    assert.isFalse(isValidPassword('123'));
   });
 
   it('should return true for valid password', () => {
-    assert.isTrue(passwordFormatIsValid('12345678910111213'));
-    assert.isTrue(passwordFormatIsValid('@,12345678910111213'));
-    assert.isTrue(passwordFormatIsValid('@,$%^&^%*^#@EOEAOEU3'));
+    assert.isTrue(isValidPassword('12345678910111213'));
+    assert.isTrue(isValidPassword('@,12345678910111213'));
+    assert.isTrue(isValidPassword('@,$%^&^%*^#@EOEAOEU3'));
   });
 
   it('should return false for invalid username', () => {
-    assert.isFalse(usernameFormatIsValid('1'));
-    assert.isFalse(usernameFormatIsValid('shrt'));
-    assert.isFalse(usernameFormatIsValid('1blh'));
-    assert.isFalse(usernameFormatIsValid('aoetu+anosteu'));
-    assert.isFalse(usernameFormatIsValid('aoetu)(*&%]anosteu'));
-    assert.isFalse(usernameFormatIsValid('a'.repeat(MAX_USERNAME_LENGTH + 1)));
+    assert.isFalse(isValidUsername('1'));
+    assert.isFalse(isValidUsername('shrt'));
+    assert.isFalse(isValidUsername('1blh'));
+    assert.isFalse(isValidUsername('aoetu+anosteu'));
+    assert.isFalse(isValidUsername('aoetu)(*&%]anosteu'));
+    assert.isFalse(isValidUsername('a'.repeat(MAX_USERNAME_LENGTH + 1)));
   });
 
   it('should return true for valid username', () => {
-    assert.isTrue(usernameFormatIsValid('a'.repeat(MAX_USERNAME_LENGTH)));
-    assert.isTrue(usernameFormatIsValid('123321'));
-    assert.isTrue(usernameFormatIsValid('bla_h.bl-ah'));
-    assert.isTrue(usernameFormatIsValid('$blah33'));
-    assert.isTrue(usernameFormatIsValid('ab@123.com'));
-    assert.isTrue(usernameFormatIsValid('abc.efg@123.com'));
+    assert.isTrue(isValidUsername('a'.repeat(MAX_USERNAME_LENGTH)));
+    assert.isTrue(isValidUsername('123321'));
+    assert.isTrue(isValidUsername('bla_h.bl-ah'));
+    assert.isTrue(isValidUsername('$blah33'));
+    assert.isTrue(isValidUsername('ab@123.com'));
+    assert.isTrue(isValidUsername('abc.efg@123.com'));
   });
 
 

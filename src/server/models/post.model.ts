@@ -13,6 +13,8 @@ import {Connection} from 'mysql2/promise';
 import {devOnly, isNumericId, undefinedToNull} from "../utils/index";
 import {TextContentModel} from "./text-content.model";
 import _ from 'lodash';
+import {DatabaseDriver} from "./model-base";
+import db from "../persistence/index";
 
 const assertValidNewModel = devOnly(function(model: PostModel) {
   console.assert(model.isNew(), `is not new`);
@@ -40,13 +42,13 @@ export class PostModel extends TextContentModel {
   visibleCircleIds?: (number[]) | (string[]);
   reShareCount?: number;
 
-  async insertIntoDatabase(con: Connection): Promise<void> {
+  async insertIntoDatabase(driver: DatabaseDriver = db): Promise<void> {
     const self = this;
     assertValidNewModel(self);
 
     let replacements: any = Object.create(self);
     replacements.mentionIds = JSON.stringify(self.mentionIds || []);
-    await self.insertIntoDatabaseAndRetrieveId(con, INSERT_SQL, replacements);
+    await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, replacements);
   }
 }
 

@@ -9,6 +9,7 @@ import {UserModel} from "../../../models/user.model";
 export class AvatarComponent implements OnInit {
 
   @Input() user: UserModel;
+  @Input() size = '32px';
 
   constructor() {
   }

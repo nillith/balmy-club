@@ -97,6 +97,7 @@ export type IdType = string | number | undefined;
 export interface AuthData {
   email?: string;
   username?: string;
+  nickname?: string;
   password?: string;
   token?: string;
   type?: number;
@@ -158,4 +159,13 @@ export interface CircleData {
 export interface SyncCircleData {
   circles?: CircleData[];
   newCircles?: CircleData[];
+}
+
+export interface SettingsData {
+  email?: string;
+  password?: string;
+  passwordConfirm?: string;
+  username?: string;
+  nickname?: string;
+  avatarUrl?: string;
 }

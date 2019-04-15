@@ -3,21 +3,31 @@ import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer.service";
 import validator from 'validator';
 import {authService, SignUpPayload, signUpService} from "../../service/auth.service";
-import {passwordFormatIsValid, UserCreateInfo, UserModel, usernameFormatIsValid} from "../../models/user.model";
+import {UserCreateInfo, UserModel} from "../../models/user.model";
 import {AuthData, SignUpTypes} from "../../../shared/interf";
 import {isString} from "util";
+import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
+import _ from "lodash";
 
 const SignUpErrorMessages = {
   invalidEmail: 'Invalid Email!',
   emailUsed: 'Email Already Used!',
   invalidPassword: 'Invalid Password!',
   invalidUsername: 'Invalid Username!',
+  usernameTaken: 'Username already taken!',
+  invalidNickname: 'Invalid Nickname!',
   unknownType: 'Unknown type!',
   noToken: 'Token Required!',
 };
 
+
 const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | string> {
-  let email, username, password;
+  let {email, username, password, nickname} = body;
+  email = _.trim(email);
+  username = _.trim(username);
+  password = _.trim(password);
+  nickname = _.trim(nickname);
+
   switch (body.type) {
     case SignUpTypes.Request:
       email = body.email && body.email.trim();
@@ -30,6 +40,10 @@ const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | s
         if (!body.token) {
           return SignUpErrorMessages.noToken;
         }
+        ({nickname} = body);
+        if (!isValidNickname(nickname)) {
+          return SignUpErrorMessages.invalidNickname;
+        }
         const payload = await signUpService.verify(body.token);
         ({email} = payload);
         console.assert(email);
@@ -39,23 +53,30 @@ const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | s
       }
       break;
     case SignUpTypes.Direct:
-      ({username, password} = body);
-      if (!passwordFormatIsValid(password)) {
+      ({username, password, nickname} = body);
+      if (!isValidPassword(password)) {
         return SignUpErrorMessages.invalidPassword;
       }
-      if (!usernameFormatIsValid(username)) {
+      if (!isValidUsername(username)) {
         return SignUpErrorMessages.invalidUsername;
+      }
+      if (!isValidNickname(nickname)) {
+        return SignUpErrorMessages.invalidNickname;
       }
       break;
     default:
       return SignUpErrorMessages.unknownType;
   }
 
-  if (email && await UserModel.emailUsed(email)) {
+  if (email && await UserModel.emailExistsInDatabase(email)) {
     return SignUpErrorMessages.emailUsed;
   }
 
-  return {email, username, password};
+  if (username && await UserModel.usernameExistsInDatabase(username)) {
+    return SignUpErrorMessages.usernameTaken;
+  }
+
+  return {email, username, password, nickname};
 };
 
 export const signUp = async function(req: Request, res: Response, next: NextFunction) {
@@ -66,13 +87,16 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
   }
   switch (body.type) {
     case SignUpTypes.Request:
-      await mailService.sendSignUpMail(new SignUpPayload(signUpInfo.email));
+      await mailService.sendSignUpMail(new SignUpPayload(signUpInfo.email!));
       break;
     case SignUpTypes.WithToken: // fallthrough
     case SignUpTypes.Direct:
       const user = await UserModel.create(signUpInfo);
       if (user) {
-        return respondWith(res, 200, await authService.sign(user));
+        return res.json({
+          token: await authService.sign(user),
+          user
+        });
       }
       break;
     default:

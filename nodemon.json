@@ -6,7 +6,8 @@
   ],
   "verbose": true,
   "watch": [
-    "src/server/"
+    "src/server/",
+    "src/shared/"
   ],
   "env": {
     "NODE_ENV": "development"

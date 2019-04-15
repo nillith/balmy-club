@@ -3,6 +3,7 @@ import {NextFunction, Request, RequestHandler, Response} from "express";
 import {STATUS_CODES} from 'http';
 import {identity, noop} from "../../shared/utils";
 import {isUndefined} from "util";
+import {MAX_URL_LENGTH} from "../../shared/constants";
 
 export const isAsyncFunction = (() => {
   const AsyncFunction = (async () => {
@@ -63,3 +64,17 @@ export const undefinedToNull = function(obj: any, keys: string[]) {
     }
   }
 };
+export const isValidURL = (function() {
+  const options = {
+    protocols: ['http', 'https'],
+    host_blacklist: ['localhost'],
+    require_tld: true,
+    require_protocol: true,
+    require_host: true,
+    allow_trailing_dot: false,
+    allow_protocol_relative_urls: false
+  };
+  return function(url?: string) {
+    return url && url.length < MAX_URL_LENGTH && validator.isURL(url, options);
+  };
+})();
