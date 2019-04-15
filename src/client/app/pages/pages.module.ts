@@ -11,7 +11,7 @@ const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'circles', component: CirclesComponent},
   {path: 'settings', component: SettingsComponent},
-  {path: 'u/:id', component: UserPageComponent},
+  {path: 'u/:userId', component: UserPageComponent},
 ];
 
 @NgModule({

@@ -36,6 +36,25 @@ const assertValidUserIds = devOnly(function(model: CircleModel) {
   });
 });
 
+
+const assertValidUserCircleUpdateData = devOnly(function(data: UserCircleUpdateData) {
+  console.assert(isNumericId(data.ownerId), `invalid owner id ${data.ownerId}`);
+  console.assert(isNumericId(data.userId), `invalid user id ${data.userId}`);
+  if (data.addCircleIds) {
+    console.assert(data.addCircleIds.length > 0, `empty add circle`);
+    for (const c of data.addCircleIds) {
+      console.assert(isNumericId(c), `invalid circle id ${c}`);
+    }
+  }
+
+  if (data.removeCircleIds) {
+    console.assert(data.removeCircleIds.length > 0, `empty remove circle`);
+    for (const c of data.removeCircleIds) {
+      console.assert(isNumericId(c), `invalid circle id ${c}`);
+    }
+  }
+});
+
 export interface CircleUsers {
   id: number | string;
   name?: string;
@@ -71,6 +90,13 @@ export class CirclePacker extends OutboundData {
 
 (CirclePacker.prototype as any).toJSON = throwNotAllowed;
 
+export interface UserCircleUpdateData {
+  ownerId: number;
+  userId: number;
+  addCircleIds?: number[];
+  removeCircleIds?: number[];
+}
+
 export class CircleModel extends ModelBase {
   userIds?: (number[]) | (string[]);
   [$userIds]?: string[];
@@ -80,9 +106,9 @@ export class CircleModel extends ModelBase {
   }
 
   static async getAllCircleForUser(ownerId: number, driver: DatabaseDriver = db) {
-    const [circleRows] = await driver.query(`SELECT id, name, userCount FROM Circles WHERE ownerId = :ownerId`, {ownerId});
+    const [circleRows] = await driver.query('SELECT id, name, userCount FROM Circles WHERE ownerId = :ownerId', {ownerId});
     const data = await Promise.all(_.map((circleRows || []) as any[], async (circle) => {
-      const [userRows] = await driver.query(`SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :id)`, circle);
+      const [userRows] = await driver.query('SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :id)', circle);
       circle.users = userRows;
       disableStringify(circle);
       disableStringify(circle.users);
@@ -94,6 +120,20 @@ export class CircleModel extends ModelBase {
     return pack;
   }
 
+  static async updateUserCircle(data: UserCircleUpdateData, driver: DatabaseDriver = db) {
+    const tasks: any[] = [];
+    if (data.removeCircleIds) {
+      tasks.push(driver.query('DELETE FROM CircleUser WHERE CircleUser.userId = :userId AND CircleUser.circleId IN (SELECT id FROM Circles WHERE ownerId = :ownerId)', data));
+    }
+
+    if (data.addCircleIds) {
+      tasks.push(driver.query('INSERT INTO CircleUser (userId, circleId) SELECT :userId, id FROM Circles WHERE id IN (:addCircleIds) AND ownerId = :ownerId', data));
+    }
+
+    if (tasks.length) {
+      await Promise.all(tasks);
+    }
+  }
 
   constructor(public name: string, public ownerId: number) {
     super();
@@ -115,7 +155,7 @@ export class CircleModel extends ModelBase {
     if (!isNumericId(self.id)) {
       throw Error("Invalid circle id!");
     }
-    await driver.query(`INSERT INTO CircleUser (circleId, userId) SELECT :circleId, Users.id FROM Users WHERE id IN (:userIds) AND id NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :ownerId)`, this);
+    await driver.query(`INSERT INTO CircleUser (circleId, userId) SELECT :id, Users.id FROM Users WHERE id IN (:userIds)`, this);
   }
 
   async addUserId(userId: number, driver: DatabaseDriver = db): Promise<void> {

@@ -41,6 +41,7 @@ export class CircleModelModifier {
     circle.name = self.name;
     circle.addUserIds = self.addUserList.map(u => u.id);
     circle.removeUserIds = self.removeUserList.map(u => u.id);
+    circle.buildLookTable();
   }
 }
 
@@ -50,6 +51,7 @@ export class CircleModel extends ModelBase {
     'name',
     'users',
   ];
+  userIdMap: any = {};
   name?: string;
   users: UserModel[] = [];
   userIds?: string[];
@@ -60,6 +62,22 @@ export class CircleModel extends ModelBase {
   constructor(http: HttpClient, public ownerId: string, private iService: IService) {
     super(http);
   }
+
+  public buildLookTable() {
+    const self = this;
+    const map = self.userIdMap = {};
+    if (!self.users) {
+      return;
+    }
+    for (const u of self.users) {
+      map[u.id] = true;
+    }
+  }
+
+  isInCircle(id: string) {
+    return this.userIdMap[id];
+  }
+
 
   protected async create(): Promise<void> {
     const self = this;

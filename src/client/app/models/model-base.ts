@@ -14,14 +14,6 @@ export abstract class ModelBase {
     return !this.id;
   }
 
-  toJSON() {
-    throw Error("Not Allowed");
-  }
-
-  toString() {
-    throw Error("Not Allowed");
-  }
-
   protected abstract async create(): Promise<void>;
 
   protected abstract async update(): Promise<void>;

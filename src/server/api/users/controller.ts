@@ -3,6 +3,7 @@ import {respondWith} from "../../utils/index";
 import {INVALID_NUMERIC_ID, userObfuscator} from "../../service/obfuscator.service";
 import {UserModel} from "../../models/user.model";
 import {isValidStringId} from "../../../shared/utils";
+import {respondWithJson} from "../../init";
 
 export const createUser = async function(req: Request, res: Response, next: NextFunction) {
   respondWith(res, 405);
@@ -15,7 +16,7 @@ export const getUserById = async function(req: Request, res: Response, next: Nex
     if (INVALID_NUMERIC_ID !== userId) {
       const user = await UserModel.getUserPublicDataById(userId);
       if (user) {
-        return res.json(user);
+        return respondWithJson(res, user);
       }
     }
   }

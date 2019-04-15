@@ -8,6 +8,7 @@ import {PostGroup} from "../../modules/post-widgets/post-group-view/post-group-v
 import {HttpClient} from "@angular/common/http";
 import {isValidStringId} from "../../../../shared/utils";
 import {PostFetcher} from "../../modules/post-widgets/post-stream-view/post-stream-view.component";
+import _ from 'lodash';
 
 class UserPostFetcher implements PostFetcher {
   private prevGroupIndex = 0;
@@ -35,11 +36,16 @@ class UserPostFetcher implements PostFetcher {
 })
 export class UserPageComponent implements OnInit {
 
-  id?: string;
+  userId?: string;
   loading = true;
   user?: UserModel;
+  circleButtonText = 'Circle';
+  circlesUpdating = false;
 
   postFetcher?: PostFetcher;
+
+  userInCircleIds: string[] = [];
+  circleSelects: string[] = [];
 
   @ViewChild('circleSelector') circleSelector: MatSelect;
 
@@ -50,14 +56,21 @@ export class UserPageComponent implements OnInit {
     const self = this;
     self.route.params.subscribe(async (params) => {
       try {
-        self.id = params['id'];
-        if (!isValidStringId(self.id)) {
-          return self.toastService.showToast('unknow user');
+        const userId = params['userId'];
+        self.userId = userId;
+        if (!isValidStringId(self.userId)) {
+          return self.toastService.showToast('unknown user');
         }
 
-        self.user = await self.iService.viewUserById(self.id);
+        self.user = await self.iService.viewUserById(self.userId);
+        self.userInCircleIds = self.iService.circles.map((c) => {
+          if (c.isInCircle(userId)) {
+            return c.id;
+          }
+        }).filter(Boolean);
+        self.circleSelects = [...self.userInCircleIds];
         self.loading = false;
-        self.postFetcher = new UserPostFetcher(self.http, self.id);
+        self.postFetcher = new UserPostFetcher(self.http, self.userId);
       } catch (e) {
         self.toastService.showToast(e.error || e.message);
       }
@@ -68,12 +81,21 @@ export class UserPageComponent implements OnInit {
     this.circleSelector.open();
   }
 
-  onCircleSelectionChange(event) {
+  async onCircleSelectorClose() {
+    console.log('on close');
+    const self = this;
+    self.circlesUpdating = true;
+    try {
+      const {circleSelects, userInCircleIds} = self;
+      const addedCircles = _.difference(circleSelects, userInCircleIds);
+      const removedCircles = _.difference(userInCircleIds, circleSelects);
+      console.log(addedCircles);
+      console.log(removedCircles);
+      await self.iService.changeUserCircles(self.user, addedCircles, removedCircles);
+    } catch (e) {
+      self.toastService.showToast(e.error || e.message);
+    } finally {
+      self.circlesUpdating = false;
+    }
   }
-
-  getCircleButtonText() {
-
-  }
-
-
 }

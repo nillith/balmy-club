@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {createCircle, getAllMyCircles, removeCircle} from "./controller";
+import {changeUserCircles, createCircle, getAllMyCircles, removeCircle} from "./controller";
 import {asyncMiddleware} from "../../../utils/index";
 
 const router = Router();
@@ -7,5 +7,5 @@ const router = Router();
 router.get('/', asyncMiddleware(getAllMyCircles));
 router.post('/', asyncMiddleware(createCircle));
 router.delete('/:id', asyncMiddleware(removeCircle));
-
+router.patch('/', asyncMiddleware(changeUserCircles));
 export default router;

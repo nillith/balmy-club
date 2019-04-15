@@ -103,6 +103,10 @@ export class IService {
         makeInstance(u, UserModel);
       }
     }
+
+    for (const c of self.circles) {
+      c.buildLookTable();
+    }
   }
 
   private unpackToken(token: string) {
@@ -249,6 +253,30 @@ export class IService {
     const user = self.createUser();
     user.assign(data);
     return user;
+  }
+
+  async changeUserCircles(user: UserModel, addCircleIds: string[], removeCircleIds: string[]) {
+    if (!user || !user.id) {
+      console.log(user);
+      console.log('no user');
+      return;
+    }
+    if (addCircleIds && !addCircleIds.length) {
+      addCircleIds = undefined;
+    }
+
+    if (removeCircleIds && !removeCircleIds.length) {
+      removeCircleIds = undefined;
+    }
+
+    if (!addCircleIds && !removeCircleIds) {
+      console.log('no change')
+      return;
+    }
+    const self = this;
+    console.log('-------patch-------')
+    await self.http.patch(API_URLS.CIRCLES, {userId: user.id, addCircleIds, removeCircleIds}, {responseType: 'text'}).toPromise();
+    // TODO update local
   }
 }
 

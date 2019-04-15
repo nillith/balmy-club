@@ -190,6 +190,7 @@ export class LoginDialogComponent implements OnInit {
           break;
       }
     } catch (e) {
+      console.log(e);
       self.error = e.error || e.message;
     } finally {
       setTimeout(() => {
