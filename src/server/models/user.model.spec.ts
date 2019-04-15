@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import {UserModel} from "./user.model";
 import {MAX_USERNAME_LENGTH} from "../../shared/constants";
-import {isValidObfuscatedIdFormat} from "../service/obfuscator.service";
+import {isValidStringId} from "../../shared/utils";
 import {authService} from "../service/auth.service";
 import {isValidPassword, isValidUsername} from "../../shared/utils";
 
@@ -106,7 +106,7 @@ describe('user', () => {
       const clone = JSON.parse(str);
       assert.isObject(clone, typeof clone);
       assert.isDefined(clone.id);
-      assert.isTrue(isValidObfuscatedIdFormat(clone.id), clone);
+      assert.isTrue(isValidStringId(clone.id), clone);
     });
 
     it('should not output sensitive info when JSON.stringify', async () => {
@@ -125,7 +125,7 @@ describe('user', () => {
       assert.isString(token, typeof token);
       const payload = await authService.verify(token);
       assert.notEqual(user.id, payload.id);
-      assert.isTrue(isValidObfuscatedIdFormat(payload.id));
+      assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
       const clone = UserModel.unObfuscateFrom(payload);
       assert.isDefined(clone);
@@ -137,7 +137,7 @@ describe('user', () => {
       assert.isString(token, typeof token);
       const payload = await authService.verify(token);
       assert.notEqual(user.id, payload.id);
-      assert.isTrue(isValidObfuscatedIdFormat(payload.id));
+      assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
       payload.id = '554d8f9e22022b23994ecff49b5033d1';
       const clone = UserModel.unObfuscateFrom(payload);

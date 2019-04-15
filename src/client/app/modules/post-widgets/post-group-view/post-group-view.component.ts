@@ -3,6 +3,9 @@ import {PostData} from "../../../../../shared/interf";
 import Masonry from 'masonry-layout';
 import {debounce} from "lodash";
 import {noop} from "../../../../../shared/utils";
+import {PostModel} from "../../../models/post.model";
+
+export type PostGroup = PostModel[];
 
 @Component({
   selector: 'app-post-group-view',
@@ -11,7 +14,7 @@ import {noop} from "../../../../../shared/utils";
 })
 export class PostGroupViewComponent implements OnInit, AfterViewInit {
 
-  @Input() posts: PostData[] = [];
+  @Input() posts: PostGroup = [];
   masonry?: Masonry;
   isVisible = false;
   onChildSizeChange = noop;

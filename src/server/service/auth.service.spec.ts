@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import {authService} from "./auth.service";
 import {UserModel} from "../models/user.model";
-import {isValidObfuscatedIdFormat} from "./obfuscator.service";
+import {isValidStringId} from "../../shared/utils";
 
 describe('auth service', () => {
   it('should not expose sensitive information.', async () => {
@@ -14,6 +14,6 @@ describe('auth service', () => {
     const token = await authService.sign(user);
     const p = await authService.verify(token);
     assert.isUndefined((p as any).password);
-    assert.isTrue(isValidObfuscatedIdFormat(p.id));
+    assert.isTrue(isValidStringId(p.id));
   });
 });

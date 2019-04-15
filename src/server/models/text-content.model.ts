@@ -3,7 +3,6 @@ import {
   $authorId,
   $mentionIds,
   INVALID_NUMERIC_ID,
-  isValidObfuscatedIdFormat,
   userObfuscator
 } from "../service/obfuscator.service";
 import {MENTION_PATTERN} from "../../shared/constants";
@@ -11,6 +10,7 @@ import db from "../persistence/index";
 import _ from 'lodash';
 import {devOnly, isNumericId} from "../utils/index";
 import {isString} from "util";
+import {isValidStringId} from "../../shared/utils";
 
 export interface Mention {
   nickname: string;
@@ -36,7 +36,7 @@ const assertValidObfuscatedIdNicknameMap = devOnly(function(obfuscatedIdNickname
   console.assert(keys.length, `empty iidNicknameMap`);
   let hasMap = false;
   for (const key of keys) {
-    if (isValidObfuscatedIdFormat(key) && obfuscatedIdNicknameMap[key]) {
+    if (isValidStringId(key) && obfuscatedIdNicknameMap[key]) {
       hasMap = true;
       break;
     }
@@ -81,7 +81,7 @@ const assertSanitizeParams = devOnly(function(model: TextContentModel, mentions:
   const mentionsMsg = `invalid mentions ${JSON.stringify(mentions)}`;
   for (let mention of mentions) {
     console.assert(isNumericId(mention.id), mentionsMsg);
-    console.assert(isValidObfuscatedIdFormat(mention.obfuscatedId), mentionsMsg);
+    console.assert(isValidStringId(mention.obfuscatedId), mentionsMsg);
     console.assert(mention.nickname && isString(mention.nickname), mentionsMsg);
   }
 });

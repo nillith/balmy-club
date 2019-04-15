@@ -2,11 +2,11 @@ import {assert} from 'chai';
 import {
   bufferToUnsignedInteger,
   circleObfuscator,
-  isValidObfuscatedIdFormat,
   postObfuscator,
   unsignedIntegerToBuffer,
   userObfuscator,
 } from "./obfuscator.service";
+import {isValidStringId} from "../../shared/utils";
 
 function randomUnsigned(): number {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
@@ -28,7 +28,7 @@ describe('obfuscator', () => {
     const invalidValues = [null, undefined, '', true, 333, 444.4,
       '3a2a2c20465685e1ed86dbfa8f649ce'];
     for (const v of invalidValues) {
-      assert.isFalse(isValidObfuscatedIdFormat(v));
+      assert.isFalse(isValidStringId(v));
     }
 
     const validValues = [
@@ -38,7 +38,7 @@ describe('obfuscator', () => {
     ];
 
     for (const v of validValues) {
-      assert.isTrue(isValidObfuscatedIdFormat(v));
+      assert.isTrue(isValidStringId(v));
     }
   });
 

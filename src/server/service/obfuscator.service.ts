@@ -1,6 +1,6 @@
 import config from "../config/index";
 import crypto from 'crypto';
-import {makeInstance} from "../../shared/utils";
+import {isValidStringId, makeInstance} from "../../shared/utils";
 import {isString} from "util";
 import _ from 'lodash';
 
@@ -20,9 +20,7 @@ export const bufferToUnsignedInteger = function(buf: Buffer): number {
   return parseInt(buf.toString('HEX'), RADIX);
 };
 
-export const isValidObfuscatedIdFormat = function(str: any): boolean {
-  return !!str && 32 === str.length && /^[0-9a-fA-F]{32}$/.test(str);
-};
+
 
 const $key = Symbol();
 
@@ -51,7 +49,7 @@ export class UnsignedIntegerObfuscator {
   }
 
   unObfuscate(hexStr): number {
-    if (!isValidObfuscatedIdFormat(hexStr)) {
+    if (!isValidStringId(hexStr)) {
       return INVALID_NUMERIC_ID;
     }
     try {

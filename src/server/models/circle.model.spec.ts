@@ -1,7 +1,7 @@
 import {assert} from 'chai';
 import {CircleModel, CirclePacker} from "./circle.model";
 import {makeInstance} from "../../shared/utils";
-import {isValidObfuscatedIdFormat} from "../service/obfuscator.service";
+import {isValidStringId} from "../../shared/utils";
 
 describe('CircleModel', () => {
   it('should return instance of CirclePacker', async () => {
@@ -59,9 +59,9 @@ describe('CircleModel', () => {
     assert.strictEqual(circles.length, data.circles.length);
 
     for (const c of circles) {
-      assert.isTrue(isValidObfuscatedIdFormat(c.id));
+      assert.isTrue(isValidStringId(c.id));
       for (const u of c.users) {
-        assert.isTrue(isValidObfuscatedIdFormat(u.id));
+        assert.isTrue(isValidStringId(u.id));
       }
     }
   });

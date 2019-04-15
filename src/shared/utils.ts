@@ -69,3 +69,6 @@ export const isValidNickname = patternCheckFun(NICKNAME_PATTERN);
 export const isValidPassword = function(password: string | undefined): boolean {
   return !!password && password.length >= MIN_PASSWORD_LENGTH;
 };
+export const isValidStringId = function(str: any): boolean {
+  return !!str && 32 === str.length && /^[0-9a-fA-F]{32}$/.test(str);
+};

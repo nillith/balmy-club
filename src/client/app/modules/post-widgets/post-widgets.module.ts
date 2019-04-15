@@ -6,6 +6,7 @@ import {ImportsModule} from "../imports/imports.module";
 import { PostGroupViewComponent } from './post-group-view/post-group-view.component';
 import { PostEditorDialogComponent } from './post-editor-dialog/post-editor-dialog.component';
 import {WidgetsModule} from "../widgets/widgets.module";
+import { PostStreamViewComponent } from './post-stream-view/post-stream-view.component';
 
 
 export const exportedEntryComponents = [
@@ -16,6 +17,7 @@ const exportedComponents = [
   CommentEditorComponent,
   PostEditorComponent,
   PostGroupViewComponent,
+  PostStreamViewComponent,
 ];
 
 

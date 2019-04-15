@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
-import {isValidObfuscatedIdFormat} from "../../service/obfuscator.service";
+import {isValidStringId} from "../../../shared/utils";
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../shared/interf";
 import {isValidPostContent, utcTimestamp} from "../../../shared/utils";
 import {MAX_VISIBLE_CIRCLE_NUMBER} from "../../../shared/constants";
@@ -27,7 +27,7 @@ const filterShareCircleIds = function(circleIds: any) {
     let id;
     for (let i = 0; i < end; ++i) {
       id = circleIds[i];
-      if (isValidObfuscatedIdFormat(id)) {
+      if (isValidStringId(id)) {
         result.push(id);
       }
     }
@@ -40,7 +40,7 @@ const getNewPostPayloadOrErr = function(body: any) {
   let {reShareFromPostId, visibility, content, visibleCircleIds} = body;
   content = String(content || '').trim();
   if (reShareFromPostId) {
-    if (!isValidObfuscatedIdFormat(reShareFromPostId)) {
+    if (!isValidStringId(reShareFromPostId)) {
       return `invalid reshare post id`;
     }
   }
