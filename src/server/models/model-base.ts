@@ -1,6 +1,7 @@
-import {$id, $toJsonFields} from '../service/obfuscator.service';
+import {$id, $outboundFields} from '../service/obfuscator.service';
 import {isNumber, isSymbol} from "util";
 import {Connection, Pool} from 'mysql2/promise';
+import {OutboundData} from "../init";
 
 
 export type DatabaseDriver = Connection | Pool;
@@ -42,8 +43,8 @@ export const jsonStringifyByFields = function(obj: any, fields: FieldMaps) {
   return JSON.stringify(cloneByFieldMaps(obj, fields));
 };
 
-export abstract class ModelBase {
 
+export abstract class ModelBase extends OutboundData {
   id?: number | string;
   [$id]?: string;
 
@@ -55,18 +56,14 @@ export abstract class ModelBase {
     throw Error('Not implemented');
   }
 
-  toString() {
-    throw Error('Not Allowed!');
-  }
-
-  toJSON() {
+  getOutboundData(): any {
     const self = this;
     self.obfuscate();
-    return cloneByFieldMaps(self, self.constructor[$toJsonFields]);
+    return cloneByFieldMaps(self, self.constructor[$outboundFields]);
   }
 
-  protected async insertIntoDatabaseAndRetrieveId(conn: DatabaseDriver, sql: string, replacements: any): Promise<void> {
-    const [result] = await conn.query(sql, replacements);
+  protected async insertIntoDatabaseAndRetrieveId(driver: DatabaseDriver, sql: string, replacements: any): Promise<void> {
+    const [result] = await driver.query(sql, replacements);
     this.id = (result as any).insertId;
     console.assert(isNumber(this.id));
   }

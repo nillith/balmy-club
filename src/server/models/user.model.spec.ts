@@ -100,13 +100,11 @@ describe('user', () => {
       }
     });
 
-    it('should obfuscate id when JSON.stringify', () => {
-      const str = JSON.stringify(user);
-      assert.isString(str, typeof str);
-      const clone = JSON.parse(str);
-      assert.isObject(clone, typeof clone);
-      assert.isDefined(clone.id);
-      assert.isTrue(isValidStringId(clone.id), clone);
+    it('should obfuscate id ', () => {
+      const data = user.getOutboundData();
+      assert.isObject(data, typeof data);
+      assert.isDefined(data.id);
+      assert.isTrue(isValidStringId(data.id), data);
     });
 
     it('should not output sensitive info when JSON.stringify', async () => {
@@ -114,10 +112,10 @@ describe('user', () => {
       assert.isDefined(user.password);
       assert.isDefined(user.salt);
       assert.isDefined(user.hash);
-      const clone = JSON.parse(JSON.stringify(user));
-      assert.isUndefined(clone.password);
-      assert.isUndefined(clone.salt);
-      assert.isUndefined(clone.hash);
+      const data = user.getOutboundData();
+      assert.isUndefined(data.password);
+      assert.isUndefined(data.salt);
+      assert.isUndefined(data.hash);
     });
 
     it('should be able to create user from jwt object literal', async () => {
@@ -127,9 +125,9 @@ describe('user', () => {
       assert.notEqual(user.id, payload.id);
       assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
-      const clone = UserModel.unObfuscateFrom(payload);
-      assert.isDefined(clone);
-      assert.strictEqual(user.id, clone!.id);
+      const data = UserModel.unObfuscateFrom(payload);
+      assert.isDefined(data);
+      assert.strictEqual(user.id, data!.id);
     });
 
     it('should not create a user from invalid object literal', async () => {
@@ -140,8 +138,8 @@ describe('user', () => {
       assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
       payload.id = '554d8f9e22022b23994ecff49b5033d1';
-      const clone = UserModel.unObfuscateFrom(payload);
-      assert.isUndefined(clone);
+      const data = UserModel.unObfuscateFrom(payload);
+      assert.isUndefined(data);
     });
   });
 });

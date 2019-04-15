@@ -4,7 +4,7 @@ import {cloneByFieldMaps, DatabaseDriver, makeFieldMaps, ModelBase} from "./mode
 import {
   $id,
   $obfuscator,
-  $toJsonFields,
+  $outboundFields,
   obfuscatorFuns,
   USER_OBFUSCATE_MAPS,
   userObfuscator
@@ -17,6 +17,7 @@ import {map} from 'lodash';
 import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} from "../../shared/utils";
 import {SettingsData} from "../../shared/interf";
 import {CircleModel} from "./circle.model";
+import {OutboundDataHolder} from "../init";
 
 
 export interface UserCreateInfo {
@@ -71,7 +72,7 @@ export interface OtherUser {
 }
 
 export class UserModel extends ModelBase implements JwtSignable {
-  static readonly [$toJsonFields] = makeFieldMaps([
+  static readonly [$outboundFields] = makeFieldMaps([
     $id,
     'username',
     'nickname',
@@ -207,11 +208,11 @@ export class UserModel extends ModelBase implements JwtSignable {
     const token = await authService.sign(self, expire);
     const circles = await CircleModel.getAllCircleForUser(self.id as number);
 
-    return {
+    return new OutboundDataHolder({
       token,
-      user: self,
-      circles,
-    };
+      user: self.getOutboundData(),
+      circles: circles.getOutboundData(),
+    });
   }
 }
 

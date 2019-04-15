@@ -1,5 +1,5 @@
 import {DatabaseDriver, ModelBase} from "./model-base";
-import {devOnly, disableStringify, isNumericId} from "../utils/index";
+import {devOnly, disableStringify, isNumericId, throwNotAllowed} from "../utils/index";
 import _ from "lodash";
 import {
   $userIds,
@@ -10,6 +10,7 @@ import {
 } from "../service/obfuscator.service";
 import db from "../persistence/index";
 import {OtherUser} from "./user.model";
+import {OutboundData} from "../init";
 
 const INSERT_SQL = `INSERT INTO Circles (name, ownerId) VALUES (:name, :ownerId)`;
 
@@ -42,10 +43,10 @@ export interface CircleUsers {
   users: OtherUser[];
 }
 
-export class CirclePacker {
+export class CirclePacker extends OutboundData {
   circles?: CircleUsers[];
 
-  toJSON() {
+  getOutboundData(): any {
     const {circles} = this;
     if (!circles) {
       return [];
@@ -67,6 +68,8 @@ export class CirclePacker {
     });
   }
 }
+
+(CirclePacker.prototype as any).toJSON = throwNotAllowed;
 
 export class CircleModel extends ModelBase {
   userIds?: (number[]) | (string[]);

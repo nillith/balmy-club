@@ -1,4 +1,4 @@
-import {createUser, getUserById} from "./controller";
+import {createUser, getUserById, getUserPosts} from "./controller";
 import {Router} from "express";
 import {asyncMiddleware} from "../../utils/index";
 

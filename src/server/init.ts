@@ -1,5 +1,6 @@
 import './env';
 import bluebird from 'bluebird';
+import {response, Response} from "express";
 
 global.Promise = bluebird;
 const DESCRIPTION = 'description';
@@ -18,6 +19,35 @@ console.assert = function(v: boolean, msg?: string) {
 };
 
 
+export abstract class OutboundData {
+  toJSON() {
+    throw Error('toJSON is not allowed!');
+  }
+
+  abstract getOutboundData(): any;
+}
+
+export class OutboundDataHolder {
+  getOutboundData(): any {
+    return this.data;
+  }
+
+  constructor(private data: any) {
+  }
+}
+
+export const respondWithJson = (() => {
+  const $json = Symbol();
+  const oldJson = response.json;
+  response.json = function() {
+    throw Error(`res.json is not allowed, use respondWithJson instead!`);
+  };
+  response[$json] = oldJson;
+
+  return function(res: Response, data: { getOutboundData(): any; }, code = 200) {
+    res.status(code)[$json](data.getOutboundData());
+  };
+})();
 
 
 // process

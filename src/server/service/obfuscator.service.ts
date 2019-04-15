@@ -149,7 +149,7 @@ export const obfuscatorFuns = function <T>(maps: IdNameObfuscatorMap[], t: { new
   };
 };
 
-export const $toJsonFields = Symbol();
+export const $outboundFields = Symbol();
 export const $obfuscator = Symbol();
 export const $id = Symbol('id');
 export const $postId = Symbol('$postId');

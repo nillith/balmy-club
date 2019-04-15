@@ -29,6 +29,13 @@ describe('ModelBase', () => {
     });
   });
 
+  it('should throw when JSON.stringify', () => {
+    const model = new ModelBaseSpec();
+    assert.throw(() => {
+      JSON.stringify(model);
+    });
+  });
+
   it('should only stringify specified fields', () => {
     const a = Symbol('a');
     const fields = makeFieldMaps([a, 'b']);
@@ -49,20 +56,10 @@ describe('ModelBase', () => {
     assert.isTrue(model.isNew());
   });
 
-  it('should throw if no $toJsonFields set when stringify', () => {
+  it('should throw if no $outboundFields set', () => {
     const model = new ModelBaseSpec();
     assert.throw(() => {
-      JSON.stringify(model);
-    });
-  });
-
-  it('should throw when to string', () => {
-    const model = new ModelBaseSpec();
-    assert.throw(() => {
-      const t = model + '';
-    });
-    assert.throw(() => {
-      model.toString();
+      model.getOutboundData();
     });
   });
 });

@@ -14,6 +14,10 @@ export const identity = function <T>(t: T): T {
   return t;
 };
 
+export const returnThis = function(this: any) {
+  return this;
+};
+
 export const utcTimestamp = function() {
   return Math.floor(Date.now() / 1000);
 };

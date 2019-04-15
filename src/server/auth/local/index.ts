@@ -1,8 +1,9 @@
 import {Router} from 'express';
 import passport from 'passport';
-import {authService} from '../../service/auth.service';
 import {Strategy as LocalStrategy} from 'passport-local';
 import {UserModel} from "../../models/user.model";
+import {returnThis} from "../../../shared/utils";
+import {respondWithJson} from "../../init";
 
 
 passport.use(new LocalStrategy({
@@ -29,12 +30,16 @@ router.post('/', (req, res, next) => {
   passport.authenticate('local', async (err, user, info) => {
     const error = err || info;
     if (error) {
-      return res.status(401).json(error);
+
+      error.getOutboundData = returnThis;
+      respondWithJson(res, error, 401);
     }
     if (!user) {
-      return res.status(404).json({message: 'Something went wrong, please try again.'});
+      const userNotFound: any = {message: 'Something went wrong, please try again.'};
+      userNotFound.getOutboundData = returnThis;
+      respondWithJson(res, userNotFound, 404);
     }
-    res.json(await user.getLoginData(req.body.rememberMe ? '2w' : undefined));
+    respondWithJson(res, await user.getLoginData(req.body.rememberMe ? '2w' : undefined));
   })(req, res, next);
 });
 

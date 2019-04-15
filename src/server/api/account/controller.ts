@@ -2,12 +2,13 @@ import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer.service";
 import validator from 'validator';
-import {authService, SignUpPayload, signUpService} from "../../service/auth.service";
+import {SignUpPayload, signUpService} from "../../service/auth.service";
 import {UserCreateInfo, UserModel} from "../../models/user.model";
 import {AuthData, SignUpTypes} from "../../../shared/interf";
 import {isString} from "util";
 import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
 import _ from "lodash";
+import {respondWithJson} from "../../init";
 
 const SignUpErrorMessages = {
   invalidEmail: 'Invalid Email!',
@@ -93,7 +94,7 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
     case SignUpTypes.Direct:
       const user = await UserModel.create(signUpInfo);
       if (user) {
-        return res.json(await user.getLoginData());
+        return respondWithJson(res, await user.getLoginData());
       }
       break;
     default:
@@ -103,6 +104,6 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
 };
 
 export const changePassword = async function(req: Request, res: Response, next: NextFunction) {
-  respondWith(res, 200);
+  respondWith(res, 405);
 };
 

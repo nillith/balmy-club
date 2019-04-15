@@ -1,7 +1,6 @@
 import {assert} from 'chai';
 import {CircleModel, CirclePacker} from "./circle.model";
-import {makeInstance} from "../../shared/utils";
-import {isValidStringId} from "../../shared/utils";
+import {isValidStringId, makeInstance} from "../../shared/utils";
 
 describe('CircleModel', () => {
   it('should return instance of CirclePacker', async () => {
@@ -48,12 +47,7 @@ describe('CircleModel', () => {
     };
     makeInstance(data, CirclePacker);
 
-    const clone = JSON.parse(JSON.stringify({
-      circles: data
-    }));
-
-    const {circles} = clone;
-
+    const circles = (data as CirclePacker).getOutboundData();
     assert.isArray(circles);
     assert.isAtLeast(circles.length, 1);
     assert.strictEqual(circles.length, data.circles.length);
