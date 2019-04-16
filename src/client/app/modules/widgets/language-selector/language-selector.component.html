@@ -2,8 +2,8 @@
   <mat-icon>language</mat-icon>
   <span>{{i18nService.name}}</span>
 </button>
-<mat-menu #languageMenu="matMenu" style="margin: 0;padding: 0">
+<mat-menu #languageMenu="matMenu">
   <div fxLayout="column" fxLayoutAlign="left center" style="margin: 0;padding: 0">
-    <span *ngFor="let trans of translations" (click)="onChooseLanguage(trans.code)">{{trans.name}}</span>
+    <span class="language-selector-option" *ngFor="let trans of translations" (click)="onChooseLanguage(trans.code)">{{trans.name}}</span>
   </div>
 </mat-menu>

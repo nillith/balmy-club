@@ -1,0 +1,22 @@
+@import "../../../../styles/mixin";
+
+.language-selector-button{
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
+}
+
+.language-selector-option{
+  cursor: pointer;
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  &:hover{
+    background-color: aliceblue;
+  }
+}
+
+mat-icon{
+  margin-right: 5px;
+}
