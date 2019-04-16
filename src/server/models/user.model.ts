@@ -15,7 +15,7 @@ import {devOnly, isNumericId} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
 import {map} from 'lodash';
 import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} from "../../shared/utils";
-import {SettingsData} from "../../shared/interf";
+import {ChangeSettingsRequest} from "../../shared/contracts";
 import {CircleModel} from "./circle.model";
 import {OutboundDataHolder} from "../init";
 
@@ -42,7 +42,7 @@ const createSaveSettingsSql = (function() {
     email: 'email',
   };
 
-  return function(data: SettingsData) {
+  return function(data: ChangeSettingsRequest) {
     const updates = Object.keys(data).map((k) => {
       const col = AllowedDbColumnMap[k];
       if (col && data[k]) {
@@ -121,12 +121,15 @@ export class UserModel extends ModelBase implements JwtSignable {
     return !!rows && !!(rows as any).length;
   }
 
-  static async getUserPublicDataById(userId: number, driver: DatabaseDriver = db) {
-    const [rows] = await driver.query(`SELECT id, nickname, avatarUrl FROM Users WHERE id = :userId LIMIT 1`, {
-      userId
+  static async getUserPublicDataById(viewerId: number, userId: number, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query('SELECT nickname, avatarUrl, bannerUrl, circlerCount, UserBlockUser.id IS NOT NULL AS blockedByMe FROM Users LEFT JOIN (SELECT id, blockeeId FROM UserBlockUser WHERE blockeeId = :userId AND blockerId = :viewerId ) UserBlockUser ON (Users.id = UserBlockUser.blockeeId) WHERE Users.id = :userId LIMIT 1', {
+      userId,
+      viewerId
     });
+
     if (rows && rows[0]) {
-      return makeInstance(rows[0], UserModel);
+      rows[0].isMe = viewerId === userId;
+      return new OutboundDataHolder(rows[0]);
     }
   }
 
@@ -193,7 +196,7 @@ export class UserModel extends ModelBase implements JwtSignable {
     return map(rows as any[], e => e.userId);
   }
 
-  async saveSettings(data: SettingsData, driver: DatabaseDriver = db) {
+  async saveSettings(data: ChangeSettingsRequest, driver: DatabaseDriver = db) {
     const self = this;
     const sql = createSaveSettingsSql(data);
     (data as any).id = self.id;

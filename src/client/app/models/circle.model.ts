@@ -50,6 +50,7 @@ export class CircleModel extends ModelBase {
     'id',
     'name',
     'users',
+    'userCount',
   ];
   userIdMap: any = {};
   name?: string;

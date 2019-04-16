@@ -12,23 +12,16 @@
             </mat-select>
           </div>
           <div>
-            <button mat-raised-button (click)="onCircleButtonClick()">{{circleButtonText}}
+            <button [disabled]="circlesUpdating" mat-raised-button (click)="onCircleButtonClick()">{{circleButtonText | i18n}}
             </button>
-            <button mat-raised-button [matMenuTriggerFor]="menu" id="other-circle-option-button">
+            <button *ngIf="extraMenuItems.length" mat-raised-button [matMenuTriggerFor]="menu"
+                    id="other-circle-option-button">
               <mat-icon id="other-circle-option-button-icon">more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
-              <button mat-menu-item >
-                <mat-icon>input</mat-icon>
-                <span>blah</span>
-              </button>
-              <button mat-menu-item >
-                <mat-icon>input</mat-icon>
-                <span>blah</span>
-              </button>
-              <button mat-menu-item >
-                <mat-icon>input</mat-icon>
-                <span>blah</span>
+              <button mat-menu-item *ngFor="let item of extraMenuItems" (click)="onExtraAction(item.action)">
+                <mat-icon>{{item.icon}}</mat-icon>
+                <span>{{item.name | i18n}}</span>
               </button>
             </mat-menu>
           </div>

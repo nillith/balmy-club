@@ -9,6 +9,8 @@ import {HttpClient} from "@angular/common/http";
 import {isValidStringId} from "../../../../shared/utils";
 import {PostFetcher} from "../../modules/post-widgets/post-stream-view/post-stream-view.component";
 import _ from 'lodash';
+import {getIconMenuOption, IconMenuOption, MenuActions} from "../../../constants";
+import {StringIds} from "../../modules/i18n/translations/string-ids";
 
 class UserPostFetcher implements PostFetcher {
   private prevGroupIndex = 0;
@@ -40,10 +42,11 @@ export class UserPageComponent implements OnInit {
   userId?: string;
   loading = true;
   user?: UserModel;
-  circleButtonText = 'Circle';
+  circleButtonText = StringIds.Circle;
   circlesUpdating = false;
 
   postFetcher?: PostFetcher;
+  extraMenuItems: IconMenuOption[] = [];
 
   userInCircleIds: string[] = [];
   circleSelects: string[] = [];
@@ -62,20 +65,42 @@ export class UserPageComponent implements OnInit {
         if (!isValidStringId(self.userId)) {
           return self.toastService.showToast('unknown user');
         }
-
         self.user = await self.iService.viewUserById(self.userId);
-        self.userInCircleIds = self.iService.circles.map((c) => {
-          if (c.isInCircle(userId)) {
-            return c.id;
-          }
-        }).filter(Boolean);
-        self.circleSelects = [...self.userInCircleIds];
+        self.user.id = userId;
+        self.updateCircleStatus();
         self.loading = false;
         self.postFetcher = new UserPostFetcher(self.http, self.userId);
+        self.updateExtraMenuItems();
       } catch (e) {
         self.toastService.showToast(e.error || e.message);
       }
     });
+  }
+
+  updateExtraMenuItems() {
+    const self = this;
+    const {user} = self;
+    if (user.blockedByMe) {
+      self.extraMenuItems = getIconMenuOption([MenuActions.UnBlock]);
+    } else if (user.isCircledByMe) {
+      self.extraMenuItems = getIconMenuOption([MenuActions.Block]);
+    } else {
+      self.extraMenuItems = [];
+    }
+    self.extraMenuItems = []; // TODO
+  }
+
+  updateCircleStatus() {
+    const self = this;
+    self.userInCircleIds = self.iService.getCirclesIdsContainsUser(self.user.id);
+    self.user.isCircledByMe = !!self.userInCircleIds.length;
+    self.circleSelects = [...self.userInCircleIds];
+    this.updateCircleButtonText();
+  }
+
+  updateCircleButtonText() {
+    const self = this;
+    self.circleButtonText = self.user.isCircledByMe ? StringIds.Circled : StringIds.Circle;
   }
 
   onCircleButtonClick() {
@@ -88,15 +113,22 @@ export class UserPageComponent implements OnInit {
     self.circlesUpdating = true;
     try {
       const {circleSelects, userInCircleIds} = self;
-      const addedCircles = _.difference(circleSelects, userInCircleIds);
-      const removedCircles = _.difference(userInCircleIds, circleSelects);
-      console.log(addedCircles);
-      console.log(removedCircles);
-      await self.iService.changeUserCircles(self.user, addedCircles, removedCircles);
+      let addCircleIds = _.difference(circleSelects, userInCircleIds);
+      let removeCircleIds = _.difference(userInCircleIds, circleSelects);
+
+      if (!addCircleIds.length && !removeCircleIds.length) {
+        return;
+      }
+      await self.iService.changeUserCircles(self.user, addCircleIds, removeCircleIds);
+      self.updateCircleStatus();
     } catch (e) {
+      console.log(e);
       self.toastService.showToast(e.error || e.message);
     } finally {
       self.circlesUpdating = false;
     }
+  }
+
+  onExtraAction(action: MenuActions) {
   }
 }

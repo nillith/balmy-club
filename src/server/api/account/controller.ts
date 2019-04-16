@@ -8,8 +8,8 @@ import {isString} from "util";
 import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
 import _ from "lodash";
 import {respondWithJson} from "../../init";
-import {SignUpTypes} from "../../../shared/constants";
-import {SignUpRequest} from "../../../shared/request_interface";
+import {SignUpTypes} from "../../../shared/contracts";
+import {SignUpRequest} from "../../../shared/contracts";
 
 const SignUpErrorMessages = {
   invalidEmail: 'Invalid Email!',

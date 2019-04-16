@@ -15,6 +15,8 @@ export class UserModel extends ModelBase {
   nickname: string;
   username: string;
   email: string;
+  blockedByMe?: boolean;
+  isCircledByMe?: boolean;
   isMe?: boolean;
 
   constructor(http: HttpClient, userData?: UserData) {

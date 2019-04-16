@@ -3,9 +3,10 @@ import {MatDialogRef} from "@angular/material";
 import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
-import {DirectSignUpRequest, LoginRequest, SignUpRequest} from "../../../../../shared/request_interface";
+import {LoginRequest} from "../../../../../shared/contracts";
 import {AuthService} from "./auth.service";
 import {StringIds} from "../../../modules/i18n/translations/string-ids";
+import {DirectSignUpRequest, SignUpRequest} from "../../../../../shared/contracts";
 
 enum DialogTypes {
   Login,

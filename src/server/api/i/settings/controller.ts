@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {SettingsData} from "../../../../shared/interf";
+import {ChangeSettingsRequest} from "../../../../shared/contracts";
 import {isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../../../shared/utils";
 import {isValidURL, respondWith, trimFields} from "../../../utils/index";
 import {isString} from "util";

@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {appConstants} from "../../app.constants";
 import {NgForm, NgModel} from "@angular/forms";
-import {SettingsData} from "../../../../shared/interf";
+import {ChangeSettingsRequest} from "../../../../shared/contracts";
 import {IService} from "../../services/i.service";
 import {ToastService} from "../../services/toast.service";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
@@ -17,7 +17,7 @@ export class SettingsComponent implements OnInit {
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;
   @ViewChild('password') passwordModel: NgModel;
   readonly appConstants = appConstants;
-  settingsData: SettingsData = {};
+  settingsData: ChangeSettingsRequest = {};
   loading = false;
 
   constructor(public iService: IService, private toastService: ToastService) {

@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {IService} from "../../../services/i.service";
 import {
-  DirectSignUpRequest, EmailSignUpRequest, LoginRequest, SignUpRequest,
-  SignUpWithTokenRequest
-} from "../../../../../shared/request_interface";
+  LoginRequest} from "../../../../../shared/contracts";
 import {API_URLS} from "../../../../constants";
-import {SignUpTypes} from "../../../../../shared/constants";
+import {
+  DirectSignUpRequest, EmailSignUpRequest, SignUpRequest, SignUpTypes,
+  SignUpWithTokenRequest
+} from "../../../../../shared/contracts";
 
 @Injectable({
   providedIn: 'root'

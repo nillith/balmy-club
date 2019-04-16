@@ -2,13 +2,12 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
-import {AccessTokenData, LoginData, SettingsData, UserData} from "../../../shared/interf";
+import {AccessTokenData, UserData} from "../../../shared/interf";
 import {API_URLS} from "../../constants";
 import {UserModel} from "../models/user.model";
 import {CircleModel} from "../models/circle.model";
-import {makeInstance} from "../../../shared/utils";
-import {LoginRequest} from "../../../shared/request_interface";
 import {DataStorage} from "../../utils/index";
+import {ChangeSettingsRequest, LoginResponse} from "../../../shared/contracts";
 
 
 const STORAGE_KEYS = {
@@ -60,12 +59,6 @@ export class IService {
       const circle = self.buildCircle();
       circle.assign(c);
       self.circles.push(circle);
-      if (!c.users) {
-        continue;
-      }
-      for (const u of c.users) {
-        makeInstance(u, UserModel);
-      }
     }
 
     for (const c of self.circles) {
@@ -100,7 +93,7 @@ export class IService {
     self.unpackCircleData(self.storage.loadObject(STORAGE_KEYS.CIRCLES));
   }
 
-  onLogin(data: LoginData) {
+  onLogin(data: LoginResponse) {
     const self = this;
     self.unpackToken(data.token);
     self.unpackUserData(data.user);
@@ -146,12 +139,22 @@ export class IService {
     return !!token && !jwtHelper.isTokenExpired(token);
   }
 
+  getCirclesIdsContainsUser(userId: string) {
+    const self = this;
+    console.log(self);
+    return self.circles.map((c) => {
+      if (c.isInCircle(userId)) {
+        return c.id;
+      }
+    }).filter(Boolean);
+  }
+
   buildCircle() {
     const self = this;
     return new CircleModel(self.http, self.me.id, self);
   }
 
-  async saveSettings(data: SettingsData) {
+  async saveSettings(data: ChangeSettingsRequest) {
     const self = this;
     await self.http.patch(API_URLS.SETTINGS, data, {
       responseType: 'text'
@@ -175,6 +178,7 @@ export class IService {
     return user;
   }
 
+
   async changeUserCircles(user: UserModel, addCircleIds: string[], removeCircleIds: string[]) {
     if (!user || !user.id) {
       return;
@@ -196,7 +200,27 @@ export class IService {
       addCircleIds,
       removeCircleIds
     }, {responseType: 'text'}).toPromise();
-    // TODO update local
+
+    if (addCircleIds) {
+      for (const addId of addCircleIds) {
+        const circle = _.find(self.circles, c => c.id === addId);
+        circle.users.push(user.assignOut());
+        circle.userIdMap[user.id] = user;
+      }
+    }
+
+    if (removeCircleIds) {
+      for (const removeId of removeCircleIds) {
+        const circle = _.find(self.circles, c => c.id === removeId);
+        _.remove(circle.users, (u) => {
+          return u.id === user.id;
+        });
+        circle.userIdMap[user.id] = undefined;
+      }
+    }
+    self.storage.saveObject(STORAGE_KEYS.CIRCLES, self.circles.map((c) => {
+      return c.assignOut();
+    }));
   }
 }
 

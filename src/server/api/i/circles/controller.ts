@@ -1,11 +1,14 @@
 import {NextFunction, Request, Response} from "express";
-import {isValidCircleName, isValidStringId} from "../../../../shared/utils";
+import {isValidCircleName, isValidStringId, utcTimestamp} from "../../../../shared/utils";
 import {isString} from "util";
 import {respondWith} from "../../../utils/index";
 import {$user} from "../../../constants/symbols";
 import {CircleModel, UserCircleUpdateData} from "../../../models/circle.model";
 import db from "../../../persistence/index";
 import {$id, batchCircleObfuscator, INVALID_NUMERIC_ID, userObfuscator} from "../../../service/obfuscator.service";
+import {ActivityModel} from "../../../models/activity.model";
+import {Activity} from "../../../../shared/interf";
+import {NotificationModel} from "../../../models/notification.model";
 
 const getCreateCirclePayloadOrErr = function(body: any) {
   let {name, userIds} = body;
@@ -62,6 +65,18 @@ const getChangeUserCirclesPayloadOrErr = function(body: any) {
 
   return {userId, addCircleIds, removeCircleIds} as UserCircleUpdateData;
 };
+
+
+async function shouldAddCircleNotification(circlerId: number, circleeId: number): Promise<boolean> {
+  const [rows] = await db.query('SELECT id FROM UserBlockUser WHERE blockerId = :circleeId AND blockeeId = :circlerId UNION ALL (SELECT id FROM CircleUser WHERE userId = :circleeId AND circleId IN (SELECT id FROM Circles WHERE ownerId = :circlerId) LIMIT 1)', {
+    circlerId, circleeId
+  });
+
+  console.log(rows);
+  return true;
+}
+
+
 export const changeUserCircles = async function(req: Request, res: Response, next: NextFunction) {
   const payload = getChangeUserCirclesPayloadOrErr(req.body);
   if (isString(payload)) {
@@ -70,16 +85,28 @@ export const changeUserCircles = async function(req: Request, res: Response, nex
 
   if (payload.addCircleIds || payload.removeCircleIds) {
     const user = req[$user];
-    payload.ownerId = user.id;
-    await CircleModel.updateUserCircle(payload);
+    const ownerId = payload.ownerId = user.id;
+    if (payload.addCircleIds && payload.addCircleIds.length && await shouldAddCircleNotification(ownerId, payload.userId)) {
+      await db.inTransaction(async (connection) => {
+        const timestamp = utcTimestamp();
+        const activity = new ActivityModel(ownerId, payload.userId, Activity.ObjectTypes.User, Activity.UserActions.Circle, timestamp);
+        await activity.insertIntoDatabase(connection);
+        const notification = new NotificationModel(payload.userId as number, activity.id as number, timestamp);
+        await notification.insertIntoDatabase(connection);
+        await CircleModel.changeUserCircles(payload, connection);
+      });
+    } else {
+      await CircleModel.changeUserCircles(payload);
+    }
   }
-
-
   return respondWith(res, 200);
 };
 
-
 export const removeCircle = async function(req: Request, res: Response, next: NextFunction) {
+  return respondWith(res, 405);
+};
+
+export const getCircleById = async function(req: Request, res: Response, next: NextFunction) {
   return respondWith(res, 405);
 };
 

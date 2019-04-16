@@ -120,7 +120,15 @@ export class CircleModel extends ModelBase {
     return pack;
   }
 
-  static async updateUserCircle(data: UserCircleUpdateData, driver: DatabaseDriver = db) {
+  static async isAlreadyCircled(userId: number, ownerId: number, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query('SELECT id FROM CircleUser WHERE userId = :userId AND circleId IN (SELECT id FROM Circles WHERE ownerId = :ownerId) LIMIT 1;', {
+      userId,
+      ownerId
+    });
+    return rows && rows[0] && !!rows[0].id;
+  }
+
+  static async changeUserCircles(data: UserCircleUpdateData, driver: DatabaseDriver = db) {
     const tasks: any[] = [];
     if (data.removeCircleIds) {
       tasks.push(driver.query('DELETE FROM CircleUser WHERE CircleUser.userId = :userId AND CircleUser.circleId IN (SELECT id FROM Circles WHERE ownerId = :ownerId)', data));
