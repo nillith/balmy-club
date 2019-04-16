@@ -1,16 +1,24 @@
 <div class="post-editor-dialog-container">
   <div fxLayout="row" fxLayoutAlign="left center">
     <button class="app-avatar-small">
-      <img src="{{iService.me.avatar}}">
+      <img src="{{iService.me | avatarUrl}}">
     </button>
     <div>{{iService.me.nickname || 'Unknown'}}</div>
     <mat-icon>navigate_next</mat-icon>
     <div style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
       <mat-select #visibilitySelector style="width:150px;" (selectionChange)="onVisibilityChange($event)">
-        <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name}}</mat-option>
+        <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name | i18n}}</mat-option>
       </mat-select>
     </div>
-    <button class="visibility-setting" (click)="showVisibilitySelector()">{{visibilityName}}</button>
+    <button class="visibility-setting" (click)="showVisibilitySelector()">{{visibilityName | i18n}}</button>
+    <div *ngIf="isPrivate()" style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
+      <mat-select #circleSelector style="width:150px;" (selectionChange)="onCircleChange($event)">
+        <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name | i18n}}</mat-option>
+      </mat-select>
+    </div>
+    <button *ngIf="isPrivate()" mat-icon-button (click)="showCircleSelection()">
+      <mat-icon class="circle-selector-icon">people</mat-icon>
+    </button>
     <div class="app-fill-space"></div>
   </div>
   <mat-divider></mat-divider>

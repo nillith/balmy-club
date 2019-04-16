@@ -1,30 +1,31 @@
 import {Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef, MatSelect} from "@angular/material";
 import {PostModel} from "../../../models/post.model";
 import {IService} from "../../../services/i.service";
 import {PostVisibilities} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {ToastService} from "../../../services/toast.service";
 import {MAX_POST_LENGTH} from "../../../../../shared/constants";
+import {StringIds} from "../../i18n/translations/string-ids";
 
 const VisibilityText = {
-  [PostVisibilities.Public]: 'Public',
-  [PostVisibilities.Private]: 'PrivateCircle',
-  [PostVisibilities.Extended]: 'ExtendedCircle',
+  [PostVisibilities.Public]: StringIds.Public,
+  [PostVisibilities.Private]: StringIds.PrivateCircle,
+  [PostVisibilities.Extended]: StringIds.ExtendedCircle,
 };
 
 const VisibilityOptions = [
   {
     id: PostVisibilities.Public,
-    name: 'Public',
+    name: StringIds.Public,
   },
   {
     id: PostVisibilities.Extended,
-    name: 'ExtendedCircle',
+    name: StringIds.ExtendedCircle,
   },
   {
     id: PostVisibilities.Private,
-    name: 'PrivateCircle'
+    name: StringIds.PrivateCircle
   }
 ];
 
@@ -37,7 +38,8 @@ export class PostEditorDialogComponent implements OnInit {
 
   post: PostModel;
   loading = false;
-  @ViewChild('visibilitySelector') visibilitySelector;
+  @ViewChild('visibilitySelector') visibilitySelector: MatSelect;
+  @ViewChild('circleSelector') circleSelector: MatSelect;
   visibilityOptions = VisibilityOptions;
 
   @ViewChild('markdownEditor')
@@ -63,8 +65,15 @@ export class PostEditorDialogComponent implements OnInit {
     return VisibilityText[self.post.visibility];
   }
 
-  showCircleSelection() {
+  isPrivate() {
     return this.post.visibility === PostVisibilities.Private;
+  }
+
+  showCircleSelection() {
+    const {circleSelector} = this;
+    if (circleSelector) {
+      circleSelector.open();
+    }
   }
 
   onVisibilityChange(e) {

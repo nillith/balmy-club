@@ -26,7 +26,7 @@ export const values = {
   [StringIds.AvatarUrl]: '头像链接',
   [StringIds.BannerUrl]: '个人页',
   [StringIds.Public]: '公开',
-  [StringIds.PrivateCircle]: '圈子',
+  [StringIds.PrivateCircle]: '私密圈子',
   [StringIds.ExtendedCircle]: '扩展圈子',
   [StringIds.Create]: '创建',
   [StringIds.Edit]: '编辑',

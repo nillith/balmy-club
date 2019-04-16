@@ -29,3 +29,12 @@ mat-divider {
 .visibility-setting {
   @include button-text(blue);
 }
+
+
+.circle-selector-icon {
+  color: #3377aa;
+
+  svg {
+    fill: #3377aa;
+  }
+}
