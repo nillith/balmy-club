@@ -18,7 +18,7 @@ import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} fro
 import {ChangeSettingsRequest} from "../../shared/contracts";
 import {CircleModel} from "./circle.model";
 import {OutboundDataHolder} from "../init";
-
+import _ from 'lodash';
 
 export interface UserCreateInfo {
   username?: string;
@@ -172,10 +172,26 @@ export class UserModel extends ModelBase implements JwtSignable {
     self.hash = await passwordService.passwordHash(self.salt, self.password!);
   }
 
+  async isBlockByUser(userId: number, driver: DatabaseDriver = db): Promise<boolean> {
+    const [rows] = await driver.query('SELECT id FROM UserBlockUser WHERE blockeeId = :myId AND blockerId = :userId LIMIT 1', {
+      myId: this.id,
+      userId
+    });
+    return !_.isEmpty(rows);
+  }
+
+  async isCircledByUser(userId: number, driver: DatabaseDriver = db): Promise<boolean> {
+    const [rows] = await driver.query('SELECT circleId FROM CircleUser WHERE userId = 1 AND circleId IN (SELECT id FROM Circles WHERE ownerId = 1) LIMIT 1', {
+      myId: this.id,
+      userId
+    });
+    return !_.isEmpty(rows);
+  }
+
   async changePassword(password: string, driver: DatabaseDriver = db) {
     this.password = password;
     await this.hashPassword();
-    await db.execute(`UPDATE Users SET salt = :salt, hash = :hash WHERE id = :id`, this);
+    await driver.execute(`UPDATE Users SET salt = :salt, hash = :hash WHERE id = :id`, this);
   }
 
   getJwtPayload(): Object {
@@ -184,15 +200,15 @@ export class UserModel extends ModelBase implements JwtSignable {
     return cloneByFieldMaps(self, JWT_PAYLOAD_FIELD_MAPS);
   }
 
-  async getSubscriberIds() {
+  async getSubscriberIds(driver: DatabaseDriver = db) {
     console.assert(isNumericId(this.id));
-    const [rows] = await db.query(`SELECT subscriberId FROM Subscriptions WHERE subscribeeId = :id`, this);
+    const [rows] = await driver.query(`SELECT subscriberId FROM Subscriptions WHERE subscribeeId = :id`, this);
     return map(rows as any[], e => e.subscriberId);
   }
 
-  async getCirclerIds() {
+  async getCirclerIds(driver: DatabaseDriver = db) {
     console.assert(isNumericId(this.id));
-    const [rows] = await db.query(`SELECT DISTINCT(CircleUser.userId) FROM Circles LEFT JOIN CircleUser ON (Circles.id = CircleUser.circleId) WHERE Circles.ownerId = :id`, this);
+    const [rows] = await driver.query(`SELECT DISTINCT(CircleUser.userId) FROM Circles LEFT JOIN CircleUser ON (Circles.id = CircleUser.circleId) WHERE Circles.ownerId = :id`, this);
     return map(rows as any[], e => e.userId);
   }
 

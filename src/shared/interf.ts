@@ -6,7 +6,7 @@ export enum UserRoles {
 export enum PostVisibilities {
   Public = 1,
   Private,
-  Extended,
+  // Extended,
 }
 
 export namespace Activity {

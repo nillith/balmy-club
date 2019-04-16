@@ -1,3 +1,6 @@
-<div fxLayout="column" fxLayoutAlign="center center">
+<div class="post-stream-view-container" fxLayout="column" fxLayoutAlign="center center" (scroll)="onScroll($event)">
   <app-post-group-view *ngFor="let group of groups" [posts]="group"></app-post-group-view>
+  <div #loadmore class="post-stream-load-more-detector">
+
+  </div>
 </div>

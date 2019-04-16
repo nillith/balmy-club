@@ -4,6 +4,7 @@ export const MIN_USERNAME_LENGTH = 5;
 export const MAX_POST_LENGTH = 4096;
 export const MAX_VISIBLE_CIRCLE_NUMBER = 20;
 export const MAX_URL_LENGTH = 200;
+export const POSTS_GROUP_SIZE = 12;
 const ALPHA_NUMERIC = '[a-zA-Z0-9]';
 const SEG = `(${ALPHA_NUMERIC}\\w*([\\-.]?\\w*${ALPHA_NUMERIC})*)`;
 export const EMAIL_ADDRESS_PATTERN = `(?=.{${MIN_USERNAME_LENGTH},${MAX_USERNAME_LENGTH}}$)${SEG}@${SEG}\.${SEG}`;

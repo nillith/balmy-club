@@ -9,6 +9,7 @@ import {$id, batchCircleObfuscator, INVALID_NUMERIC_ID, userObfuscator} from "..
 import {ActivityModel} from "../../../models/activity.model";
 import {Activity} from "../../../../shared/interf";
 import {NotificationModel} from "../../../models/notification.model";
+import _ from 'lodash';
 
 const getCreateCirclePayloadOrErr = function(body: any) {
   let {name, userIds} = body;
@@ -71,9 +72,7 @@ async function shouldAddCircleNotification(circlerId: number, circleeId: number)
   const [rows] = await db.query('SELECT id FROM UserBlockUser WHERE blockerId = :circleeId AND blockeeId = :circlerId UNION ALL (SELECT id FROM CircleUser WHERE userId = :circleeId AND circleId IN (SELECT id FROM Circles WHERE ownerId = :circlerId) LIMIT 1)', {
     circlerId, circleeId
   });
-
-  console.log(rows);
-  return true;
+  return !_.isEmpty(rows);
 }
 
 
