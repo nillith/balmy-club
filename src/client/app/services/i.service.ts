@@ -2,50 +2,14 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
-import {AccessTokenData, AuthData, LoginData, SettingsData, SignUpTypes, UserData} from "../../../shared/interf";
+import {AccessTokenData, LoginData, SettingsData, UserData} from "../../../shared/interf";
 import {API_URLS} from "../../constants";
 import {UserModel} from "../models/user.model";
 import {CircleModel} from "../models/circle.model";
 import {makeInstance} from "../../../shared/utils";
+import {LoginRequest} from "../../../shared/request_interface";
+import {DataStorage} from "../../utils/index";
 
-
-class DataStorage {
-  constructor(private userId: string) {
-  }
-
-  private generateKey(key: string) {
-    return `${this.userId}:${key}`;
-  }
-
-  saveString(key: string, data: string) {
-    return localStorage.setItem(this.generateKey(key), data);
-  }
-
-  loadString(key: string): string {
-    return localStorage.getItem(this.generateKey(key));
-  }
-
-  saveObject(key: string, obj: any) {
-    if (!key || !obj) {
-      return;
-    }
-    return this.saveString(key, JSON.stringify(obj));
-  }
-
-  loadObject(key: string): any {
-    if (!key) {
-      return;
-    }
-    const data = this.loadString(key);
-    if (data) {
-      return JSON.parse(data);
-    }
-  }
-
-  clear() {
-    localStorage.clear();
-  }
-}
 
 const STORAGE_KEYS = {
   USER: 'user',
@@ -177,18 +141,6 @@ export class IService {
     localStorage.clear();
   }
 
-
-  async login(payload: AuthData) {
-    const self = this;
-    const {username, password, rememberMe} = payload;
-    const loginResult = await self.http.post(API_URLS.LOGIN, {
-      username,
-      password,
-      rememberMe
-    }).toPromise() as any;
-    self.onLogin(loginResult);
-  }
-
   isLoggedIn() {
     const {token, jwtHelper} = this;
     return !!token && !jwtHelper.isTokenExpired(token);
@@ -208,38 +160,6 @@ export class IService {
   }
 
 
-  private async postSignUpPayload(payload: AuthData): Promise<string> {
-    return this.http.post(API_URLS.ACCOUNT, payload, {responseType: 'text'}).toPromise();
-  }
-
-  private async signUpWithPayload(payload: AuthData) {
-    const self = this;
-    const authData = await self.postSignUpPayload(payload);
-    self.onLogin(JSON.parse(authData));
-    location.reload();
-  }
-
-  async requestSignUp(payload: AuthData) {
-    const {email} = payload;
-    return this.postSignUpPayload({email});
-  }
-
-  async signUpWithToken(payload: AuthData) {
-    const self = this;
-    const {token, username, password, nickname} = payload;
-    await self.signUpWithPayload({
-      token, username, password, nickname, type: SignUpTypes.WithToken
-    });
-  }
-
-  async signUpWithUsername(payload: AuthData) {
-    const self = this;
-    const {email, username, password, nickname} = payload;
-    await self.signUpWithPayload({
-      email, username, password, nickname, type: SignUpTypes.Direct
-    });
-  }
-
   private createUser() {
     return new UserModel(this.http);
   }
@@ -257,8 +177,6 @@ export class IService {
 
   async changeUserCircles(user: UserModel, addCircleIds: string[], removeCircleIds: string[]) {
     if (!user || !user.id) {
-      console.log(user);
-      console.log('no user');
       return;
     }
     if (addCircleIds && !addCircleIds.length) {
@@ -270,12 +188,14 @@ export class IService {
     }
 
     if (!addCircleIds && !removeCircleIds) {
-      console.log('no change')
       return;
     }
     const self = this;
-    console.log('-------patch-------')
-    await self.http.patch(API_URLS.CIRCLES, {userId: user.id, addCircleIds, removeCircleIds}, {responseType: 'text'}).toPromise();
+    await self.http.patch(API_URLS.CIRCLES, {
+      userId: user.id,
+      addCircleIds,
+      removeCircleIds
+    }, {responseType: 'text'}).toPromise();
     // TODO update local
   }
 }

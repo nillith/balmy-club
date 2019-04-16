@@ -29,6 +29,7 @@ class UserPostFetcher implements PostFetcher {
 
 }
 
+
 @Component({
   selector: 'app-user-page',
   templateUrl: './user-page.component.html',

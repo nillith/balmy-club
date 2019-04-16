@@ -4,11 +4,12 @@ import mailService from "../../service/mailer.service";
 import validator from 'validator';
 import {SignUpPayload, signUpService} from "../../service/auth.service";
 import {UserCreateInfo, UserModel} from "../../models/user.model";
-import {AuthData, SignUpTypes} from "../../../shared/interf";
 import {isString} from "util";
 import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
 import _ from "lodash";
 import {respondWithJson} from "../../init";
+import {SignUpTypes} from "../../../shared/constants";
+import {SignUpRequest} from "../../../shared/request_interface";
 
 const SignUpErrorMessages = {
   invalidEmail: 'Invalid Email!',
@@ -22,15 +23,15 @@ const SignUpErrorMessages = {
 };
 
 
-const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | string> {
-  let {email, username, password, nickname} = body;
+const getSignUpInfo = async function(body: SignUpRequest): Promise<UserCreateInfo | string> {
+  let {email, username, password, nickname} = body as any;
   email = _.trim(email);
   username = _.trim(username);
   password = _.trim(password);
   nickname = _.trim(nickname);
 
   switch (body.type) {
-    case SignUpTypes.Request:
+    case SignUpTypes.Email:
       email = body.email && body.email.trim();
       if (!email || !validator.isEmail(email)) {
         return SignUpErrorMessages.invalidEmail;
@@ -81,13 +82,13 @@ const getSignUpInfo = async function(body: AuthData): Promise<UserCreateInfo | s
 };
 
 export const signUp = async function(req: Request, res: Response, next: NextFunction) {
-  const body: AuthData = req.body;
+  const body: SignUpRequest = req.body;
   const signUpInfo = await getSignUpInfo(body) as UserCreateInfo;
   if (isString(signUpInfo)) {
     return respondWith(res, 400, signUpInfo);
   }
   switch (body.type) {
-    case SignUpTypes.Request:
+    case SignUpTypes.Email:
       await mailService.sendSignUpMail(new SignUpPayload(signUpInfo.email!));
       break;
     case SignUpTypes.WithToken: // fallthrough

@@ -3,10 +3,6 @@ export enum UserRoles {
   Admin,
 }
 
-export enum SignUpTypes {
-  Request = 1, WithToken, Direct
-}
-
 export enum PostVisibilities {
   Public = 1,
   Private,

@@ -1,5 +1,5 @@
 <span class="spinner-switch-container">
     <mat-icon class="material-icons non-spinner-icon" *ngIf="!showSpinner">{{icon}}</mat-icon>
     <mat-spinner [diameter]="spinnerDiameter" class="material-icons" *ngIf="showSpinner"></mat-spinner>
-  {{text}}
+  {{textId | i18n}}
 </span>

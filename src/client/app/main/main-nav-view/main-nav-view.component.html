@@ -31,7 +31,7 @@
       <div class="comp-avatar-area">
         <button *ngIf="loginWallService.isLoggedIn()" #button (click)="settingService.showAvatarSettingDialog(button)"
                 class="app-avatar-small">
-          <img src="{{iService.me.avatar}}">
+          <img src="{{iService.me | avatarUrl}}">
         </button>
       </div>
     </mat-toolbar>

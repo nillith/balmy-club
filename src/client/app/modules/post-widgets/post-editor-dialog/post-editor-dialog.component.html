@@ -20,7 +20,7 @@
     <div class="app-fill-space"></div>
     <button mat-raised-button (click)="cancelPost()">Cancel</button>
     <button mat-raised-button (click)="publishPost()" [disabled]="editor.isEmpty()" style="width: 100px;">
-      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [text]="'Post'"></app-spinner-switch>
+      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="'Post'"></app-spinner-switch>
     </button>
   </div>
 </div>

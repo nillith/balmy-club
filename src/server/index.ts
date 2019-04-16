@@ -2,18 +2,25 @@ import './init';
 import config from './config';
 import http from 'http';
 import app from './app';
+import {UserModel} from "./models/user.model";
+import {cloneFields} from "../shared/utils";
+import {MENTION_PATTERN, SignUpTypes} from "../shared/constants";
+
+import {DirectSignUpRequest} from "../shared/request_interface";
+
 function createMentionRegexp() {
   return new RegExp(MENTION_PATTERN, 'g');
 }
 
 
-import {db} from './persistence';
-import {UserModel} from "./models/user.model";
-import {NotificationModel} from "./models/notification.model";
-import {cloneFields, utcTimestamp} from "../shared/utils";
-import {TextContentModel} from "./models/text-content.model";
-import {MENTION_PATTERN} from "../shared/constants";
+const blah: DirectSignUpRequest = {
+  username: 'string',
+  nickname: 'string',
+  password: 'string',
+  type: SignUpTypes.Direct,
+};
 
+console.log(blah);
 const usr = new UserModel();
 
 usr.id = 1;
@@ -21,7 +28,7 @@ usr.id = 1;
 const b = cloneFields(usr, ['name']);
 
 (async () => {
- //  const t = new TextContentModel();
+  //  const t = new TextContentModel();
   //  t.content = content;
   //  console.log(t.extractMentionsFromContent());
   // // const con = await db.getConnection();

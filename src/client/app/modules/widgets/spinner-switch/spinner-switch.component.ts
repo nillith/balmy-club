@@ -11,7 +11,7 @@ export class SpinnerSwitchComponent implements OnInit {
   private spinnerDiameter = 20;
   private spanSize = '20px';
 
-  @Input() text: string;
+  @Input() textId: string;
 
   @Input()
   set size(v: number) {

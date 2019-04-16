@@ -39,7 +39,7 @@
       <button [disabled]="!circleModifier || loading" mat-button mat-raised-button (click)="cancelEdit()">cancel
       </button>
       <button [disabled]="!circleModifier || !circleModifier.name || loading" mat-button mat-raised-button (click)="saveEdit()">
-        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [text]="saveButtonText"></app-spinner-switch>
+        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="saveButtonText"></app-spinner-switch>
       </button>
     </mat-card-actions>
   </mat-card>

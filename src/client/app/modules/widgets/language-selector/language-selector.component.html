@@ -1,0 +1,9 @@
+<button mat-icon-button [matMenuTriggerFor]="languageMenu">
+  <mat-icon>language</mat-icon>
+  <span>{{i18nService.name}}</span>
+</button>
+<mat-menu #languageMenu="matMenu" style="margin: 0;padding: 0">
+  <div fxLayout="column" fxLayoutAlign="left center" style="margin: 0;padding: 0">
+    <span *ngFor="let trans of translations" (click)="onChooseLanguage(trans.code)">{{trans.name}}</span>
+  </div>
+</mat-menu>

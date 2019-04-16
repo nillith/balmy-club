@@ -1,4 +1,4 @@
-<form name="form" #formRef="ngForm">
+<form name="form" #formRef="ngForm" *ngIf="!changingLanguage">
   <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center center">
     <img src="../../../../assets/logo.png" class="app-logo-median">
   </h2>
@@ -7,32 +7,35 @@
     [class.sign-up-main-content]="DialogTypes.SignUp === dialogType"
     fxLayout="column">
     <mat-form-field *ngIf="uiConfig.username">
-      <input matInput placeholder="Username"
+      <input matInput placeholder="{{usernamePlaceholder | i18n}}"
              type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
              name="username" required #username="ngModel"
              [(ngModel)]="dialogModel.username">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.nickname">
-      <input matInput placeholder="Nickname"
+      <input matInput placeholder="{{nicknamePlaceholder | i18n}}"
              type="text" pattern="^{{appConstants.NICKNAME_PATTERN}}$"
              name="nickname" required #nickname="ngModel"
              [(ngModel)]="dialogModel.nickname">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.email">
-      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="Email" id="email"
+      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput
+             placeholder="{{emailPlaceholder | i18n}}" id="email"
              name="email"
              [required]="uiConfig.emailRequired"
              #email="ngModel" [(ngModel)]="dialogModel.email">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.password">
-      <input type="password" matInput placeholder="Password" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+      <input type="password" matInput placeholder="{{passwordPlaceholder | i18n}}"
+             minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="password"
              name="password" required
              #password="ngModel" [(ngModel)]="dialogModel.password">
     </mat-form-field>
 
     <mat-form-field *ngIf="uiConfig.passwordConfirm">
-      <input type="password" matInput placeholder="Confirm" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+      <input type="password" matInput placeholder="{{confirmPasswordPlaceholder | i18n}}"
+             minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="passwordConfirm"
              name="passwordConfirm"
              [disabled]="confirmDisabled()"
@@ -40,14 +43,15 @@
              #passwordConfirm="ngModel" [(ngModel)]="dialogModel.passwordConfirm"
              (ngModelChange)="onConfirmChange()">
     </mat-form-field>
-    <section *ngIf="uiConfig.mainExtra">
+    <section *ngIf="uiConfig.mainExtra" fxLayout="row" fxLayoutAlign="center center">
       <mat-checkbox *ngIf="uiConfig.rememberMe" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
-        Remember Me
+        {{rememberMeStringId | i18n}}
       </mat-checkbox>
-      <button *ngIf="uiConfig.passwordToggle" class="app-button-link login-wall-button-link"
+      <div class="app-fill-space"></div>
+      <button *ngIf="uiConfig.passwordToggle" class="app-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.PasswordRecoverRequest : DialogTypes.Login)"
               [disabled]="loading || togging">
-        {{passwordToggleText}}
+        {{passwordToggleText | i18n}}?
       </button>
     </section>
   </mat-dialog-content>
@@ -63,16 +67,21 @@
               color="mat-red"
               (click)="onSubmit()" #button>
       <span>
-        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'" [text]="submitButtonText"></app-spinner-switch>
+        <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'"
+                            [textId]="submitButtonText"></app-spinner-switch>
       </span>
       </button>
     </div>
-    <div style="width:100%;padding-bottom: 20px;"
-         *ngIf="uiConfig.signUpToggle">
-      <button class="app-button-link login-wall-button-link"
+    <div style="width:100%;padding-bottom: 20px;" fxLayout="row" fxLayoutAlign="center center" >
+      <app-language-selector (change)="onLanguageChange()"></app-language-selector>
+
+
+
+      <div class="app-fill-space"></div>
+      <button *ngIf="uiConfig.signUpToggle" class="app-button-link login-wall-button-link"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.SignUp : DialogTypes.Login)"
               [disabled]="loading || togging">
-        {{signUpToggleText}}
+        {{signUpToggleText | i18n}}?
       </button>
     </div>
   </mat-dialog-actions>

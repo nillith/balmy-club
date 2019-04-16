@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import Editor from 'tui-editor';
-import {I18nServiceService} from "../../services/i18n-service.service";
+import {I18nService} from "../../services/i18n.service";
 import {MentionPlugin} from "./mention.markdown-plugin";
 import {MentionCommand, MentionCommandName, Mentionee} from "./mention.command";
 
@@ -53,7 +53,7 @@ const mention = function(this: MarkdownEditor, mentionee: Mentionee) {
 })
 export class MarkdownService {
 
-  constructor(private i18Service: I18nServiceService) {
+  constructor(private i18Service: I18nService) {
   }
 
   private prepareOptions(option: any) {

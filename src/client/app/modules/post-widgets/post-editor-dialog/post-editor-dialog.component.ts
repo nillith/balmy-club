@@ -9,8 +9,8 @@ import {MAX_POST_LENGTH} from "../../../../../shared/constants";
 
 const VisibilityText = {
   [PostVisibilities.Public]: 'Public',
-  [PostVisibilities.Private]: 'Private',
-  [PostVisibilities.Extended]: 'Extended',
+  [PostVisibilities.Private]: 'PrivateCircle',
+  [PostVisibilities.Extended]: 'ExtendedCircle',
 };
 
 const VisibilityOptions = [
@@ -20,11 +20,11 @@ const VisibilityOptions = [
   },
   {
     id: PostVisibilities.Extended,
-    name: 'Extended',
+    name: 'ExtendedCircle',
   },
   {
     id: PostVisibilities.Private,
-    name: 'Private'
+    name: 'PrivateCircle'
   }
 ];
 

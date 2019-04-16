@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 
-import { I18nServiceService } from './i18n-service.service';
+import { I18nService } from './i18n.service';
 import {ProjectModulesImportsTestingModule} from "../modules/imports/project-modules-imports-testing.module.spec";
 
-describe('I18nServiceService', () => {
+describe('I18nService', () => {
   beforeEach(() => TestBed.configureTestingModule({
     imports: [ProjectModulesImportsTestingModule]
   }));
 
   it('should be created', () => {
-    const service: I18nServiceService = TestBed.get(I18nServiceService);
+    const service: I18nService = TestBed.get(I18nService);
     expect(service).toBeTruthy();
   });
 });

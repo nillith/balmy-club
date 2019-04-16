@@ -3,8 +3,9 @@ import {MatDialogRef} from "@angular/material";
 import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
-import {AuthData} from "../../../../../shared/interf";
-import {IService} from "../../../services/i.service";
+import {DirectSignUpRequest, LoginRequest, SignUpRequest} from "../../../../../shared/request_interface";
+import {AuthService} from "./auth.service";
+import {StringIds} from "../../../../i18n/string-ids";
 
 enum DialogTypes {
   Login,
@@ -20,21 +21,21 @@ const DialogUrl = {
 };
 
 const SubmitButtonTexts = {
-  [DialogTypes.Login]: 'Login',
-  [DialogTypes.SignUp]: 'Sign Up',
-  [DialogTypes.PasswordRecoverRequest]: 'Recover Password',
-  [DialogTypes.PasswordRecover]: 'Change Password',
+  [DialogTypes.Login]: StringIds.Login,
+  [DialogTypes.SignUp]: StringIds.SignUp,
+  [DialogTypes.PasswordRecoverRequest]: StringIds.RecoverPassword,
+  [DialogTypes.PasswordRecover]: StringIds.ChangePassword,
 };
 
 const SignUpToggleTexts = {
-  [DialogTypes.Login]: 'Sign Up?',
-  [DialogTypes.SignUp]: 'Login?',
+  [DialogTypes.Login]: StringIds.SignUp,
+  [DialogTypes.SignUp]: StringIds.Login,
 };
 
 const PasswordToggleTexts = {
-  [DialogTypes.Login]: 'Forgot Password?',
-  [DialogTypes.PasswordRecoverRequest]: 'Login?',
-  [DialogTypes.PasswordRecover]: 'Login?',
+  [DialogTypes.Login]: StringIds.ForgotPassword,
+  [DialogTypes.PasswordRecoverRequest]: StringIds.Login,
+  [DialogTypes.PasswordRecover]: StringIds.Login,
 };
 
 interface UiConfig {
@@ -76,9 +77,9 @@ const UiConfigs = {
 };
 
 
-interface LoginDialogModel extends AuthData {
+type LoginDialogModel = SignUpRequest | LoginRequest | {
   passwordConfirm?: string;
-}
+};
 
 @Component({
   selector: 'app-login-dialog',
@@ -86,6 +87,14 @@ interface LoginDialogModel extends AuthData {
   styleUrls: ['./login-dialog.component.scss']
 })
 export class LoginDialogComponent implements OnInit {
+
+  usernamePlaceholder = StringIds.Username;
+  nicknamePlaceholder = StringIds.Nickname;
+  passwordPlaceholder = StringIds.Password;
+  emailPlaceholder = StringIds.Email;
+  confirmPasswordPlaceholder = StringIds.ConfirmPassword;
+
+  rememberMeStringId = StringIds.RememberMe;
 
   @ViewChild('formRef') formRef: NgForm;
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;
@@ -100,11 +109,12 @@ export class LoginDialogComponent implements OnInit {
   signUpToken: string;
   error = '';
   redirect: string | null = null;
+  changingLanguage = false;
 
   constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
               private activeRoute: ActivatedRoute,
               private router: Router,
-              private iService: IService) {
+              private authService: AuthService) {
   }
 
   ngOnInit() {
@@ -148,7 +158,7 @@ export class LoginDialogComponent implements OnInit {
 
   confirmDisabled() {
     const {passwordModel} = this;
-    return passwordModel.invalid || !passwordModel.value;
+    return passwordModel && (passwordModel.invalid || !passwordModel.value);
   }
 
   onConfirmChange() {
@@ -173,15 +183,15 @@ export class LoginDialogComponent implements OnInit {
     const self = this;
     try {
       self.error = '';
-      const {dialogType, dialogModel, iService} = self;
+      const {dialogType, dialogModel, authService} = self;
       self.loading = true;
       switch (dialogType) {
         case DialogTypes.Login:
-          await iService.login(dialogModel);
+          await authService.login(dialogModel as LoginRequest);
           this.closeDialog();
           break;
         case DialogTypes.SignUp:
-          await iService.signUpWithUsername(dialogModel);
+          await authService.signUpWithUsername(dialogModel as DirectSignUpRequest);
           this.closeDialog();
           break;
         case DialogTypes.PasswordRecoverRequest:
@@ -190,12 +200,19 @@ export class LoginDialogComponent implements OnInit {
           break;
       }
     } catch (e) {
-      console.log(e);
       self.error = e.error || e.message;
     } finally {
       setTimeout(() => {
         self.loading = false;
       }, 300);
     }
+  }
+
+  onLanguageChange() {
+    const self = this;
+    self.changingLanguage = true;
+    setTimeout(() => {
+      self.changingLanguage = false;
+    });
   }
 }

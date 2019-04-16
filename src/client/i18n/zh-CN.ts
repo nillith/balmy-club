@@ -1,0 +1,38 @@
+import {StringIds} from "./string-ids";
+
+export const name = '中文';
+export const code = 'zh-CN';
+export const values = {
+  [StringIds.Username]: '用户名',
+  [StringIds.Password]: '密码',
+  [StringIds.Email]: 'Email',
+  [StringIds.ForgotPassword]: '忘记密码',
+  [StringIds.RememberMe]: '记住我',
+  [StringIds.RecoverPassword]: '找回密码',
+  [StringIds.ConfirmPassword]: '确认密码',
+  [StringIds.ChangePassword]: '修改密码',
+  [StringIds.Nickname]: '昵称',
+  [StringIds.Login]: '登录',
+  [StringIds.Logout]: '登出',
+  [StringIds.SignUp]: '注册',
+  [StringIds.Settings]: '设置',
+  [StringIds.Home]: '主页',
+  [StringIds.People]: '人',
+  [StringIds.Circle]: '圈子',
+  [StringIds.Cancel]: '取消',
+  [StringIds.Save]: '保存',
+  [StringIds.AvatarUrl]: '头像链接',
+  [StringIds.BannerUrl]: '个人页',
+  [StringIds.Public]: '公开',
+  [StringIds.PrivateCircle]: '圈子',
+  [StringIds.ExtendedCircle]: '扩展圈子',
+  [StringIds.Edit]: '编辑',
+  [StringIds.Mute]: 'Mute',
+  [StringIds.Muted]: 'Muted',
+  [StringIds.Delete]: '删除',
+  [StringIds.AddComment]: '添加评论',
+  [StringIds.ShowAllXComments]: '显示全部{x}个评论',
+  [StringIds.Share]: '分享',
+  [StringIds.Menu]: '菜单',
+  [StringIds.PublishPost]: '发布',
+};

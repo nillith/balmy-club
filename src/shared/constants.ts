@@ -25,3 +25,7 @@ export const UserRanks = {
   [Roles.User]: 1,
   [Roles.Admin]: 2,
 };
+
+export const enum SignUpTypes {
+  Email = 1, WithToken, Direct
+}

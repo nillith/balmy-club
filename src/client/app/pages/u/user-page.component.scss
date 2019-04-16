@@ -37,3 +37,22 @@
   }
 
 }
+
+$width: 16px;
+
+#other-circle-option-button {
+  width: $width !important;
+  min-width: 10px;
+  .mat-button-ripple .mat-ripple {
+    width: $width !important;
+  }
+
+  .mat-button-focus-overlay {
+    width: $width !important;
+  }
+
+  #other-circle-option-button-icon{
+    position: relative;
+    left: -10px;
+  }
+}

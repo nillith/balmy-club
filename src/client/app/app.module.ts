@@ -20,7 +20,7 @@ const appRoutes: Routes = [
     AppComponent,
     LoginDialogComponent,
     AvatarSettingDialogComponent,
-    MainNavViewComponent
+    MainNavViewComponent,
   ],
   imports: [
     ProjectModulesImportsModule,

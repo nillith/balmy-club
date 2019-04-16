@@ -45,7 +45,7 @@
     <button [disabled]="loading" mat-button mat-raised-button (click)="cancelSettings()">cancel
     </button>
     <button [disabled]="formRef.form.pristine || !formRef.form.valid || loading" mat-button mat-raised-button (click)="saveSettings()">
-      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [text]="'Save'"></app-spinner-switch>
+      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="'Save'"></app-spinner-switch>
     </button>
   </mat-card-actions>
 </mat-card>
