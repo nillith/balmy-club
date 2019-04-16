@@ -1,38 +1,41 @@
 <mat-card>
   <form name="form" #formRef="ngForm" fxLayout="column">
     <mat-form-field>
-      <input matInput placeholder="Username"
+      <input matInput placeholder="{{StringIds.Username | i18n}}"
              type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
              name="username" #username="ngModel"
              [(ngModel)]="settingsData.username">
     </mat-form-field>
     <mat-form-field>
-      <input matInput placeholder="Nickname"
+      <input matInput placeholder="{{StringIds.Nickname | i18n}}"
              type="text" pattern="^{{appConstants.NICKNAME_PATTERN}}$"
              name="nickname" #nickname="ngModel"
              [(ngModel)]="settingsData.nickname">
     </mat-form-field>
     <mat-form-field>
-      <input matInput placeholder="Avatar Url"
+      <input matInput placeholder="{{StringIds.AvatarUrl | i18n}}"
              type="url"
              maxlength="{{appConstants.MAX_URL_LENGTH}}"
              name="avatarUrl" #nickname="ngModel"
              [(ngModel)]="settingsData.avatarUrl">
     </mat-form-field>
     <mat-form-field>
-      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="Email" id="email"
+      <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="{{StringIds.Email | i18n}}"
+             id="email"
              name="email"
              #email="ngModel" [(ngModel)]="settingsData.email">
     </mat-form-field>
     <mat-form-field>
-      <input type="password" matInput placeholder="Password" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+      <input type="password" matInput placeholder="{{StringIds.Password | i18n}}"
+             minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="password"
              name="password"
              #password="ngModel" [(ngModel)]="settingsData.password">
     </mat-form-field>
 
     <mat-form-field>
-      <input type="password" matInput placeholder="Confirm" minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
+      <input type="password" matInput placeholder="{{StringIds.ConfirmPassword | i18n}}"
+             minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="passwordConfirm"
              name="passwordConfirm"
              [disabled]="confirmDisabled()"
@@ -42,10 +45,12 @@
     </mat-form-field>
   </form>
   <mat-card-actions align="end">
-    <button [disabled]="loading" mat-button mat-raised-button (click)="cancelSettings()">cancel
+    <button [disabled]="loading" mat-button mat-raised-button (click)="cancelSettings()">{{StringIds.Cancel | i18n}}
     </button>
-    <button [disabled]="formRef.form.pristine || !formRef.form.valid || loading" mat-button mat-raised-button (click)="saveSettings()">
-      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="'Save'"></app-spinner-switch>
+    <button [disabled]="formRef.form.pristine || !formRef.form.valid || loading" mat-button mat-raised-button
+            (click)="saveSettings()">
+      <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'"
+                          [textId]="StringIds.Save"></app-spinner-switch>
     </button>
   </mat-card-actions>
 </mat-card>

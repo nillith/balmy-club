@@ -1,4 +1,4 @@
-export const enum StringIds {
+export enum StringIds {
   Username = 1,
   Password,
   Email,
@@ -13,8 +13,10 @@ export const enum StringIds {
   SignUp,
   Settings,
   Home,
+  Dashboard,
   People,
   Circle,
+  CircleName,
   Cancel,
   Save,
   AvatarUrl,
@@ -22,6 +24,7 @@ export const enum StringIds {
   Public,
   PrivateCircle,
   ExtendedCircle,
+  Create,
   Edit,
   Mute,
   Muted,
@@ -30,5 +33,5 @@ export const enum StringIds {
   ShowAllXComments,
   Share,
   Menu,
-  PublishPost
+  Publish,
 }

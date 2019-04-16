@@ -1,6 +1,7 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
+import {StringIds} from '../../i18n/translations/string-ids';
 
 const enum PostActions {
   Edit,
@@ -41,7 +42,7 @@ const noop = () => {
   styleUrls: ['./post-editor.component.scss']
 })
 export class PostEditorComponent implements OnInit {
-
+  readonly StringIds = StringIds;
   @Input() content: string;
 
   @Input() editMode = false;

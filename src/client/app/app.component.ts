@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {appConstants} from "./app.constants";
-import {NavEntry} from "./main/main-nav-view/main-nav-view.component";
+import {NavEntry} from "../constants";
 
 @Component({
   selector: 'app-root',

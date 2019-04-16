@@ -2,6 +2,7 @@ import {Component, ElementRef, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {IService} from "../../services/i.service";
 import {makeBackdropTransparent} from "../../../utils/index";
+import {StringIds} from "../../modules/i18n/translations/string-ids";
 
 @Component({
   selector: 'app-avatar-setting-dialog',
@@ -11,6 +12,7 @@ import {makeBackdropTransparent} from "../../../utils/index";
 export class AvatarSettingDialogComponent implements OnInit {
 
   anchor: HTMLElement;
+  StringIds = StringIds;
 
   constructor(public hostElement: ElementRef,
               public dialogRef: MatDialogRef<AvatarSettingDialogComponent>,

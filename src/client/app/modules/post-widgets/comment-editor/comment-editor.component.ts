@@ -2,6 +2,8 @@ import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {CommentData} from "../../../../../shared/interf";
 import {PostEditorComponent} from "../post-editor/post-editor.component";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
+import {StringIds} from '../../i18n/translations/string-ids';
+import {IService} from "../../../services/i.service";
 
 const enum PostActions {
   Edit,
@@ -46,6 +48,7 @@ const ActionOption = {
 })
 export class CommentEditorComponent implements OnInit {
 
+  readonly StringIds = StringIds;
   @Input() comment: CommentData;
   @Input() editMode = false;
   enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete, PostActions.Report].map(action => ActionOption[action]);
@@ -57,7 +60,7 @@ export class CommentEditorComponent implements OnInit {
     this.editor = editor;
   }
 
-  constructor(private postEditor: PostEditorComponent) {
+  constructor(private postEditor: PostEditorComponent, public iService: IService) {
 
   }
 

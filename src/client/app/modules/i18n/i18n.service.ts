@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {TRANSLATIONS} from "../../i18n";
-import {cloneFields} from "../../../shared/utils";
+import {TRANSLATIONS} from "./translations";
+import {cloneFields} from "../../../../shared/utils";
 
 const LANGUAGE_OPTION_KEY = 'language';
 const DEFAULT_LANGUAGE_CODE = 'en';
@@ -16,8 +16,6 @@ export class I18nService {
 
   constructor() {
     const self = this;
-    console.log(localStorage.getItem(LANGUAGE_OPTION_KEY));
-    console.log(localStorage.getItem('access_token'));
     self.changeLanguageByCode(self.language);
   }
 

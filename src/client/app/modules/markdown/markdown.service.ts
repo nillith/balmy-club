@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import Editor from 'tui-editor';
-import {I18nService} from "../../services/i18n.service";
+import {I18nService} from "../i18n/i18n.service";
 import {MentionPlugin} from "./mention.markdown-plugin";
 import {MentionCommand, MentionCommandName, Mentionee} from "./mention.command";
 

@@ -1,21 +1,25 @@
-export const sideNav = [
+import {StringIds} from "./app/modules/i18n/translations/string-ids";
+
+export interface NavEntry {
+  readonly name: StringIds;
+  readonly icon: string;
+  readonly link: string;
+}
+
+
+export const sideNav: NavEntry[] = [
   {
-    name: 'Home',
+    name: StringIds.Home,
     icon: 'home',
     link: '',
   },
   {
-    name: 'Dashboard',
-    icon: 'dashboard',
-    link: '/dashboard',
-  },
-  {
-    name: 'People',
+    name: StringIds.Circle,
     icon: 'people',
     link: '/circles',
   },
   {
-    name: 'Settings',
+    name: StringIds.Settings,
     icon: 'settings',
     link: '/settings',
   },

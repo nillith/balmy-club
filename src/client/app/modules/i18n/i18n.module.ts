@@ -1,20 +1,21 @@
 import {NgModule} from '@angular/core';
-import {UserLinkPipe} from './user-link.pipe';
-import {AvatarUrlPipe} from './avatar-url.pipe';
-
+import {ImportsModule} from "../imports/imports.module";
+import {I18nPipe} from "./pipes/i18n.pipe";
 
 export const exportedEntryComponents = [];
 const exportedComponents = [
   ...exportedEntryComponents,
-  UserLinkPipe, AvatarUrlPipe
+  I18nPipe
 ];
 
 
 @NgModule({
   declarations: [...exportedComponents],
-  imports: [],
+  imports: [
+    ImportsModule
+  ],
   exports: exportedComponents,
   entryComponents: exportedEntryComponents
 })
-export class CommonPipesModule {
+export class I18nModule {
 }

@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
 import {DirectSignUpRequest, LoginRequest, SignUpRequest} from "../../../../../shared/request_interface";
 import {AuthService} from "./auth.service";
-import {StringIds} from "../../../../i18n/string-ids";
+import {StringIds} from "../../../modules/i18n/translations/string-ids";
 
 enum DialogTypes {
   Login,
@@ -87,14 +87,7 @@ type LoginDialogModel = SignUpRequest | LoginRequest | {
   styleUrls: ['./login-dialog.component.scss']
 })
 export class LoginDialogComponent implements OnInit {
-
-  usernamePlaceholder = StringIds.Username;
-  nicknamePlaceholder = StringIds.Nickname;
-  passwordPlaceholder = StringIds.Password;
-  emailPlaceholder = StringIds.Email;
-  confirmPasswordPlaceholder = StringIds.ConfirmPassword;
-
-  rememberMeStringId = StringIds.RememberMe;
+  StringIds = StringIds;
 
   @ViewChild('formRef') formRef: NgForm;
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;

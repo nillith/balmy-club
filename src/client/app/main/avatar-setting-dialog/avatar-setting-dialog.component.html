@@ -9,11 +9,11 @@
     <p>
       <a class="setting-link" (click)="closeDialog()" [routerLink]="'settings'" fxLayout="row" fxLayoutAlign="left center">
         <mat-icon class="icon">settings</mat-icon>
-        <span class="label">Settings</span>
+        <span class="label">{{StringIds.Settings | i18n}}</span>
       </a>
     </p>
     <p>
-      <button mat-raised-button (click)="logout()">logout</button>
+      <button mat-raised-button (click)="logout()">{{StringIds.Logout | i18n}}</button>
     </p>
   </div>
 </div>

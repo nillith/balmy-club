@@ -7,6 +7,8 @@ import { PostGroupViewComponent } from './post-group-view/post-group-view.compon
 import { PostEditorDialogComponent } from './post-editor-dialog/post-editor-dialog.component';
 import {WidgetsModule} from "../widgets/widgets.module";
 import { PostStreamViewComponent } from './post-stream-view/post-stream-view.component';
+import {CommonPipesModule} from "../common-pipes/common-pipes.module";
+import {I18nModule} from "../i18n/i18n.module";
 
 
 export const exportedEntryComponents = [
@@ -27,6 +29,8 @@ const exportedComponents = [
     ImportsModule,
     MarkdownModule,
     WidgetsModule,
+    CommonPipesModule,
+    I18nModule,
   ],
   exports: exportedComponents,
   entryComponents: exportedEntryComponents

@@ -5,6 +5,7 @@ import {SpinnerSwitchComponent} from './spinner-switch/spinner-switch.component'
 import {AvatarComponent} from './avatar/avatar.component';
 import {CommonPipesModule} from "../common-pipes/common-pipes.module";
 import { LanguageSelectorComponent } from './language-selector/language-selector.component';
+import {I18nModule} from "../i18n/i18n.module";
 
 
 export const exportedEntryComponents = [];
@@ -22,6 +23,7 @@ const exportedComponents = [
     ImportsModule,
     MarkdownModule,
     CommonPipesModule,
+    I18nModule
   ],
   exports: exportedComponents,
   entryComponents: exportedEntryComponents

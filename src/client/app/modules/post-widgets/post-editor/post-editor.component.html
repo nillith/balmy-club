@@ -24,12 +24,13 @@
         <app-markdown-editor #markdownEditor [content]="post.content"></app-markdown-editor>
         <mat-divider></mat-divider>
         <mat-card-actions align="end" class="post-editor-content-section">
-          <button mat-raised-button (click)="cancelEdit()">Cancel</button>
-          <button mat-raised-button (click)="saveEdit()">Save</button>
+          <button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}</button>
+          <button mat-raised-button (click)="saveEdit()">{{StringIds.Save | i18n}}</button>
         </mat-card-actions>
       </div>
     </div>
-    <app-markdown-viewer *ngIf="!editMode" [content]="post.content" class="post-editor-content-section"></app-markdown-viewer>
+    <app-markdown-viewer *ngIf="!editMode" [content]="post.content"
+                         class="post-editor-content-section"></app-markdown-viewer>
   </mat-card-content>
   <mat-card-actions align="end" style="padding:1em;">
     <button mat-icon-button color="accent">
@@ -45,7 +46,7 @@
     <mat-expansion-panel (opened)="notifyParent()" (closed)="notifyParent()">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Show all {{post.comments.length}} comments
+          {{StringIds.ShowAllXComments | i18n:post.comments}}
         </mat-panel-title>
       </mat-expansion-panel-header>
       <div [ngClass]="{'limit-comment-height':limitCommentHeight}">

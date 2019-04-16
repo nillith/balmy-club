@@ -4,6 +4,7 @@ import {NgForm, NgModel} from "@angular/forms";
 import {SettingsData} from "../../../../shared/interf";
 import {IService} from "../../services/i.service";
 import {ToastService} from "../../services/toast.service";
+import {StringIds} from "../../modules/i18n/translations/string-ids";
 
 @Component({
   selector: 'app-setting',
@@ -11,6 +12,7 @@ import {ToastService} from "../../services/toast.service";
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
+  StringIds = StringIds;
   @ViewChild('formRef') formRef: NgForm;
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;
   @ViewChild('password') passwordModel: NgModel;

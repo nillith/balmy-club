@@ -7,26 +7,26 @@
     [class.sign-up-main-content]="DialogTypes.SignUp === dialogType"
     fxLayout="column">
     <mat-form-field *ngIf="uiConfig.username">
-      <input matInput placeholder="{{usernamePlaceholder | i18n}}"
+      <input matInput placeholder="{{StringIds.Username | i18n}}"
              type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
              name="username" required #username="ngModel"
              [(ngModel)]="dialogModel.username">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.nickname">
-      <input matInput placeholder="{{nicknamePlaceholder | i18n}}"
+      <input matInput placeholder="{{StringIds.Nickname | i18n}}"
              type="text" pattern="^{{appConstants.NICKNAME_PATTERN}}$"
              name="nickname" required #nickname="ngModel"
              [(ngModel)]="dialogModel.nickname">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.email">
       <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput
-             placeholder="{{emailPlaceholder | i18n}}" id="email"
+             placeholder="{{StringIds.Email | i18n}}" id="email"
              name="email"
              [required]="uiConfig.emailRequired"
              #email="ngModel" [(ngModel)]="dialogModel.email">
     </mat-form-field>
     <mat-form-field *ngIf="uiConfig.password">
-      <input type="password" matInput placeholder="{{passwordPlaceholder | i18n}}"
+      <input type="password" matInput placeholder="{{StringIds.Password | i18n}}"
              minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="password"
              name="password" required
@@ -34,7 +34,7 @@
     </mat-form-field>
 
     <mat-form-field *ngIf="uiConfig.passwordConfirm">
-      <input type="password" matInput placeholder="{{confirmPasswordPlaceholder | i18n}}"
+      <input type="password" matInput placeholder="{{StringIds.ConfirmPassword | i18n}}"
              minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="passwordConfirm"
              name="passwordConfirm"
@@ -45,7 +45,7 @@
     </mat-form-field>
     <section *ngIf="uiConfig.mainExtra" fxLayout="row" fxLayoutAlign="center center">
       <mat-checkbox *ngIf="uiConfig.rememberMe" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
-        {{rememberMeStringId | i18n}}
+        {{StringIds.RememberMe | i18n}}
       </mat-checkbox>
       <div class="app-fill-space"></div>
       <button *ngIf="uiConfig.passwordToggle" class="app-button-link"

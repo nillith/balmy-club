@@ -14,7 +14,7 @@
   <mat-card fxLayout="row wrap" fxLayoutAlign="left center" class="circle-users-panel clearfix">
     <mat-card-title style="width:100%">
       <mat-form-field style="width: 100%;">
-        <input matInput placeholder="Circle Name"
+        <input matInput placeholder="{{StringIds.CircleName | i18n}}"
                type="text" pattern="^{{appConstants.CIRCLE_NAME_PATTERN}}$"
                name="name" required #name="ngModel"
                [(ngModel)]="circleModifier.name">
@@ -36,7 +36,7 @@
   </mat-card>
   <mat-card class="circle-users-panel">
     <mat-card-actions align="end">
-      <button [disabled]="!circleModifier || loading" mat-button mat-raised-button (click)="cancelEdit()">cancel
+      <button [disabled]="!circleModifier || loading" mat-button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}
       </button>
       <button [disabled]="!circleModifier || !circleModifier.name || loading" mat-button mat-raised-button (click)="saveEdit()">
         <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="saveButtonText"></app-spinner-switch>

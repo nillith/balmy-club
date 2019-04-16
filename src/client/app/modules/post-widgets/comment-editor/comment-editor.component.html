@@ -1,13 +1,13 @@
 <div fxLayout="row" fxLayoutAlign="left up">
   <div class="comment-editor-avatar">
-    <img src="assets/default-avatar.png">
+    <img src="{{iService.me | avatarUrl}}">
   </div>
   <div class="app-fill-space">
     <div *ngIf="editMode && comment">
       <app-markdown-editor [initialFocus]="true" [content]="comment.content"></app-markdown-editor>
       <mat-card-actions align="end">
-        <button mat-raised-button (click)="cancelEdit()">Cancel</button>
-        <button mat-raised-button (click)="saveEdit()">Save</button>
+        <button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}</button>
+        <button mat-raised-button (click)="saveEdit()">{{StringIds.Publish | i18n}}</button>
       </mat-card-actions>
     </div>
     <div *ngIf="!editMode && comment">
@@ -15,7 +15,7 @@
     </div>
     <div *ngIf="!editMode && !comment" (click)="createComment()" class="comment-editor-fake"
          style="cursor: text!important;">
-      Add a comment...
+      {{StringIds.AddComment | i18n}}...
     </div>
     <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
       <div class="app-fill-space"></div>

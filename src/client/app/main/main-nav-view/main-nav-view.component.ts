@@ -3,12 +3,7 @@ import {LoginWallService} from "../login-wall/login-wall.service";
 import {MatDialog} from "@angular/material";
 import {SettingService} from "../avatar-setting-dialog/setting.service";
 import {IService} from "../../services/i.service";
-
-export interface NavEntry {
-  readonly name: string;
-  readonly icon: string;
-  readonly link: string;
-}
+import {NavEntry} from "../../../constants";
 
 @Component({
   selector: 'app-main-nav-view',

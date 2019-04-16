@@ -4,6 +4,7 @@ import {CircleModel, CircleModelModifier} from "../../models/circle.model";
 import {appConstants} from "../../app.constants";
 import {ToastService} from "../../services/toast.service";
 import {isValidCircleName} from "../../../../shared/utils";
+import {StringIds} from "../../modules/i18n/translations/string-ids";
 
 @Component({
   selector: 'app-circles',
@@ -12,6 +13,7 @@ import {isValidCircleName} from "../../../../shared/utils";
 })
 export class CirclesComponent implements OnInit {
 
+  readonly StringIds = StringIds;
   readonly appConstants = appConstants;
 
   constructor(private iService: IService, private toastService: ToastService) {
@@ -24,13 +26,13 @@ export class CirclesComponent implements OnInit {
 
   selectedCircle?: any;
   circleModifier?: CircleModelModifier;
-  saveButtonText = 'Save';
+  saveButtonText = StringIds.Save;
 
   setSelectCircle(circle: CircleModel) {
     const self = this;
     self.selectedCircle = circle;
     self.circleModifier = circle.createModifier();
-    self.saveButtonText = self.isCreatingNewCircle() ? 'Create' : 'Save';
+    self.saveButtonText = self.isCreatingNewCircle() ? StringIds.Create : StringIds.Save;
   }
 
   ngOnInit() {

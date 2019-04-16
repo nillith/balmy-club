@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {I18nService} from "../../../services/i18n.service";
+import {I18nService} from "../../i18n/i18n.service";
 import {MarkdownEditor, MarkdownService} from "../markdown.service";
 import {MentionSelectionDialogService} from "../mention-selection-dialog/mention-selection-dialog.service";
 import {MentionSelectionListener} from "../mention-selection-dialog/mention-selection-dialog.component";

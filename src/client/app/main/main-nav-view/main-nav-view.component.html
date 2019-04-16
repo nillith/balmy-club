@@ -9,7 +9,7 @@
          (click)="drawer.toggle()"
          [routerLink]="entry.link">
         <mat-icon class="icon">{{entry.icon}}</mat-icon>
-        <span class="label">{{entry.name}}</span>
+        <span class="label">{{entry.name | i18n}}</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
