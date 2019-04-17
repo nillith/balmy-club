@@ -135,7 +135,7 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
     viewerId: viewer.id,
   };
 
-  let posts = await PostModel.getPublicStreamPosts(params);
+  let posts = await PostModel.getPublicTimelinePosts(params);
 
   if (!posts.length) {
     return respondWith(res, 200);

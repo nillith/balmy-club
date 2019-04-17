@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 export function getSettingsPayloadOrError(body: any) {
   trimFields(body);
-  let {email, password, username, nickname, avatarUrl} = body;
+  let {email, password, username, nickname, avatarUrl, bannerUrl} = body;
 
   if (email && !isValidEmailAddress(email)) {
     return `invalid email`;
@@ -30,7 +30,11 @@ export function getSettingsPayloadOrError(body: any) {
     return `invalid avatar url`;
   }
 
-  return {email, password, username, nickname, avatarUrl};
+  if (avatarUrl && !isValidURL(bannerUrl)) {
+    return `invalid banner url`;
+  }
+
+  return {email, password, username, nickname, avatarUrl, bannerUrl};
 }
 
 export const changeSettings = async function(req: Request, res: Response, next: NextFunction) {

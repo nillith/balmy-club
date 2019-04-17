@@ -1,7 +1,4 @@
-<div>
-  <app-post-group-view [posts]="posts" style="margin: auto"></app-post-group-view>
+<div class="discover-page-content">
+  <app-post-stream-view [streamFetcher]="streamFetcher"></app-post-stream-view>
 </div>
-
-<button mat-fab color="warn" class="post-fab" (click)="postEditorDialogService.popup()">
-  <mat-icon>edit</mat-icon>
-</button>
+<app-post-editor-fab></app-post-editor-fab>

@@ -154,6 +154,10 @@ export class IService {
     return new CircleModel(self.http, self.me.id, self);
   }
 
+  isMeById(id: string): boolean {
+    return id === this.me.id;
+  }
+
   async saveSettings(data: ChangeSettingsRequest) {
     const self = this;
     await self.http.patch(API_URLS.SETTINGS, data, {

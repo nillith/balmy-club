@@ -9,6 +9,7 @@ export class UserModel extends ModelBase {
     'username',
     'nickname',
     'avatarUrl',
+    'bannerUrl',
     'email',
   ];
   avatarUrl: string;

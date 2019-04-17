@@ -1,9 +1,7 @@
 <mat-card>
   <mat-card-header fxLayout="row" fxLayoutAlign="left center">
-    <button class="app-avatar-small">
-      <img src="assets/default-avatar.png">
-    </button>
-    <div>My Awesome Name</div>
+    <app-avatar [user]="post.author"></app-avatar>
+    <div>{{post.author.nickname}}</div>
     <mat-icon>navigate_next</mat-icon>
     <div>Public</div>
     <div class="app-fill-space"></div>

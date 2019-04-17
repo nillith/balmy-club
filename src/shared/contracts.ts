@@ -1,14 +1,14 @@
-export interface MinimumUser{
+export interface MinimumUser {
   id: string;
   nickname: string;
   avatarUrl?: string;
+  isMe?: boolean;
 }
 
-export interface UserResponse extends MinimumUser{
+export interface UserResponse extends MinimumUser {
   bannerUrl?: string;
   circlerCount: number;
   blockedByMe: boolean;
-  isMe?: boolean;
 }
 
 

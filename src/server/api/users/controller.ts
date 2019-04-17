@@ -54,7 +54,7 @@ export const getUserStreamPosts = async function(req: Request, res: Response, ne
     offset: group * POSTS_GROUP_SIZE,
     viewerId: viewer.id,
   };
-  let posts = await PostModel.getUserStreamPosts(params);
+  let posts = await PostModel.getUserTimelinePosts(params);
 
   if (!posts.length) {
     return respondWith(res, 200);

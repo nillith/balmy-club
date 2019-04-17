@@ -30,53 +30,116 @@ const assertValidNewModel = devOnly(function(model: PostModel) {
 
 const INSERT_SQL = `INSERT INTO Posts (authorId, reShareFromPostId, content, createdAt, visibility, mentionIds) VALUES(:authorId, :reShareFromPostId, :content, :createdAt, :visibility, :mentionIds)`;
 
-
-interface UserStreamParams {
-  userId: number;
+interface TimelineParams {
   timestamp: number;
   offset: number;
   viewerId: number;
+}
+
+interface UserTimelineParams extends TimelineParams {
+  userId: number;
+
 }
 
 const isValidStreamOffset = function(offset: any) {
   return Number.isSafeInteger(offset) && offset >= 0 && ((offset % POSTS_GROUP_SIZE) === 0)
 };
 
-const assertIsValidUserStreamParams = devOnly(function(params: any) {
-  console.assert(isNumericId(params.userId), `invalid userId ${params.userId}`);
+const assertValidTimelineParams = devOnly(function(params: any) {
   console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
   console.assert(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
   console.assert(isValidStreamOffset(params.offset), `invalid offset ${params.offset}`);
 });
 
-interface PublicStreamParams {
-  timestamp: number;
-  offset: number;
-  viewerId: number;
+const assertIsValidUserTimelineParams = devOnly(function(params: any) {
+  console.assert(isNumericId(params.userId), `invalid userId ${params.userId}`);
+  assertValidTimelineParams(params);
+});
+
+
+interface TimelineSqlCreateOptions {
+  withUser?: boolean;
+  withPrivatePost?: boolean;
+  singleUser?: boolean;
 }
 
-const assertValidPublicStreamParams = devOnly(function(params: any) {
-  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
-  console.assert(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
-  console.assert(isValidStreamOffset(params.offset), `invalid offset ${params.offset}`);
+const createTimelineSql = (function() {
+
+  const POST_PUBLIC_SQL_COLUMNS = [
+    'Posts.id',
+    'Posts.authorId',
+    'Posts.reShareFromPostId',
+    'Posts.content',
+    'Posts.visibility',
+    'Posts.plusCount',
+    'Posts.reShareCount',
+    'Posts.createdAt'
+  ];
+
+  const POST_PUBLIC_SQL_COLUMNS_WITH_USER = POST_PUBLIC_SQL_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']);
+
+
+  return function(options: TimelineSqlCreateOptions) {
+    let cols = POST_PUBLIC_SQL_COLUMNS;
+
+    const froms = ['Posts'];
+    if (options.withUser) {
+      froms.push('Users ON (Posts.authorId = Users.id)');
+      cols = POST_PUBLIC_SQL_COLUMNS_WITH_USER;
+    }
+
+
+    const ands = [
+      'Posts.createdAt < :timestamp',
+    ];
+
+    if (options.singleUser) {
+      ands.push('Posts.authorId = :userId');
+    }
+
+    const visibilityOr = [
+      'Posts.authorId = :viewerId'
+    ];
+
+    const visibilitySubAnd = [
+      'Posts.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId)',
+      'Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)',
+    ];
+
+
+    const visibilitySubAndSubOr = [
+      `visibility = ${PostVisibilities.Public}`
+    ];
+
+    if (options.withPrivatePost) {
+      froms.push('PostCircle ON (Posts.id = PostCircle.postId)');
+      visibilitySubAndSubOr.push(`(visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE userId = :viewerId))`);
+    }
+
+    visibilitySubAnd.push(`(${visibilitySubAndSubOr.join(' OR ')})`);
+    visibilityOr.push(`(${visibilitySubAnd.join(' AND ')})`);
+
+    ands.push(`(${visibilityOr.join(' OR ')})`);
+
+    return `SELECT ${cols.join(', ')} FROM ${froms.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
+  };
+})();
+
+
+const PUBLIC_TIMELINE_POSTS_SQL = createTimelineSql({
+  withUser: true,
 });
 
-const POST_PUBLIC_COLUMNS = [
-  'Posts.id',
-  'Posts.authorId',
-  'Posts.reShareFromPostId',
-  'Posts.content',
-  'Posts.visibility',
-  'Posts.plusCount',
-  'Posts.reShareCount',
-  'Posts.createdAt'
-];
 
+const USER_TIMELINE_POSTS_SQL = createTimelineSql({
+  singleUser: true,
+  withPrivatePost: true,
+});
 
-const PUBLIC_STREAM_POSTS_SQL = `SELECT ${POST_PUBLIC_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']).join(', ')} FROM Posts LEFT JOIN Users ON (Posts.authorId = Users.id) WHERE Users.id NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND Users.id NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId) AND Posts.createdAt < :timestamp AND visibility = ${PostVisibilities.Public} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
-
-
-const USER_STREAM_POSTS_SQL = `SELECT ${POST_PUBLIC_COLUMNS.join(', ')} FROM Posts LEFT JOIN PostCircle ON (Posts.id = PostCircle.postId) WHERE Posts.authorId = :userId AND Posts.createdAt < :timestamp AND (visibility = ${PostVisibilities.Public} OR (visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE circleId IN (SELECT id FROM Circles WHERE ownerId = :userId) AND userId = :viewerId))) ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
+const HOME_STREAM_POSTS_SQL = createTimelineSql({
+  withUser: true,
+  withPrivatePost: true
+});
 
 export class PostModel extends TextContentModel {
   static readonly [$obfuscator] = postObfuscator;
@@ -99,14 +162,19 @@ export class PostModel extends TextContentModel {
   }
 
 
-  static async getUserStreamPosts(params: UserStreamParams, driver: DatabaseDriver = db) {
-    assertIsValidUserStreamParams(params);
-    return this.getPostsBySQL(USER_STREAM_POSTS_SQL, params, driver);
+  static async getUserTimelinePosts(params: UserTimelineParams, driver: DatabaseDriver = db) {
+    assertIsValidUserTimelineParams(params);
+    return this.getPostsBySQL(USER_TIMELINE_POSTS_SQL, params, driver);
   }
 
-  static async getPublicStreamPosts(params: PublicStreamParams, driver: DatabaseDriver = db) {
-    assertValidPublicStreamParams(params);
-    return this.getPostsBySQL(PUBLIC_STREAM_POSTS_SQL, params, driver);
+  static async getPublicTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db) {
+    assertValidTimelineParams(params);
+    return this.getPostsBySQL(PUBLIC_TIMELINE_POSTS_SQL, params, driver);
+  }
+
+  static async getHomeTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db) {
+    assertValidTimelineParams(params);
+    return this.getPostsBySQL(HOME_STREAM_POSTS_SQL, params, driver);
   }
 
 

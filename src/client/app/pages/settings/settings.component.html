@@ -20,6 +20,13 @@
              [(ngModel)]="settingsData.avatarUrl">
     </mat-form-field>
     <mat-form-field>
+      <input matInput placeholder="{{StringIds.BannerUrl | i18n}}"
+             type="url"
+             maxlength="{{appConstants.MAX_URL_LENGTH}}"
+             name="avatarUrl" #nickname="ngModel"
+             [(ngModel)]="settingsData.bannerUrl">
+    </mat-form-field>
+    <mat-form-field>
       <input type="text" pattern="^{{appConstants.EMAIL_ADDRESS_PATTERN}}$" matInput placeholder="{{StringIds.Email | i18n}}"
              id="email"
              name="email"

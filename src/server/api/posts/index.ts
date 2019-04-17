@@ -6,6 +6,5 @@ import {getPublicStreamPosts, publishNewPost} from "./controller";
 const router = Router();
 
 router.post('/', asyncMiddleware(publishNewPost));
-
 router.get('/discover', asyncMiddleware(getPublicStreamPosts));
 export default router;

@@ -68,6 +68,7 @@ export class PostEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this.post);
   }
 
   toggleEditMode() {

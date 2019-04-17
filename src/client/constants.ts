@@ -14,6 +14,12 @@ export const sideNav: NavEntry[] = [
     link: '',
   },
   {
+    name: StringIds.Discover,
+    icon: 'public',
+    link: '/discover',
+  },
+
+  {
     name: StringIds.Circle,
     icon: 'people',
     link: '/circles',
@@ -32,6 +38,7 @@ export const API_URLS = {
   DISCOVER: 'api/posts/discover',
   CIRCLES: 'api/i/circles',
   SETTINGS: 'api/i/settings',
+  HOME_TIMELINE: 'api/i/home-timeline',
   USERS: 'api/users',
   LOGIN: 'auth/local',
   ACCOUNT: 'api/account'

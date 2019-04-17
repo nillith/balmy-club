@@ -13,12 +13,11 @@ import {Roles, UserRanks} from "../../shared/constants";
 import {authService, JwtSignable} from "../service/auth.service";
 import {devOnly, isNumericId} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
-import {map} from 'lodash';
+import _, {map} from 'lodash';
 import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} from "../../shared/utils";
 import {ChangeSettingsRequest} from "../../shared/contracts";
 import {CircleModel} from "./circle.model";
 import {OutboundDataHolder} from "../init";
-import _ from 'lodash';
 
 export interface UserCreateInfo {
   username?: string;
@@ -39,6 +38,7 @@ const createSaveSettingsSql = (function() {
     username: 'username',
     nickname: 'nickname',
     avatarUrl: 'avatarUrl',
+    bannerUrl: 'bannerUrl',
     email: 'email',
   };
 
@@ -78,13 +78,15 @@ export class UserModel extends ModelBase implements JwtSignable {
     'nickname',
     'email',
     'role',
-    'avatarUrl'
+    'avatarUrl',
+    'bannerUrl'
   ]);
 
   static readonly [$obfuscator] = userObfuscator;
 
   role?: string;
   avatarUrl?: string;
+  bannerUrl?: string;
   hash?: Buffer;
   salt?: Buffer;
   username?: string;
@@ -145,7 +147,7 @@ export class UserModel extends ModelBase implements JwtSignable {
     if (!isValidUsername(userName) || !isValidPassword(password)) {
       return;
     }
-    const [rows] = await db.query(`SELECT id, username, nickname, avatarUrl, role, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
+    const [rows] = await db.query(`SELECT id, username, nickname, avatarUrl, bannerUrl, role, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
     if (rows && (rows as any).length) {
       const user = makeInstance(rows[0], UserModel);
       if (await user!.verifyPassword(password)) {

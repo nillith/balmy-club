@@ -3,6 +3,7 @@ import {PostGroup} from "../post-group-view/post-group-view.component";
 import {HttpClient} from "@angular/common/http";
 import {utcTimestamp} from "../../../../../shared/utils";
 import {POSTS_GROUP_SIZE} from "../../../../../shared/constants";
+import {IService} from "../../../services/i.service";
 
 
 export interface StreamFetcher {
@@ -19,7 +20,7 @@ export class DefaultStreamFetcher {
   private end = false;
   private timestamp = utcTimestamp();
 
-  constructor(protected http: HttpClient, protected apiUrl: string) {
+  constructor(protected http: HttpClient, protected apiUrl: string, protected iService: IService) {
 
   }
 
@@ -46,6 +47,7 @@ export class DefaultStreamFetcher {
         id: g.authorId,
         nickname: g.authorNickname,
         avatarUrl: g.authorAvatarUrl,
+        isMe: this.iService.isMeById(g.authorId),
       };
     }
     return group;

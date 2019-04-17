@@ -6,7 +6,7 @@ import {IService} from "../../services/i.service";
 import {MatSelect} from "@angular/material";
 import {PostGroup} from "../../modules/post-widgets/post-group-view/post-group-view.component";
 import {HttpClient} from "@angular/common/http";
-import {isValidStringId, utcTimestamp} from "../../../../shared/utils";
+import {isValidStringId} from "../../../../shared/utils";
 import {
   DefaultStreamFetcher,
   StreamFetcher
@@ -14,11 +14,10 @@ import {
 import _ from 'lodash';
 import {API_URLS, getIconMenuOption, IconMenuOption, MenuActions} from "../../../constants";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
-import {POSTS_GROUP_SIZE} from "../../../../shared/constants";
 
 class UserStreamFetcher extends DefaultStreamFetcher {
-  constructor(http: HttpClient, private user: any) {
-    super(http, `${API_URLS.USERS}/${user.id}/posts`);
+  constructor(http: HttpClient, private user: any, iService: IService) {
+    super(http, `${API_URLS.USERS}/${user.id}/posts`, iService);
   }
 
   protected preprocess(group: PostGroup) {
@@ -28,7 +27,6 @@ class UserStreamFetcher extends DefaultStreamFetcher {
     return group;
   }
 }
-
 
 @Component({
   selector: 'app-user-page',
@@ -67,7 +65,7 @@ export class UserPageComponent implements OnInit {
         self.user.id = userId;
         self.updateCircleStatus();
         self.loading = false;
-        self.streamFetcher = new UserStreamFetcher(self.http, self.user);
+        self.streamFetcher = new UserStreamFetcher(self.http, self.user, self.iService);
         self.updateExtraMenuItems();
       } catch (e) {
         self.toastService.showToast(e.error || e.message);

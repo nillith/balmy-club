@@ -1,9 +1,9 @@
 import {ModelBase} from "./model-base";
-import {UserModel} from "./user.model";
+import {MinimumUser} from "../../../shared/contracts";
 
 export abstract class TextContentModel extends ModelBase {
   authorId?: string;
-  author?: UserModel;
+  author?: MinimumUser;
   content?: string;
   createdAt?: number;
   updatedAt?: number;

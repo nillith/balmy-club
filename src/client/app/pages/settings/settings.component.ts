@@ -21,11 +21,11 @@ export class SettingsComponent implements OnInit {
   loading = false;
 
   constructor(public iService: IService, private toastService: ToastService) {
-    const self = this;
-    self.iService.me.assignOut(self.settingsData);
   }
 
   ngOnInit() {
+    const self = this;
+    self.iService.me.assignOut(self.settingsData);
   }
 
   confirmDisabled() {
