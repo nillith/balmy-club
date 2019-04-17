@@ -3,39 +3,8 @@ import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
 import {PostApiService} from "../../../api/post-api.service";
-
-const enum PostActions {
-  Edit,
-  Delete,
-  Mute,
-  UnMute,
-}
-
-const ActionOption = {
-  [PostActions.Edit]: {
-    action: PostActions.Edit,
-    icon: 'edit',
-    name: 'Edit'
-  },
-  [PostActions.Delete]: {
-    action: PostActions.Delete,
-    icon: 'delete',
-    name: 'Delete'
-  },
-  [PostActions.UnMute]: {
-    action: PostActions.UnMute,
-    icon: 'notifications_off',
-    name: 'Muted'
-  },
-  [PostActions.Mute]: {
-    action: PostActions.Mute,
-    icon: 'notifications_on',
-    name: 'Mute'
-  }
-};
-
-const noop = () => {
-};
+import {noop} from "../../../../../shared/utils";
+import {getIconMenuOption, MenuActions} from "../../../../constants";
 
 @Component({
   selector: 'app-post-editor',
@@ -57,7 +26,7 @@ export class PostEditorComponent implements OnInit {
   @ViewChild('markdownEditor')
   private editor: MarkdownEditorComponent;
 
-  enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete].map(action => ActionOption[action]);
+  enabledActions = getIconMenuOption([MenuActions.Link]);
 
   constructor(private viewContainerRef: ViewContainerRef, private postApi: PostApiService) {
     const hostComponent = this.viewContainerRef["_view"].component;
@@ -78,11 +47,14 @@ export class PostEditorComponent implements OnInit {
     self.notifyParent();
   }
 
-  onMenu(action: PostActions) {
+  onMenu(action: MenuActions) {
     const self = this;
     switch (action) {
-      case PostActions.Edit:
+      case MenuActions.Edit:
         self.toggleEditMode();
+        break;
+      case MenuActions.Link:
+        window.open(`p/${self.post.id}`);
         break;
     }
   }
@@ -102,7 +74,7 @@ export class PostEditorComponent implements OnInit {
     await self.postApi.plusOne(self.post.id);
   }
 
-  async onShareClick(){
+  async onShareClick() {
     const self = this;
     await self.postApi.unPlusOne(self.post.id);
   }

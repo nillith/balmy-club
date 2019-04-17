@@ -13,6 +13,7 @@ export const values = {
   [StringIds.ChangePassword]: 'Change Password',
   [StringIds.Nickname]: 'Nickname',
   [StringIds.Notification]: 'Notification',
+  [StringIds.Link]: 'Link',
   [StringIds.Login]: 'Login',
   [StringIds.Logout]: 'Logout',
   [StringIds.SignUp]: 'Sign Up',

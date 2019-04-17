@@ -13,6 +13,7 @@ export const values = {
   [StringIds.ChangePassword]: '修改密码',
   [StringIds.Nickname]: '昵称',
   [StringIds.Notification]: '通知',
+  [StringIds.Link]: '链接',
   [StringIds.Login]: '登录',
   [StringIds.Logout]: '登出',
   [StringIds.SignUp]: '注册',

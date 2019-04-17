@@ -173,7 +173,7 @@ export const getPostById = async function(req: Request, res: Response, next: Nex
     if (post) {
       post.comments = await CommentModel.getCommentsByPostId(postViewer);
       post.comments = post.comments.map(c => c.getOutboundData());
-      respondWithJson(res, post);
+      return respondWithJson(res, post);
     }
   }
   return respondWith(res, 404);

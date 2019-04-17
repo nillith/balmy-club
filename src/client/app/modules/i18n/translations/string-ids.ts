@@ -9,6 +9,7 @@ export enum StringIds {
   ChangePassword,
   Nickname,
   Notification,
+  Link,
   Login,
   Logout,
   SignUp,

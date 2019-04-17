@@ -11,7 +11,7 @@
     <mat-menu #menu="matMenu">
       <button mat-menu-item *ngFor="let m of enabledActions" (click)="onMenu(m.action)">
         <mat-icon>{{m.icon}}</mat-icon>
-        <span>{{m.name}}</span>
+        <span>{{m.name | i18n}}</span>
       </button>
     </mat-menu>
   </mat-card-header>

@@ -7,6 +7,7 @@ import {UserPageComponent} from './u/user-page.component';
 import {CirclesComponent} from './circles/circles.component';
 import {SettingsComponent} from './settings/settings.component';
 import { DiscoverComponent } from './discover/discover.component';
+import { PostPageComponent } from './p/p.component';
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: 'settings', component: SettingsComponent},
   {path: 'discover', component: DiscoverComponent},
   {path: 'u/:userId', component: UserPageComponent},
+  {path: 'p/:postId', component: PostPageComponent},
 ];
 
 @NgModule({
@@ -23,7 +25,8 @@ const routes: Routes = [
     UserPageComponent,
     CirclesComponent,
     SettingsComponent,
-    DiscoverComponent
+    DiscoverComponent,
+    PostPageComponent
   ],
   imports: [
     ProjectModulesImportsModule,

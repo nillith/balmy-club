@@ -55,7 +55,8 @@ export enum MenuActions {
   Report,
   Block,
   UnBlock,
-  Circle
+  Circle,
+  Link,
 }
 
 export interface IconMenuOption {
@@ -109,7 +110,12 @@ const ActionOptions: IconMenuOption[] = [
     action: MenuActions.Circle,
     icon: 'panorama_fish_eye',
     name: StringIds.Circle,
-  }
+  },
+  {
+    action: MenuActions.Link,
+    icon: 'link',
+    name: StringIds.Link,
+  },
 ];
 
 export const getIconMenuOption = (() => {

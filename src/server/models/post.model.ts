@@ -134,7 +134,7 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 };
 
 const GET_POST_BY_ID_SQL = (function() {
-  const leftJoins = ['Posts'];
+  const leftJoins = ['Posts LEFT JOIN Users ON (Posts.authorId = Users.id)'];
   const ands = ['Posts.id = :postId'];
   processVisibilityOption({
     withPrivatePost: true,
