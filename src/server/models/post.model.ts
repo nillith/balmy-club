@@ -63,7 +63,7 @@ export interface PostViewer {
 
 const assertValidPostViewer = devOnly(function(params: any) {
   console.assert(isNumericId(params.postId), `invalid postId ${params.postId}`);
-  console.assert(isNumericId(params.viewerId), `invalid postId ${params.viewerId}`);
+  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
 });
 
 interface TimelineSqlCreateOptions {
@@ -135,7 +135,7 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 
 const GET_POST_BY_ID_SQL = (function() {
   const leftJoins = ['Posts'];
-  const ands = ['Posts.id = :id'];
+  const ands = ['Posts.id = :postId'];
   processVisibilityOption({
     withPrivatePost: true,
   }, ands, leftJoins);
@@ -144,7 +144,7 @@ const GET_POST_BY_ID_SQL = (function() {
 
 const IS_POST_ACCESSIBLE_SQL = (function() {
   const leftJoins = ['Posts'];
-  const ands = ['Posts.id = :id'];
+  const ands = ['Posts.id = :postId'];
   processVisibilityOption({
     withPrivatePost: true,
   }, ands, leftJoins);
@@ -189,10 +189,8 @@ export class PostModel extends TextContentModel {
     });
   }
 
-  static async getPostById(id: number, viewerId: number, driver: DatabaseDriver = db) {
-    const [rows] = await driver.query(GET_POST_BY_ID_SQL, {
-      id, viewerId
-    });
+  static async getPostById(params: PostViewer, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query(GET_POST_BY_ID_SQL, params);
     if (rows && rows[0]) {
       return makeInstance(rows[0], PostModel);
     }

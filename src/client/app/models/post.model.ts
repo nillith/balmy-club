@@ -28,4 +28,9 @@ export class PostModel extends TextContentModel {
   protected update(): Promise<void> {
     return undefined;
   }
+
+  async plusOne() {
+    const self = this;
+    const data = await self.http.post(`${API_URLS.POSTS}/${self.id}/plus`, undefined, {responseType: 'text'}).toPromise();
+  }
 }

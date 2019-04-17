@@ -10,7 +10,7 @@ export class CommentModel extends TextContentModel {
 
   protected async create(): Promise<void> {
     const self = this;
-    const data = await self.http.post(API_URLS.COMMENTS, self.cloneModelFields([
+    const data = await self.http.post(API_URLS.MY_COMMENTS, self.cloneModelFields([
       'content',
       'postId',
     ]), {responseType: 'text'}).toPromise();

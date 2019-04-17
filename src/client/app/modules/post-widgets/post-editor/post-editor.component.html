@@ -31,10 +31,10 @@
                          class="post-editor-content-section"></app-markdown-viewer>
   </mat-card-content>
   <mat-card-actions align="end" style="padding:1em;">
-    <button mat-icon-button color="accent">
+    <button mat-icon-button color="accent" (click)="onPlusClick()">
       <mat-icon>plus_one</mat-icon>
     </button>
-    <button mat-icon-button color="warn">
+    <button mat-icon-button color="warn" (click)="onShareClick()">
       <mat-icon>share</mat-icon>
     </button>
   </mat-card-actions>

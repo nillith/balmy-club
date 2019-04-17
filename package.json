@@ -1,5 +1,5 @@
 {
-  "name": "balmy-club",
+  "name": "circle-plus",
   "version": "0.0.0",
   "scripts": {
     "client:start": "ng serve -o",

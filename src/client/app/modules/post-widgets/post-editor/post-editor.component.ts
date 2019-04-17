@@ -2,6 +2,7 @@ import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/co
 import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
+import {PostApiService} from "../../../api/post-api.service";
 
 const enum PostActions {
   Edit,
@@ -58,7 +59,7 @@ export class PostEditorComponent implements OnInit {
 
   enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete].map(action => ActionOption[action]);
 
-  constructor(private viewContainerRef: ViewContainerRef) {
+  constructor(private viewContainerRef: ViewContainerRef, private postApi: PostApiService) {
     const hostComponent = this.viewContainerRef["_view"].component;
     if (hostComponent.onChildSizeChange) {
       this.notifyParent = () => {
@@ -94,5 +95,15 @@ export class PostEditorComponent implements OnInit {
     const self = this;
     self.post.content = self.editor.markdown;
     this.toggleEditMode();
+  }
+
+  async onPlusClick() {
+    const self = this;
+    await self.postApi.plusOne(self.post.id);
+  }
+
+  async onShareClick(){
+    const self = this;
+    await self.postApi.unPlusOne(self.post.id);
   }
 }

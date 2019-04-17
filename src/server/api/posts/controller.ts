@@ -4,7 +4,7 @@ import {isValidPostContent, isValidStringId, isValidTimestamp, utcTimestamp} fro
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../shared/interf";
 import {MAX_VISIBLE_CIRCLE_NUMBER, POSTS_GROUP_SIZE} from "../../../shared/constants";
 import {isString} from "util";
-import {PostModel} from "../../models/post.model";
+import {PostModel, PostViewer} from "../../models/post.model";
 import {$user} from "../../constants/symbols";
 import db from "../../persistence/index";
 import {ActivityModel} from "../../models/activity.model";
@@ -143,7 +143,10 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
   }
 
   for (const p of posts) {
-    p.comments = await CommentModel.getCommentsByPostId(p.id as number, viewer.id);
+    p.comments = await CommentModel.getCommentsByPostId({
+      postId: p.id as number,
+      viewerId: viewer.id
+    });
   }
 
   posts = posts.map((p) => {
@@ -162,11 +165,61 @@ export const getPostById = async function(req: Request, res: Response, next: Nex
   const postId = postObfuscator.unObfuscate(id);
   if (INVALID_NUMERIC_ID !== postId) {
     const viewer = req[$user];
-    const post = await PostModel.getPostById(postId, viewer.id);
+    const postViewer = {
+      postId,
+      viewerId: viewer.id
+    };
+    const post = await PostModel.getPostById(postViewer);
     if (post) {
-      post.comments = await CommentModel.getCommentsByPostId(postId, viewer.id);
+      post.comments = await CommentModel.getCommentsByPostId(postViewer);
       post.comments = post.comments.map(c => c.getOutboundData());
       respondWithJson(res, post);
+    }
+  }
+  return respondWith(res, 404);
+};
+
+export const plusPost = async function(req: Request, res: Response, next: NextFunction) {
+  const {id} = req.params;
+  const postId = postObfuscator.unObfuscate(id);
+  if (INVALID_NUMERIC_ID !== postId) {
+    const viewer = req[$user];
+    const postViewer: PostViewer = {
+      postId, viewerId: viewer.id
+    };
+    if (await PostModel.isAccessible(postViewer)) {
+      const timestamp = utcTimestamp();
+      await db.inTransaction(async (conn) => {
+        await conn.query('INSERT INTO PostPlusOnes (postId, userId) VALUES (:postId, :viewerId)', postViewer);
+        const activity = new ActivityModel(viewer.id, postId, Activity.ObjectTypes.Post, Activity.ContentActions.PlusOne, timestamp);
+        await activity.insertIntoDatabase(conn);
+        const notification = new NotificationModel(viewer.id, activity.id as number, timestamp);
+        await notification.insertIntoDatabase(conn);
+        await conn.query('UPDATE Posts SET plusCount = plusCount + 1 WHERE id = :postId', postViewer);
+      });
+      return respondWith(res, 200);
+    }
+  }
+  return respondWith(res, 404);
+};
+
+export const unPlusPost = async function(req: Request, res: Response, next: NextFunction) {
+  const {id} = req.params;
+  const postId = postObfuscator.unObfuscate(id);
+  if (INVALID_NUMERIC_ID !== postId) {
+    const viewer = req[$user];
+    const postViewer: PostViewer = {
+      postId, viewerId: viewer.id
+    };
+    if (await PostModel.isAccessible(postViewer)) {
+      await db.inTransaction(async (conn) => {
+        const [result] = await conn.query('DELETE FROM PostPlusOnes WHERE postId = :postId AND userId = :viewerId', postViewer);
+        if (!result || 1 !== (result as any).affectedRows) {
+          throw Error('No plus one to delete!');
+        }
+        await conn.query('UPDATE Posts SET plusCount = plusCount - 1 WHERE id = :postId', postViewer);
+      });
+      return respondWith(res, 200);
     }
   }
   return respondWith(res, 404);

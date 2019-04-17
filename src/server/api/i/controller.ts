@@ -39,7 +39,10 @@ export const getHomeTimelinePosts = async function(req: Request, res: Response, 
   }
 
   for (const p of posts) {
-    p.comments = await CommentModel.getCommentsByPostId(p.id as number);
+    p.comments = await CommentModel.getCommentsByPostId({
+      postId: p.id as number,
+      viewerId: viewer.id
+    });
   }
 
   posts = posts.map((p) => {
