@@ -5,7 +5,7 @@ import {API_URLS} from "../../constants";
 @Injectable({
   providedIn: 'root'
 })
-export class CommentApiService {
+export class CommentsApiService {
   constructor(private http: HttpClient) {
   }
 

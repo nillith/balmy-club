@@ -24,8 +24,10 @@
       </button>
       <span class="app-fill-space"></span>
       <button mat-icon-button color="warn">
-        <mat-icon matBadge="99" matBadgeColor="warn" matBadgeSize="small" matBadgeOverlap="true" role="img">
-          notifications
+        <mat-icon matBadge="{{notificationsApi.unreadCount > 0 ?notificationsApi.unreadCount:null}}"
+                  matBadgeColor="warn" matBadgeSize="small"
+                  matBadgeOverlap="true" role="img">
+          {{notificationsApi.unreadCount > 0 ? 'notifications':'notifications_none'}}
         </mat-icon>
       </button>
       <div class="comp-avatar-area">

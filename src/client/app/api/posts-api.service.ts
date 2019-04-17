@@ -6,7 +6,7 @@ import {PostModel} from "../models/post.model";
 @Injectable({
   providedIn: 'root'
 })
-export class PostApiService {
+export class PostsApiService {
 
   constructor(private http: HttpClient) {
   }

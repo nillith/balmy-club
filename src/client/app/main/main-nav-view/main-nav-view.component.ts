@@ -4,6 +4,7 @@ import {MatDialog} from "@angular/material";
 import {SettingService} from "../avatar-setting-dialog/setting.service";
 import {IService} from "../../services/i.service";
 import {NavEntry} from "../../../constants";
+import {NotificationsApiService} from "../../api/notifications-api.service";
 
 @Component({
   selector: 'app-main-nav-view',
@@ -16,7 +17,8 @@ export class MainNavViewComponent implements OnInit {
   constructor(public dialog: MatDialog,
               public loginWallService: LoginWallService,
               public settingService: SettingService,
-              public iService: IService) {
+              public iService: IService,
+              public notificationsApi: NotificationsApiService) {
   }
 
   ngOnInit(): void {

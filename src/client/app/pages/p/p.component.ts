@@ -5,7 +5,7 @@ import {IService} from "../../services/i.service";
 import {ActivatedRoute} from "@angular/router";
 import {PostModel} from "../../models/post.model";
 import {isValidStringId} from "../../../../shared/utils";
-import {PostApiService} from "../../api/post-api.service";
+import {PostsApiService} from "../../api/posts-api.service";
 
 @Component({
   selector: 'app-p',
@@ -16,7 +16,7 @@ export class PostPageComponent implements OnInit {
   postId?: string;
   post?: PostModel;
 
-  constructor(private route: ActivatedRoute, private iService: IService, private toastService: ToastService, private http: HttpClient, private postApi: PostApiService) {
+  constructor(private route: ActivatedRoute, private iService: IService, private toastService: ToastService, private http: HttpClient, private postApi: PostsApiService) {
   }
 
   ngOnInit() {

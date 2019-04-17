@@ -8,6 +8,7 @@ import {CirclesComponent} from './circles/circles.component';
 import {SettingsComponent} from './settings/settings.component';
 import { DiscoverComponent } from './discover/discover.component';
 import { PostPageComponent } from './p/p.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
@@ -16,6 +17,7 @@ const routes: Routes = [
   {path: 'discover', component: DiscoverComponent},
   {path: 'u/:userId', component: UserPageComponent},
   {path: 'p/:postId', component: PostPageComponent},
+  {path: 'notifications', component: NotificationsComponent},
 ];
 
 @NgModule({
@@ -26,7 +28,8 @@ const routes: Routes = [
     CirclesComponent,
     SettingsComponent,
     DiscoverComponent,
-    PostPageComponent
+    PostPageComponent,
+    NotificationsComponent
   ],
   imports: [
     ProjectModulesImportsModule,

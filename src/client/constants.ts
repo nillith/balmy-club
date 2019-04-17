@@ -29,6 +29,11 @@ export const sideNav: NavEntry[] = [
     icon: 'settings',
     link: '/settings',
   },
+  {
+    name: StringIds.Notifications,
+    icon: 'notifications',
+    link: '/notifications',
+  },
 ];
 
 export const DEFAULT_AVATAR_URL = 'assets/default-avatar.png';
@@ -38,6 +43,7 @@ export const API_URLS = {
   DISCOVER: 'api/posts/discover',
   CIRCLES: 'api/i/circles',
   SETTINGS: 'api/i/settings',
+  NOTIFICATIONS: 'api/i/notifications',
   MY_COMMENTS: 'api/i/comments',
   HOME_TIMELINE: 'api/i/home-timeline',
   USERS: 'api/users',

@@ -2,7 +2,7 @@ import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/co
 import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
-import {PostApiService} from "../../../api/post-api.service";
+import {PostsApiService} from "../../../api/posts-api.service";
 import {noop} from "../../../../../shared/utils";
 import {getIconMenuOption, MenuActions} from "../../../../constants";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
@@ -32,7 +32,7 @@ export class PostEditorComponent implements OnInit {
 
   enabledActions = getIconMenuOption([MenuActions.Link]);
 
-  constructor(private viewContainerRef: ViewContainerRef, private postApi: PostApiService) {
+  constructor(private viewContainerRef: ViewContainerRef, private postApi: PostsApiService) {
     const self = this;
     const hostComponent = self.viewContainerRef["_view"].component;
     if (hostComponent.onChildSizeChange) {
@@ -80,10 +80,6 @@ export class PostEditorComponent implements OnInit {
     const self = this;
     self.post.content = self.editor.markdown;
     this.toggleEditMode();
-  }
-
-  onPlusClick() {
-    this.plusOne.switch();
   }
 
   async onShareClick() {

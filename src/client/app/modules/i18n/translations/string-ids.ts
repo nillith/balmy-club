@@ -8,7 +8,7 @@ export enum StringIds {
   ConfirmPassword,
   ChangePassword,
   Nickname,
-  Notification,
+  Notifications,
   Link,
   Login,
   Logout,
