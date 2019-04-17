@@ -27,7 +27,7 @@ export const getUserById = async function(req: Request, res: Response, next: Nex
   return respondWith(res, 404);
 };
 
-export const getUserPosts = async function(req: Request, res: Response, next: NextFunction) {
+export const getUserStreamPosts = async function(req: Request, res: Response, next: NextFunction) {
 
   const {id} = req.params;
   const userId = userObfuscator.unObfuscate(id);
@@ -54,7 +54,7 @@ export const getUserPosts = async function(req: Request, res: Response, next: Ne
     offset: group * POSTS_GROUP_SIZE,
     viewerId: viewer.id,
   };
-  let posts = await PostModel.getUserPosts(params);
+  let posts = await PostModel.getUserStreamPosts(params);
 
   if (!posts.length) {
     return respondWith(res, 200);
@@ -72,5 +72,6 @@ export const getUserPosts = async function(req: Request, res: Response, next: Ne
     }
     return p.getOutboundData();
   });
+
   respondWith(res, 200, JSON.stringify(posts));
 };

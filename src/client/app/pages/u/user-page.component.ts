@@ -7,84 +7,26 @@ import {MatSelect} from "@angular/material";
 import {PostGroup} from "../../modules/post-widgets/post-group-view/post-group-view.component";
 import {HttpClient} from "@angular/common/http";
 import {isValidStringId, utcTimestamp} from "../../../../shared/utils";
-import {PostFetcher} from "../../modules/post-widgets/post-stream-view/post-stream-view.component";
+import {
+  DefaultStreamFetcher,
+  StreamFetcher
+} from "../../modules/post-widgets/post-stream-view/post-stream-view.component";
 import _ from 'lodash';
 import {API_URLS, getIconMenuOption, IconMenuOption, MenuActions} from "../../../constants";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
 import {POSTS_GROUP_SIZE} from "../../../../shared/constants";
 
-class UserPostFetcher implements PostFetcher {
-  private container?: PostGroup[];
-  private groupIndex = 0;
-  private loading = false;
-  private goOn = false;
-  private end = false;
-  private timestamp = utcTimestamp();
-
-  constructor(private http: HttpClient, private userId: string, private user: any) {
-
+class UserStreamFetcher extends DefaultStreamFetcher {
+  constructor(http: HttpClient, private user: any) {
+    super(http, `${API_URLS.USERS}/${user.id}/posts`);
   }
 
-  start(container: PostGroup[]) {
-    this.container = container;
-    this.nextGroup();
-  }
-
-  loadMore() {
-    const self = this;
-    if (self.end) {
-      return;
+  protected preprocess(group: PostGroup) {
+    for (const g of group) {
+      g.author = this.user;
     }
-    if (self.loading) {
-      self.goOn = true;
-    } else {
-      self.nextGroup();
-    }
+    return group;
   }
-
-  isEnd(): boolean {
-    return this.end;
-  }
-
-  async nextGroup() {
-    const self = this;
-    self.loading = true;
-    self.goOn = false;
-
-    const data = await self.http.get(`${API_URLS.USERS}/${self.userId}/posts?t=${self.timestamp}&g=${self.groupIndex}`, {
-      responseType: 'text'
-    }).toPromise();
-
-    try {
-      const result = JSON.parse(data);
-      if (result.length < POSTS_GROUP_SIZE) {
-        self.end = true;
-      }
-      for (const g of result) {
-        g.author = self.user;
-      }
-      self.container.push(result);
-      ++self.groupIndex;
-    } catch (e) {
-      self.end = true;
-      console.log(e);
-    } finally {
-      if (self.goOn) {
-        setTimeout(() => {
-          self.nextGroup();
-        });
-      } else {
-        self.loading = false;
-      }
-
-
-    }
-  }
-
-  prevGroup(): Promise<PostGroup> {
-    return undefined;
-  }
-
 }
 
 
@@ -101,7 +43,7 @@ export class UserPageComponent implements OnInit {
   circleButtonText = StringIds.Circle;
   circlesUpdating = false;
 
-  postFetcher?: PostFetcher;
+  streamFetcher?: StreamFetcher;
   extraMenuItems: IconMenuOption[] = [];
 
   userInCircleIds: string[] = [];
@@ -125,7 +67,7 @@ export class UserPageComponent implements OnInit {
         self.user.id = userId;
         self.updateCircleStatus();
         self.loading = false;
-        self.postFetcher = new UserPostFetcher(self.http, self.userId, self.user);
+        self.streamFetcher = new UserStreamFetcher(self.http, self.user);
         self.updateExtraMenuItems();
       } catch (e) {
         self.toastService.showToast(e.error || e.message);

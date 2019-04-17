@@ -30,21 +30,53 @@ const assertValidNewModel = devOnly(function(model: PostModel) {
 
 const INSERT_SQL = `INSERT INTO Posts (authorId, reShareFromPostId, content, createdAt, visibility, mentionIds) VALUES(:authorId, :reShareFromPostId, :content, :createdAt, :visibility, :mentionIds)`;
 
-interface GetUserPostsParams {
+
+interface UserStreamParams {
   userId: number;
   timestamp: number;
   offset: number;
   viewerId: number;
 }
 
-const assertIsValidGetUserPostsParams = devOnly(function(params: any) {
-  console.log(isNumericId(params.userId), `invalid userId ${params.userId}`);
-  console.log(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
-  console.log(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
-  console.log(Number.isSafeInteger(params.offset) && params.offset >= 0, `invalid offset ${params.offset}`);
+const isValidStreamOffset = function(offset: any) {
+  return Number.isSafeInteger(offset) && offset >= 0 && ((offset % POSTS_GROUP_SIZE) === 0)
+};
+
+const assertIsValidUserStreamParams = devOnly(function(params: any) {
+  console.assert(isNumericId(params.userId), `invalid userId ${params.userId}`);
+  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
+  console.assert(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
+  console.assert(isValidStreamOffset(params.offset), `invalid offset ${params.offset}`);
 });
 
-const GET_USER_POSTS_SQL = `SELECT Posts.id, authorId, reShareFromPostId, content, visibility, plusCount, reShareCount, createdAt FROM Posts LEFT JOIN PostCircle ON (Posts.id = PostCircle.postId) WHERE Posts.authorId = :userId AND Posts.createdAt < :timestamp AND (visibility = ${PostVisibilities.Public} OR (visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE circleId IN (SELECT id FROM Circles WHERE ownerId = :userId) AND userId = :viewerId))) ORDER BY createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
+interface PublicStreamParams {
+  timestamp: number;
+  offset: number;
+  viewerId: number;
+}
+
+const assertValidPublicStreamParams = devOnly(function(params: any) {
+  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
+  console.assert(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
+  console.assert(isValidStreamOffset(params.offset), `invalid offset ${params.offset}`);
+});
+
+const POST_PUBLIC_COLUMNS = [
+  'Posts.id',
+  'Posts.authorId',
+  'Posts.reShareFromPostId',
+  'Posts.content',
+  'Posts.visibility',
+  'Posts.plusCount',
+  'Posts.reShareCount',
+  'Posts.createdAt'
+];
+
+
+const PUBLIC_STREAM_POSTS_SQL = `SELECT ${POST_PUBLIC_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']).join(', ')} FROM Posts LEFT JOIN Users ON (Posts.authorId = Users.id) WHERE Users.id NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND Users.id NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId) AND Posts.createdAt < :timestamp AND visibility = ${PostVisibilities.Public} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
+
+
+const USER_STREAM_POSTS_SQL = `SELECT ${POST_PUBLIC_COLUMNS.join(', ')} FROM Posts LEFT JOIN PostCircle ON (Posts.id = PostCircle.postId) WHERE Posts.authorId = :userId AND Posts.createdAt < :timestamp AND (visibility = ${PostVisibilities.Public} OR (visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE circleId IN (SELECT id FROM Circles WHERE ownerId = :userId) AND userId = :viewerId))) ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
 
 export class PostModel extends TextContentModel {
   static readonly [$obfuscator] = postObfuscator;
@@ -52,21 +84,31 @@ export class PostModel extends TextContentModel {
     $id,
     $authorId,
     $reShareFromPostId,
-    'content', 'visibility', 'plusCount', 'reShareCount', 'createdAt', 'comments'
+    'content', 'visibility', 'plusCount', 'reShareCount', 'createdAt', 'comments', 'authorNickname', 'authorAvatarUrl'
   ]);
 
   static unObfuscateFrom(obj: any): PostModel | undefined {
     throw Error('Not implemented');
   }
 
-
-  static async getUserPosts(params: GetUserPostsParams, driver: DatabaseDriver = db) {
-    assertIsValidGetUserPostsParams(params);
-    const [rows] = await driver.query(GET_USER_POSTS_SQL, params);
+  private static async getPostsBySQL(sql: string, params: any, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query(sql, params);
     return _.map(rows, (row) => {
       return makeInstance(row, PostModel);
     });
   }
+
+
+  static async getUserStreamPosts(params: UserStreamParams, driver: DatabaseDriver = db) {
+    assertIsValidUserStreamParams(params);
+    return this.getPostsBySQL(USER_STREAM_POSTS_SQL, params, driver);
+  }
+
+  static async getPublicStreamPosts(params: PublicStreamParams, driver: DatabaseDriver = db) {
+    assertValidPublicStreamParams(params);
+    return this.getPostsBySQL(PUBLIC_STREAM_POSTS_SQL, params, driver);
+  }
+
 
   reShareFromPostId?: number | string;
   [$reShareFromPostId]?: string;

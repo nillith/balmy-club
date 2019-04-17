@@ -1,9 +1,9 @@
 import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
-import {isValidStringId} from "../../../shared/utils";
+import {isValidPassword, isValidStringId, isValidTimestamp} from "../../../shared/utils";
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../shared/interf";
 import {isValidPostContent, utcTimestamp} from "../../../shared/utils";
-import {MAX_VISIBLE_CIRCLE_NUMBER} from "../../../shared/constants";
+import {MAX_VISIBLE_CIRCLE_NUMBER, POSTS_GROUP_SIZE} from "../../../shared/constants";
 import {isString} from "util";
 import {PostModel} from "../../models/post.model";
 import {$user} from "../../constants/symbols";
@@ -11,6 +11,7 @@ import db from "../../persistence/index";
 import {ActivityModel} from "../../models/activity.model";
 import {NotificationModel} from "../../models/notification.model";
 import _ from 'lodash';
+import {CommentModel} from "../../models/comment.model";
 
 // authorId?: number | string;
 // [$authorId]?: string;
@@ -115,4 +116,42 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
     }
   });
   respondWith(res, 200);
+};
+
+
+export const getPublicStreamPosts = async function(req: Request, res: Response, next: NextFunction) {
+  const {query} = req;
+  const timestamp = Math.floor(parseFloat(query.t));
+  const group = Math.floor(parseFloat(query.g));
+
+  if (!isValidTimestamp(timestamp) || group < 0) {
+    return respondWith(res, 404);
+  }
+
+  const viewer = req[$user];
+  const params = {
+    timestamp,
+    offset: group * POSTS_GROUP_SIZE,
+    viewerId: viewer.id,
+  };
+
+  let posts = await PostModel.getPublicStreamPosts(params);
+
+  if (!posts.length) {
+    return respondWith(res, 200);
+  }
+
+  for (const p of posts) {
+    p.comments = await CommentModel.getCommentsByPostId(p.id as number);
+  }
+
+  posts = posts.map((p) => {
+    if (p.comments) {
+      p.comments = p.comments.map((c) => {
+        return c.getOutboundData();
+      });
+    }
+    return p.getOutboundData();
+  });
+  respondWith(res, 200, JSON.stringify(posts));
 };

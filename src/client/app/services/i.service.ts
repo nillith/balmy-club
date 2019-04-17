@@ -8,7 +8,7 @@ import {UserModel} from "../models/user.model";
 import {CircleModel} from "../models/circle.model";
 import {DataStorage} from "../../utils/index";
 import {ChangeSettingsRequest, LoginResponse} from "../../../shared/contracts";
-
+import _ from 'lodash';
 
 const STORAGE_KEYS = {
   USER: 'user',

@@ -11,7 +11,7 @@ import {StringIds} from "../../i18n/translations/string-ids";
 const VisibilityText = {
   [PostVisibilities.Public]: StringIds.Public,
   [PostVisibilities.Private]: StringIds.PrivateCircle,
-  [PostVisibilities.Extended]: StringIds.ExtendedCircle,
+  //[PostVisibilities.Extended]: StringIds.ExtendedCircle,
 };
 
 const VisibilityOptions = [
@@ -19,10 +19,10 @@ const VisibilityOptions = [
     id: PostVisibilities.Public,
     name: StringIds.Public,
   },
-  {
-    id: PostVisibilities.Extended,
-    name: StringIds.ExtendedCircle,
-  },
+  // {
+  //   id: PostVisibilities.Extended,
+  //   name: StringIds.ExtendedCircle,
+  // },
   {
     id: PostVisibilities.Private,
     name: StringIds.PrivateCircle

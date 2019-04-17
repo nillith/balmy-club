@@ -12,3 +12,4 @@ export const changePassword = async function(req: Request, res: Response, next: 
   await user.changePassword(password);
   respondWith(res, 200);
 };
+

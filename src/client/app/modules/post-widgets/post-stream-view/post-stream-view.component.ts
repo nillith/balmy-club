@@ -1,12 +1,95 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {PostGroup} from "../post-group-view/post-group-view.component";
+import {HttpClient} from "@angular/common/http";
+import {utcTimestamp} from "../../../../../shared/utils";
+import {POSTS_GROUP_SIZE} from "../../../../../shared/constants";
 
 
-export interface PostFetcher {
+export interface StreamFetcher {
   start(container: PostGroup[]);
 
   loadMore();
 }
+
+export class DefaultStreamFetcher {
+  private container?: PostGroup[];
+  private groupIndex = 0;
+  private loading = false;
+  private goOn = false;
+  private end = false;
+  private timestamp = utcTimestamp();
+
+  constructor(protected http: HttpClient, protected apiUrl: string) {
+
+  }
+
+  start(container: PostGroup[]) {
+    this.container = container;
+    this.nextGroup();
+  }
+
+  loadMore() {
+    const self = this;
+    if (self.end) {
+      return;
+    }
+    if (self.loading) {
+      self.goOn = true;
+    } else {
+      self.nextGroup();
+    }
+  }
+
+  protected preprocess(group: PostGroup) {
+    for (const g of group) {
+      g.author = {
+        id: g.authorId,
+        nickname: g.authorNickname,
+        avatarUrl: g.authorAvatarUrl,
+      };
+    }
+    return group;
+  }
+
+  isEnd(): boolean {
+    return this.end;
+  }
+
+  async nextGroup() {
+    const self = this;
+    self.loading = true;
+    self.goOn = false;
+
+    const data = await self.http.get(`${self.apiUrl}?t=${self.timestamp}&g=${self.groupIndex}`, {
+      responseType: 'text'
+    }).toPromise();
+
+    try {
+      const result = JSON.parse(data);
+
+      if (!result || result.length < POSTS_GROUP_SIZE) {
+        self.end = true;
+      }
+      if (result && result.length) {
+        self.container.push(self.preprocess(result));
+        ++self.groupIndex;
+      }
+
+    } catch (e) {
+      self.end = true;
+      console.log(e);
+    } finally {
+      if (self.goOn) {
+        setTimeout(() => {
+          self.nextGroup();
+        });
+      } else {
+        self.loading = false;
+      }
+    }
+  }
+}
+
 
 @Component({
   selector: 'app-post-stream-view',
@@ -15,7 +98,7 @@ export interface PostFetcher {
 })
 export class PostStreamViewComponent implements OnInit, OnDestroy {
 
-  @Input() postFetcher: PostFetcher;
+  @Input() streamFetcher: StreamFetcher;
   @ViewChild('loadmore') loadMoreDetector: ElementRef;
 
   groups: PostGroup[] = [];
@@ -28,7 +111,7 @@ export class PostStreamViewComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     const self = this;
-    self.postFetcher.start(self.groups)
+    self.streamFetcher.start(self.groups);
     window.addEventListener('scroll', this.scrollListener, true);
   }
 
@@ -43,7 +126,7 @@ export class PostStreamViewComponent implements OnInit, OnDestroy {
     const rect = nativeElement.getBoundingClientRect();
     const totalHeight = window.innerHeight || document.documentElement.clientHeight;
     if (rect.top < totalHeight) {
-      self.postFetcher.loadMore();
+      self.streamFetcher.loadMore();
     }
   }
 }

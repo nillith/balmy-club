@@ -6,11 +6,13 @@ import {ProjectModulesImportsModule} from "../modules/imports/project-modules-im
 import {UserPageComponent} from './u/user-page.component';
 import {CirclesComponent} from './circles/circles.component';
 import {SettingsComponent} from './settings/settings.component';
+import { DiscoverComponent } from './discover/discover.component';
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
   {path: 'circles', component: CirclesComponent},
   {path: 'settings', component: SettingsComponent},
+  {path: 'discover', component: DiscoverComponent},
   {path: 'u/:userId', component: UserPageComponent},
 ];
 
@@ -20,7 +22,8 @@ const routes: Routes = [
     DashboardComponent,
     UserPageComponent,
     CirclesComponent,
-    SettingsComponent
+    SettingsComponent,
+    DiscoverComponent
   ],
   imports: [
     ProjectModulesImportsModule,

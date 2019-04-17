@@ -6,6 +6,9 @@ import {API_URLS} from "../../constants";
 
 export class PostModel extends TextContentModel {
   comments?: CommentModel[];
+  authorNickname?: string;
+  authorAvatarUrl?: string;
+  authorId?: string;
   reShareFromPostId?: string;
   reShareCount?: number;
   visibility?: number = PostVisibilities.Public;
