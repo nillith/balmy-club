@@ -22,7 +22,7 @@ export class PostModel extends TextContentModel {
       'reShareFromPostId',
       'visibility',
       'visibleCircleIds',
-    ]), {responseType: 'text'}).toPromise() as PostData;
+    ]), {responseType: 'text'}).toPromise();
   }
 
   protected update(): Promise<void> {

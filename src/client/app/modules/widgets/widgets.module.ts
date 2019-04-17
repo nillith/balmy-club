@@ -4,8 +4,9 @@ import {ImportsModule} from "../imports/imports.module";
 import {SpinnerSwitchComponent} from './spinner-switch/spinner-switch.component';
 import {AvatarComponent} from './avatar/avatar.component';
 import {CommonPipesModule} from "../common-pipes/common-pipes.module";
-import { LanguageSelectorComponent } from './language-selector/language-selector.component';
+import {LanguageSelectorComponent} from './language-selector/language-selector.component';
 import {I18nModule} from "../i18n/i18n.module";
+import {PlusOneButtonComponent} from './plus-one-button/plus-one-button.component';
 
 
 export const exportedEntryComponents = [];
@@ -14,6 +15,7 @@ const exportedComponents = [
   SpinnerSwitchComponent,
   AvatarComponent,
   LanguageSelectorComponent,
+  PlusOneButtonComponent,
 ];
 
 

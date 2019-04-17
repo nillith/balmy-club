@@ -142,6 +142,7 @@ export interface PostData extends TextContentData {
   reShareCount?: number;
   visibility?: number;
   visibleCircleIds?: string[];
+  plusedByMe: boolean;
 }
 
 export interface CircleData {

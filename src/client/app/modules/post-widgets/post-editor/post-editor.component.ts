@@ -5,6 +5,7 @@ import {StringIds} from '../../i18n/translations/string-ids';
 import {PostApiService} from "../../../api/post-api.service";
 import {noop} from "../../../../../shared/utils";
 import {getIconMenuOption, MenuActions} from "../../../../constants";
+import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
 
 @Component({
   selector: 'app-post-editor',
@@ -20,6 +21,9 @@ export class PostEditorComponent implements OnInit {
   @Input() post: PostData;
   @Input() limitCommentHeight = false;
   @Input() showComments = true;
+  plusAction: NullaryAsyncAction;
+  unPlusAction: NullaryAsyncAction;
+
 
   notifyParent = noop;
 
@@ -29,16 +33,25 @@ export class PostEditorComponent implements OnInit {
   enabledActions = getIconMenuOption([MenuActions.Link]);
 
   constructor(private viewContainerRef: ViewContainerRef, private postApi: PostApiService) {
-    const hostComponent = this.viewContainerRef["_view"].component;
+    const self = this;
+    const hostComponent = self.viewContainerRef["_view"].component;
     if (hostComponent.onChildSizeChange) {
-      this.notifyParent = () => {
+      self.notifyParent = () => {
         hostComponent.onChildSizeChange();
       };
     }
+    self.plusAction = async () => {
+      await self.postApi.plusOne(self.post.id);
+      self.post.plusedByMe = true;
+    };
+
+    self.unPlusAction = async () => {
+      await self.postApi.unPlusOne(self.post.id);
+      self.post.plusedByMe = false;
+    };
   }
 
   ngOnInit() {
-    console.log(this.post);
   }
 
   toggleEditMode() {
@@ -69,9 +82,8 @@ export class PostEditorComponent implements OnInit {
     this.toggleEditMode();
   }
 
-  async onPlusClick() {
-    const self = this;
-    await self.postApi.plusOne(self.post.id);
+  onPlusClick() {
+    this.plusOne.switch();
   }
 
   async onShareClick() {

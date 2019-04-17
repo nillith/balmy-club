@@ -31,10 +31,8 @@
                          class="post-editor-content-section"></app-markdown-viewer>
   </mat-card-content>
   <mat-card-actions align="end" style="padding:1em;">
-    <button mat-icon-button color="accent" (click)="onPlusClick()">
-      <mat-icon>plus_one</mat-icon>
-    </button>
-    <button mat-icon-button color="warn" (click)="onShareClick()">
+    <app-plus-one-button [initialOn]="post.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
+    <button mat-icon-button class="off-icon" (click)="onShareClick()">
       <mat-icon>share</mat-icon>
     </button>
   </mat-card-actions>

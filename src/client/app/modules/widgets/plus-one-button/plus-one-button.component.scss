@@ -1,0 +1,17 @@
+$on-color: #aa3322;
+$off-color: gray;
+.on-icon {
+  color: $on-color;
+
+  svg {
+    fill: $on-color;
+  }
+}
+
+.off-icon {
+  color: $off-color;
+
+  svg {
+    fill: $off-color;
+  }
+}
