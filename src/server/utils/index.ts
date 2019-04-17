@@ -4,6 +4,7 @@ import {STATUS_CODES} from 'http';
 import {identity, noop} from "../../shared/utils";
 import {isString, isUndefined} from "util";
 import {MAX_URL_LENGTH} from "../../shared/constants";
+import {INVALID_NUMERIC_ID} from "../service/obfuscator.service";
 
 export const isAsyncFunction = (() => {
   const AsyncFunction = (async () => {
@@ -54,7 +55,7 @@ export const devOnly = (function() {
 })();
 
 export const isNumericId = function(id?: any) {
-  return id > 0 && Number.isSafeInteger(id);
+  return INVALID_NUMERIC_ID !== id && id > 0 && Number.isSafeInteger(id);
 };
 
 export const undefinedToNull = function(obj: any, keys: string[]) {

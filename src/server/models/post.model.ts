@@ -56,6 +56,15 @@ const assertIsValidUserTimelineParams = devOnly(function(params: any) {
   assertValidTimelineParams(params);
 });
 
+export interface PostViewer {
+  postId: number;
+  viewerId: number;
+}
+
+const assertValidPostViewer = devOnly(function(params: any) {
+  console.assert(isNumericId(params.postId), `invalid postId ${params.postId}`);
+  console.assert(isNumericId(params.viewerId), `invalid postId ${params.viewerId}`);
+});
 
 interface TimelineSqlCreateOptions {
   withUser?: boolean;
@@ -63,68 +72,87 @@ interface TimelineSqlCreateOptions {
   singleUser?: boolean;
 }
 
-const createTimelineSql = (function() {
+const POST_PUBLIC_SQL_COLUMNS = [
+  'Posts.id',
+  'Posts.authorId',
+  'Posts.reShareFromPostId',
+  'Posts.content',
+  'Posts.visibility',
+  'Posts.plusCount',
+  'Posts.reShareCount',
+  'Posts.createdAt'
+];
 
-  const POST_PUBLIC_SQL_COLUMNS = [
-    'Posts.id',
-    'Posts.authorId',
-    'Posts.reShareFromPostId',
-    'Posts.content',
-    'Posts.visibility',
-    'Posts.plusCount',
-    'Posts.reShareCount',
-    'Posts.createdAt'
+const POST_PUBLIC_SQL_COLUMNS_WITH_USER = POST_PUBLIC_SQL_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']);
+
+const processVisibilityOption = function(options: TimelineSqlCreateOptions, ands: string[], leftJoins: string[]) {
+  const visibilityOr = [
+    'Posts.authorId = :viewerId'
   ];
 
-  const POST_PUBLIC_SQL_COLUMNS_WITH_USER = POST_PUBLIC_SQL_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']);
+  const visibilitySubAnd = [
+    'Posts.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId)',
+    'Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)',
+  ];
 
 
-  return function(options: TimelineSqlCreateOptions) {
-    let cols = POST_PUBLIC_SQL_COLUMNS;
+  const visibilitySubAndSubOr = [
+    `visibility = ${PostVisibilities.Public}`
+  ];
 
-    const froms = ['Posts'];
-    if (options.withUser) {
-      froms.push('Users ON (Posts.authorId = Users.id)');
-      cols = POST_PUBLIC_SQL_COLUMNS_WITH_USER;
-    }
+  if (options.withPrivatePost) {
+    leftJoins.push('PostCircle ON (Posts.id = PostCircle.postId)');
+    visibilitySubAndSubOr.push(`(visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE userId = :viewerId))`);
+  }
 
+  visibilitySubAnd.push(`(${visibilitySubAndSubOr.join(' OR ')})`);
+  visibilityOr.push(`(${visibilitySubAnd.join(' AND ')})`);
 
-    const ands = [
-      'Posts.createdAt < :timestamp',
-    ];
-
-    if (options.singleUser) {
-      ands.push('Posts.authorId = :userId');
-    }
-
-    const visibilityOr = [
-      'Posts.authorId = :viewerId'
-    ];
-
-    const visibilitySubAnd = [
-      'Posts.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId)',
-      'Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)',
-    ];
+  ands.push(`(${visibilityOr.join(' OR ')})`);
+};
 
 
-    const visibilitySubAndSubOr = [
-      `visibility = ${PostVisibilities.Public}`
-    ];
+const createTimelineSql = function(options: TimelineSqlCreateOptions) {
+  let cols = POST_PUBLIC_SQL_COLUMNS;
 
-    if (options.withPrivatePost) {
-      froms.push('PostCircle ON (Posts.id = PostCircle.postId)');
-      visibilitySubAndSubOr.push(`(visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE userId = :viewerId))`);
-    }
+  const leftJoins = ['Posts'];
+  if (options.withUser) {
+    leftJoins.push('Users ON (Posts.authorId = Users.id)');
+    cols = POST_PUBLIC_SQL_COLUMNS_WITH_USER;
+  }
 
-    visibilitySubAnd.push(`(${visibilitySubAndSubOr.join(' OR ')})`);
-    visibilityOr.push(`(${visibilitySubAnd.join(' AND ')})`);
 
-    ands.push(`(${visibilityOr.join(' OR ')})`);
+  const ands = [
+    'Posts.createdAt < :timestamp',
+  ];
 
-    return `SELECT ${cols.join(', ')} FROM ${froms.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
-  };
+  if (options.singleUser) {
+    ands.push('Posts.authorId = :userId');
+  }
+  processVisibilityOption(options, ands, leftJoins);
+  return `SELECT ${cols.join(', ')} FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
+};
+
+const GET_POST_BY_ID_SQL = (function() {
+  const leftJoins = ['Posts'];
+  const ands = ['Posts.id = :id'];
+  processVisibilityOption({
+    withPrivatePost: true,
+  }, ands, leftJoins);
+  return `SELECT ${POST_PUBLIC_SQL_COLUMNS_WITH_USER.join(', ')} FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} LIMIT 1`;
 })();
 
+const IS_POST_ACCESSIBLE_SQL = (function() {
+  const leftJoins = ['Posts'];
+  const ands = ['Posts.id = :id'];
+  processVisibilityOption({
+    withPrivatePost: true,
+  }, ands, leftJoins);
+  return `SELECT Posts.id FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} LIMIT 1`;
+})();
+
+
+const POST_OTHER_COMMENTER_IDS_SQL = 'SELECT id FROM Comments WHERE postId = :postId AND authorId != :viewerId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)';
 
 const PUBLIC_TIMELINE_POSTS_SQL = createTimelineSql({
   withUser: true,
@@ -161,6 +189,15 @@ export class PostModel extends TextContentModel {
     });
   }
 
+  static async getPostById(id: number, viewerId: number, driver: DatabaseDriver = db) {
+    const [rows] = await driver.query(GET_POST_BY_ID_SQL, {
+      id, viewerId
+    });
+    if (rows && rows[0]) {
+      return makeInstance(rows[0], PostModel);
+    }
+  }
+
 
   static async getUserTimelinePosts(params: UserTimelineParams, driver: DatabaseDriver = db) {
     assertIsValidUserTimelineParams(params);
@@ -177,6 +214,18 @@ export class PostModel extends TextContentModel {
     return this.getPostsBySQL(HOME_STREAM_POSTS_SQL, params, driver);
   }
 
+  static async isAccessible(params: PostViewer, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidPostViewer(params);
+    const [rows] = await driver.query(IS_POST_ACCESSIBLE_SQL, params);
+    return !!rows && !!rows[0] && !!rows[0].id;
+  }
+
+  static async getOtherCommenterIds(params: PostViewer, driver: DatabaseDriver = db): Promise<number[]> {
+    assertValidPostViewer(params);
+    const [rows] = await driver.query(POST_OTHER_COMMENTER_IDS_SQL, params);
+
+    return rows as any as number[];
+  }
 
   reShareFromPostId?: number | string;
   [$reShareFromPostId]?: string;

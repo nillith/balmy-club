@@ -1,8 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
-import {isValidPassword, isValidStringId, isValidTimestamp} from "../../../shared/utils";
+import {isValidPostContent, isValidStringId, isValidTimestamp, utcTimestamp} from "../../../shared/utils";
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../shared/interf";
-import {isValidPostContent, utcTimestamp} from "../../../shared/utils";
 import {MAX_VISIBLE_CIRCLE_NUMBER, POSTS_GROUP_SIZE} from "../../../shared/constants";
 import {isString} from "util";
 import {PostModel} from "../../models/post.model";
@@ -12,6 +11,8 @@ import {ActivityModel} from "../../models/activity.model";
 import {NotificationModel} from "../../models/notification.model";
 import _ from 'lodash';
 import {CommentModel} from "../../models/comment.model";
+import {INVALID_NUMERIC_ID, postObfuscator} from "../../service/obfuscator.service";
+import {respondWithJson} from "../../init";
 
 // authorId?: number | string;
 // [$authorId]?: string;
@@ -142,7 +143,7 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
   }
 
   for (const p of posts) {
-    p.comments = await CommentModel.getCommentsByPostId(p.id as number);
+    p.comments = await CommentModel.getCommentsByPostId(p.id as number, viewer.id);
   }
 
   posts = posts.map((p) => {
@@ -154,4 +155,19 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
     return p.getOutboundData();
   });
   respondWith(res, 200, JSON.stringify(posts));
+};
+
+export const getPostById = async function(req: Request, res: Response, next: NextFunction) {
+  const {id} = req.params;
+  const postId = postObfuscator.unObfuscate(id);
+  if (INVALID_NUMERIC_ID !== postId) {
+    const viewer = req[$user];
+    const post = await PostModel.getPostById(postId, viewer.id);
+    if (post) {
+      post.comments = await CommentModel.getCommentsByPostId(postId, viewer.id);
+      post.comments = post.comments.map(c => c.getOutboundData());
+      respondWithJson(res, post);
+    }
+  }
+  return respondWith(res, 404);
 };

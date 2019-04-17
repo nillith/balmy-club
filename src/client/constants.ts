@@ -38,6 +38,7 @@ export const API_URLS = {
   DISCOVER: 'api/posts/discover',
   CIRCLES: 'api/i/circles',
   SETTINGS: 'api/i/settings',
+  COMMENTS: 'api/i/comments',
   HOME_TIMELINE: 'api/i/home-timeline',
   USERS: 'api/users',
   LOGIN: 'auth/local',

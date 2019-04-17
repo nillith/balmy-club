@@ -4,6 +4,7 @@ import {changePassword, getHomeTimelinePosts} from "./controller";
 import settings from './settings';
 import circles from './circles';
 import notifications from './notifications';
+import comments from './comments';
 
 const router = Router();
 
@@ -11,5 +12,6 @@ router.put('/password', asyncMiddleware(changePassword));
 router.use('/circles', circles);
 router.use('/settings', settings);
 router.use('/notifications', notifications);
+router.use('/comments', comments);
 router.use('/home-timeline', asyncMiddleware(getHomeTimelinePosts));
 export default router;

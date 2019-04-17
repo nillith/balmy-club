@@ -21,8 +21,18 @@ class UserStreamFetcher extends DefaultStreamFetcher {
   }
 
   protected preprocess(group: PostGroup) {
-    for (const g of group) {
-      g.author = this.user;
+    for (const post of group) {
+      post.author = this.user;
+      if (post.comments) {
+        for (const comment of post.comments) {
+          comment.author = {
+            id: comment.authorId,
+            nickname: comment.authorNickname,
+            avatarUrl: comment.authorAvatarUrl,
+            isMe: this.iService.isMeById(comment.authorId),
+          };
+        }
+      }
     }
     return group;
   }

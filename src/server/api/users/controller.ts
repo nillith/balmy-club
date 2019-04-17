@@ -61,7 +61,7 @@ export const getUserStreamPosts = async function(req: Request, res: Response, ne
   }
   // posts = posts.map(p => p.getOutboundData());
   for (const p of posts) {
-    p.comments = await CommentModel.getCommentsByPostId(p.id as number);
+    p.comments = await CommentModel.getCommentsByPostId(p.id as number, viewer.id);
   }
 
   posts = posts.map((p) => {

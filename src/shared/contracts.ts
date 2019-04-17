@@ -1,3 +1,5 @@
+import {PostVisibilities} from "./interf";
+
 export interface MinimumUser {
   id: string;
   nickname: string;
@@ -70,4 +72,17 @@ export interface ChangeSettingsRequest {
   username?: string;
   nickname?: string;
   avatarUrl?: string;
+}
+
+
+export interface PublishPostRequest {
+  reShareFromPostId: string;
+  visibility: PostVisibilities;
+  content: string;
+  visibleCircleIds?: string[];
+}
+
+export interface PublishCommentRequest {
+  postId: string;
+  content: string;
 }

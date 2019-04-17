@@ -51,6 +51,8 @@ export class CommentEditorComponent implements OnInit {
   readonly StringIds = StringIds;
   @Input() comment: CommentData;
   @Input() editMode = false;
+  @Input() post: any;
+  loading: boolean;
   enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete, PostActions.Report].map(action => ActionOption[action]);
 
   private editor: MarkdownEditorComponent;
@@ -58,6 +60,7 @@ export class CommentEditorComponent implements OnInit {
   @ViewChild('markdownEditor')
   set markdownEditor(editor: MarkdownEditorComponent) {
     this.editor = editor;
+    console.log(editor);
   }
 
   constructor(private postEditor: PostEditorComponent, public iService: IService) {
@@ -65,6 +68,9 @@ export class CommentEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (!this.post) {
+      throw Error('post required!');
+    }
   }
 
   toggleEditMode() {
@@ -88,10 +94,21 @@ export class CommentEditorComponent implements OnInit {
     this.toggleEditMode();
   }
 
-  saveEdit() {
+  async saveEdit() {
     const self = this;
-    self.comment.content = self.editor.markdown;
-    this.toggleEditMode();
+    self.loading = true;
+    try {
+      console.log(self.post);
+      self.comment.content = self.editor.markdown;
+      this.toggleEditMode();
+      const comment = self.iService.createComment(self.post.id);
+      comment.content = self.comment.content;
+      await comment.save();
+      console.log('------');
+    } catch (e) {
+      console.log(e);
+    } finally {
+      self.loading = false;
+    }
   }
-
 }

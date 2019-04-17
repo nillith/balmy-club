@@ -42,13 +42,23 @@ export class DefaultStreamFetcher {
   }
 
   protected preprocess(group: PostGroup) {
-    for (const g of group) {
-      g.author = {
-        id: g.authorId,
-        nickname: g.authorNickname,
-        avatarUrl: g.authorAvatarUrl,
-        isMe: this.iService.isMeById(g.authorId),
+    for (const post of group) {
+      post.author = {
+        id: post.authorId,
+        nickname: post.authorNickname,
+        avatarUrl: post.authorAvatarUrl,
+        isMe: this.iService.isMeById(post.authorId),
       };
+      if (post.comments) {
+        for (const comment of post.comments) {
+          comment.author = {
+            id: comment.authorId,
+            nickname: comment.authorNickname,
+            avatarUrl: comment.authorAvatarUrl,
+            isMe: this.iService.isMeById(comment.authorId),
+          };
+        }
+      }
     }
     return group;
   }

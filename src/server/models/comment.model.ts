@@ -23,16 +23,16 @@ const assertValidNewModel = devOnly(function(model: CommentModel) {
   console.assert(isValidTimestamp(model.createdAt), `invalid timestamp ${model.createdAt}`);
 });
 
-const INSERT_SQL = 'INSERT INTO Comments (id, postId, authorId, content, createdAt BIGINT, updatedAt, mentionIds) VALUES(:id, :postId, :authorId, :content, :createdAt, :updatedAt, :mentionIds)';
+const INSERT_SQL = 'INSERT INTO Comments (id, postId, authorId, content, createdAt, updatedAt, mentionIds) VALUES(:id, :postId, :authorId, :content, :createdAt, :updatedAt, :mentionIds)';
 
-const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT id, postId, authorId, content, createdAt, updatedAt FROM Comments WHERE postId = :postId';
+const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl FROM Comments LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :viewerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)))';
 
 export class CommentModel extends TextContentModel {
   static readonly [$obfuscator] = postObfuscator;
   static readonly [$outboundFields] = makeFieldMaps([
     $id,
     $authorId,
-    'content', 'plusCount', 'createdAt'
+    'content', 'plusCount', 'createdAt', 'authorNickname', 'authorAvatarUrl'
   ]);
 
   static unObfuscateFrom(obj: any): CommentModel | undefined {
@@ -52,7 +52,7 @@ export class CommentModel extends TextContentModel {
     await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, replacements);
   }
 
-  static async getCommentsByPostId(postId: number, driver: DatabaseDriver = db): Promise<CommentModel[]> {
+  static async getCommentsByPostId(postId: number, viewerId: number, driver: DatabaseDriver = db): Promise<CommentModel[]> {
     const [rows] = await driver.query(GET_COMMENTS_BY_POST_ID_SQL, {
       postId
     });

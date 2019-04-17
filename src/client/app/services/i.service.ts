@@ -9,6 +9,7 @@ import {CircleModel} from "../models/circle.model";
 import {DataStorage} from "../../utils/index";
 import {ChangeSettingsRequest, LoginResponse} from "../../../shared/contracts";
 import _ from 'lodash';
+import {CommentModel} from "../models/comment.model";
 
 const STORAGE_KEYS = {
   USER: 'user',
@@ -225,6 +226,10 @@ export class IService {
     self.storage.saveObject(STORAGE_KEYS.CIRCLES, self.circles.map((c) => {
       return c.assignOut();
     }));
+  }
+
+  createComment(postId: string): CommentModel {
+    return new CommentModel(this.http, postId);
   }
 }
 
