@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {UserModel} from "../../models/user.model";
 import {ToastService} from "../../services/toast.service";
 import {IService} from "../../services/i.service";
 import {MatSelect} from "@angular/material";
@@ -14,6 +13,7 @@ import {
 import _ from 'lodash';
 import {API_URLS, getIconMenuOption, IconMenuOption, MenuActions} from "../../../constants";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
+import {UserResponse} from "../../../../shared/contracts";
 
 class UserStreamFetcher extends DefaultStreamFetcher {
   constructor(http: HttpClient, private user: any, iService: IService) {
@@ -47,7 +47,7 @@ export class UserPageComponent implements OnInit {
 
   userId?: string;
   loading = true;
-  user?: UserModel;
+  user?: UserResponse;
   circleButtonText = StringIds.Circle;
   circlesUpdating = false;
 

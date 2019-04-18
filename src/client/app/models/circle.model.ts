@@ -1,15 +1,15 @@
 import {ModelBase} from "./model-base";
 import {HttpClient} from "@angular/common/http";
 import {API_URLS} from "../../constants";
-import {UserModel} from "./user.model";
 import {IService} from "../services/i.service";
+import {MinimumUser} from "../../../shared/contracts";
 
 const API_URL = API_URLS.CIRCLES;
 
 export class CircleModelModifier {
-  users?: UserModel[] = [];
-  addUserList: UserModel[] = [];
-  removeUserList: UserModel[] = [];
+  users?: MinimumUser[] = [];
+  addUserList: MinimumUser[] = [];
+  removeUserList: MinimumUser[] = [];
   name?: string;
 
   addToRemoveListByIndex(idx: number) {
@@ -20,12 +20,12 @@ export class CircleModelModifier {
     }
 
     self.users.splice(idx, 1);
-    if (!user.isNew()) {
+    if (user.id) {
       self.removeUserList.push(user);
     }
   }
 
-  addToAddUserList(usr: UserModel) {
+  addToAddUserList(usr: MinimumUser) {
     this.addUserList.push(usr);
   }
 
@@ -54,7 +54,7 @@ export class CircleModel extends ModelBase {
   ];
   userIdMap: any = {};
   name?: string;
-  users: UserModel[] = [];
+  users: MinimumUser[] = [];
   userIds?: string[];
   addUserIds?: string[];
   removeUserIds?: string[];

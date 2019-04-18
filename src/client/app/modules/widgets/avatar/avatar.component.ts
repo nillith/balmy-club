@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {UserModel} from "../../../models/user.model";
+import {MinimumUser} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-avatar',
@@ -8,7 +8,7 @@ import {UserModel} from "../../../models/user.model";
 })
 export class AvatarComponent implements OnInit {
 
-  @Input() user: UserModel;
+  @Input() user: MinimumUser
   @Input() size = '32px';
 
   constructor() {

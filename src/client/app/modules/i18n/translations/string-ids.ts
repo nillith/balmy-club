@@ -39,6 +39,7 @@ export enum StringIds {
   Subscribe,
   AddComment,
   ShowAllXComments,
+  HideAllComments,
   Share,
   Menu,
   Publish,

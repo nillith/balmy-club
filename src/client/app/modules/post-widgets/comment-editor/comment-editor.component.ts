@@ -97,13 +97,16 @@ export class CommentEditorComponent implements OnInit {
     const self = this;
     self.loading = true;
     try {
-      console.log(self.post);
       self.comment.content = self.editor.markdown;
       this.toggleEditMode();
       const comment = self.iService.createComment(self.post.id);
       comment.content = self.comment.content;
       await comment.save();
-      console.log('------');
+      if (!self.post.comments) {
+        self.post.comments = [comment];
+      } else {
+        self.post.comments.push(comment);
+      }
     } catch (e) {
       console.log(e);
     } finally {

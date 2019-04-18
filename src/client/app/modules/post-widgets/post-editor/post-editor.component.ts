@@ -6,6 +6,7 @@ import {PostsApiService} from "../../../api/posts-api.service";
 import {noop} from "../../../../../shared/utils";
 import {getIconMenuOption, MenuActions} from "../../../../constants";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
+import {PostResponse} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-post-editor',
@@ -18,7 +19,7 @@ export class PostEditorComponent implements OnInit {
 
   @Input() editMode = false;
 
-  @Input() post: PostData;
+  @Input() post: PostResponse;
   @Input() limitCommentHeight = false;
   @Input() showComments = true;
   plusAction: NullaryAsyncAction;

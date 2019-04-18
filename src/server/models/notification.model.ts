@@ -39,7 +39,7 @@ export interface BroadcastParams {
 
 const assertBroadcastParams = devOnly(function(data: any) {
   const {recipientIds, activityId, timestamp} = data;
-  console.assert(!recipientIds || !recipientIds.length, `no recipients`);
+  console.assert(recipientIds && recipientIds.length, `no recipients`);
   for (let id of recipientIds) {
     console.assert(isNumericId(id), `invalid recipient id ${id}`);
   }

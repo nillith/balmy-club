@@ -43,6 +43,7 @@ export const values = {
   [StringIds.Subscribe]: '订阅',
   [StringIds.AddComment]: '添加评论',
   [StringIds.ShowAllXComments]: '显示全部{{length}}个评论',
+  [StringIds.HideAllComments]: '隐藏全部评论',
   [StringIds.Share]: '分享',
   [StringIds.Menu]: '菜单',
   [StringIds.Publish]: '发布',

@@ -43,6 +43,7 @@ export const values = {
   [StringIds.Subscribe]: 'Subscribe',
   [StringIds.AddComment]: 'Add Comment',
   [StringIds.ShowAllXComments]: 'Show All {{length}} Comments',
+  [StringIds.HideAllComments]: 'Hide All Comments',
   [StringIds.Share]: 'Share',
   [StringIds.Menu]: 'Menu',
   [StringIds.Publish]: 'Publish',

@@ -11,6 +11,7 @@ export interface UserResponse extends MinimumUser {
   bannerUrl?: string;
   circlerCount: number;
   blockedByMe: boolean;
+  isCircledByMe?: boolean;
 }
 
 
@@ -91,6 +92,7 @@ export interface PublishCommentRequest {
 export interface TextContentResponse {
   id: string;
   authorId: string;
+  author?: MinimumUser;
   content: string;
   plusCount: number;
   createdAt: number;

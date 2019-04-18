@@ -4,10 +4,9 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 import {getAccessToken, removeAccessToken, setAccessToken} from "../../utils/auth";
 import {AccessTokenData, UserData} from "../../../shared/interf";
 import {API_URLS} from "../../constants";
-import {UserModel} from "../models/user.model";
 import {CircleModel} from "../models/circle.model";
 import {DataStorage} from "../../utils/index";
-import {ChangeSettingsRequest, LoginResponse} from "../../../shared/contracts";
+import {ChangeSettingsRequest, LoginResponse, MinimumUser, UserResponse} from "../../../shared/contracts";
 import _ from 'lodash';
 import {CommentModel} from "../models/comment.model";
 
@@ -35,7 +34,7 @@ export class IService {
       self.loadUserFromStorage();
       self.loadCirclesFromStorage();
     }
-    if (!self.me || self.me.isNew()) {
+    if (!self.me || !self.me.id) {
       self.logout();
     }
   }
@@ -45,8 +44,7 @@ export class IService {
       return;
     }
     const self = this;
-    self.me = new UserModel(self.http);
-    self.me.assign(data);
+    self.me = data;
     self.me.isMe = true;
   }
 
@@ -117,13 +115,13 @@ export class IService {
     self.circles.push(circle);
     const circlesData = self.storage.loadObject(STORAGE_KEYS.CIRCLES);
     const c = circle.assignOut();
-    if (c.users) {
-      c.users = c.users.map((u) => {
-        return u.cloneModelFields([
-          'id', 'nickname', 'avatarUrl'
-        ]);
-      });
-    }
+    // if (c.users) {
+    //   c.users = c.users.map((u) => {
+    //     return u.cloneModelFields([
+    //       'id', 'nickname', 'avatarUrl'
+    //     ]);
+    //   });
+    // }
     circlesData.push(c);
     self.storage.saveObject(STORAGE_KEYS.CIRCLES, circlesData);
   }
@@ -168,23 +166,17 @@ export class IService {
   }
 
 
-  private createUser() {
-    return new UserModel(this.http);
-  }
-
-  async viewUserById(id: string): Promise<UserModel> {
+  async viewUserById(id: string): Promise<UserResponse> {
     const self = this;
     if (self.me.id === id) {
       return self.me;
     }
     const data = await self.http.get(`${API_URLS.USERS}/${id}`).toPromise();
-    const user = self.createUser();
-    user.assign(data);
-    return user;
+    return data as UserResponse;
   }
 
 
-  async changeUserCircles(user: UserModel, addCircleIds: string[], removeCircleIds: string[]) {
+  async changeUserCircles(user: MinimumUser, addCircleIds: string[], removeCircleIds: string[]) {
     if (!user || !user.id) {
       return;
     }
@@ -209,7 +201,7 @@ export class IService {
     if (addCircleIds) {
       for (const addId of addCircleIds) {
         const circle = _.find(self.circles, c => c.id === addId);
-        circle.users.push(user.assignOut());
+        circle.users.push(user);
         circle.userIdMap[user.id] = user;
       }
     }

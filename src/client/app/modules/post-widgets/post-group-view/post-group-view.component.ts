@@ -1,11 +1,10 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {PostData} from "../../../../../shared/interf";
 import Masonry from 'masonry-layout';
 import {debounce} from "lodash";
 import {noop} from "../../../../../shared/utils";
-import {PostModel} from "../../../models/post.model";
+import {PostResponse} from "../../../../../shared/contracts";
 
-export type PostGroup = PostModel[];
+export type PostGroup = PostResponse[];
 
 @Component({
   selector: 'app-post-group-view',
