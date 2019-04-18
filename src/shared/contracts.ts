@@ -1,4 +1,4 @@
-import {PostVisibilities} from "./interf";
+import {Activity, PostVisibilities} from "./interf";
 
 export interface MinimumUser {
   id: string;
@@ -110,4 +110,17 @@ export interface PostResponse extends TextContentResponse {
   visibility: PostVisibilities;
   reShareCount: number;
   comments: CommentResponse[];
+}
+
+export interface NotificationResponse {
+  subjectNickname: string;
+  subjectAvatarUrl: string;
+  objectType: Activity.ObjectTypes;
+  actionType: number;
+  contextType?: Activity.ContextTypes;
+  contextId?: string;
+  id: string;
+  subjectId: string;
+  objectId: string;
+  contextExtraId?: string;
 }

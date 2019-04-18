@@ -48,7 +48,7 @@
       <div [ngClass]="{'limit-comment-height':limitCommentHeight}">
         <div *ngFor="let comment of post.comments; let i = index">
           <hr class="comment-hr">
-          <app-comment-editor [comment]="comment" [post]="post"></app-comment-editor>
+          <app-comment-editor id="{{comment.id}}" [comment]="comment" [post]="post"></app-comment-editor>
         </div>
       </div>
     </mat-expansion-panel>

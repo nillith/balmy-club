@@ -18,7 +18,8 @@ import {
   assertValidRawTextContent,
   Mentions,
   RawTextContent,
-  TextContentBuilder, TextContentOutboundCloneFields,
+  TextContentBuilder,
+  TextContentOutboundCloneFields,
   TextContentRecord
 } from "./text-content.model";
 import {CommentRecord} from "./comment.model";
@@ -215,7 +216,9 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 };
 
 const GET_POST_BY_ID_SQL = (function() {
-  const leftJoins = ['Posts LEFT JOIN Users ON (Posts.authorId = Users.id)'];
+  const leftJoins = ['Posts',
+    '(SELECT * FROM PostPlusOnes WHERE userId = :observerId) PostPlusOnes ON (PostPlusOnes.postId = Posts.id)',
+    'Users ON (Posts.authorId = Users.id)'];
   const ands = ['Posts.id = :postId', 'Posts.deletedAt IS NULL'];
   processVisibilityOption({
     withPrivatePost: true,
@@ -255,7 +258,6 @@ export class PostModel {
   private static async getPostsBySQL(sql: string, params: any, driver: DatabaseDriver = db): Promise<PostRecord[]> {
     const [rows] = await driver.query(sql, params);
     return _.map(rows, (row) => {
-      // console.log(row);
       return fromDatabaseRow(row, PostRecord);
     });
   }
@@ -263,7 +265,7 @@ export class PostModel {
   static async getPostById(params: PostViewer, driver: DatabaseDriver = db) {
     const [rows] = await driver.query(GET_POST_BY_ID_SQL, params);
     if (rows && rows[0]) {
-      return makeInstance(rows[0], PostRecord);
+      return fromDatabaseRow(rows[0], PostRecord);
     }
   }
 

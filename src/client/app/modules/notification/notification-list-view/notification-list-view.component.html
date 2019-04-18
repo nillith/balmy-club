@@ -1,0 +1,17 @@
+<div *ngIf="notifications">
+  <mat-card *ngFor="let n of notifications" fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="10px" >
+    <app-avatar [user]="n.subject"></app-avatar>
+    <a href="u/{{n.subjectId}}">{{n.subjectNickname}}</a>
+    <div [ngSwitch]="n.objectType">
+      <div *ngSwitchCase="Activity.ObjectTypes.Comment">
+        <app-comment-action-view [notification]="n"></app-comment-action-view>
+      </div>
+      <div *ngSwitchCase="Activity.ObjectTypes.Post">
+        <app-post-action-view [notification]="n"></app-post-action-view>
+      </div>
+      <div *ngSwitchCase="Activity.ObjectTypes.User">
+        <app-user-action-view [notification]="n"></app-user-action-view>
+      </div>
+    </div>
+  </mat-card>
+</div>

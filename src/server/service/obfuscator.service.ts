@@ -172,6 +172,7 @@ export const $subjectId = Symbol('subjectId');
 export const $objectId = Symbol('objectId');
 export const $visibleCircleIds = Symbol('visibleCircleIds');
 export const $contextId = Symbol('contextId');
+export const $contextExtraId = Symbol('contextExtraId');
 export const $mentionIds = Symbol('mentionIds');
 export const $recipientId = Symbol('recipientId');
 export const $activityId = Symbol('activityId');

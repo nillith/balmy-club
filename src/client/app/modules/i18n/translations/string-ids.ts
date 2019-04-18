@@ -43,4 +43,10 @@ export enum StringIds {
   Share,
   Menu,
   Publish,
+  PlusOnePost,
+  PublishedPost,
+  PlusOneComment,
+  PublishedComment,
+  MentionedYou,
+  CircledYou,
 }

@@ -164,20 +164,20 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
 
 export const getPostById = async function(req: Request, res: Response, next: NextFunction) {
   const {id} = req.params;
-  // const postId = postObfuscator.unObfuscate(id);
-  // if (INVALID_NUMERIC_ID !== postId) {
-  //   const viewer = req[$user];
-  //   const postViewer = {
-  //     postId,
-  //     observerId: observer[$id]
-  //   };
-  //   const post = await PostModel.getPostById(postViewer);
-  //   if (post) {
-  //     post.comments = await CommentModel.getCommentsForPost(postViewer);
-  //     post.comments = post.comments.map(c => c.getOutboundData());
-  //     return respondWithJson(res, post);
-  //   }
-  // }
+  const postId = postObfuscator.unObfuscate(id);
+  if (INVALID_NUMERIC_ID !== postId) {
+    const observer = getRequestUser(req);
+    const postViewer = {
+      postId,
+      observerId: observer[$id]
+    };
+    const post = await PostModel.getPostById(postViewer);
+    if (post) {
+      console.log(JSON.stringify(post));
+      post.comments = await CommentModel.getCommentsForPost(postViewer);
+      return res.json(post);
+    }
+  }
   return respondWith(res, 404);
 };
 

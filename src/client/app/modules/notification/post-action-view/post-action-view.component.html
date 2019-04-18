@@ -1,0 +1,12 @@
+<div>
+  <a href="p/{{notification.objectId}}">
+    <div [ngSwitch]="notification.actionType">
+      <div *ngSwitchCase="Activity.ContentActions.PlusOne">
+        {{StringIds.PlusOnePost | i18n}}
+      </div>
+      <div *ngSwitchCase="Activity.ContentActions.Create">
+        {{StringIds.PublishedPost | i18n}}
+      </div>
+    </div>
+  </a>
+</div>

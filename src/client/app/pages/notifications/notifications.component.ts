@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {NotificationsApiService} from "../../api/notifications-api.service";
+import {Component, OnInit} from '@angular/core';
+import {NotificationData, NotificationsApiService} from "../../api/notifications-api.service";
 
 @Component({
   selector: 'app-notifications',
@@ -8,10 +8,14 @@ import {NotificationsApiService} from "../../api/notifications-api.service";
 })
 export class NotificationsComponent implements OnInit {
 
-  constructor(private notificationsApi: NotificationsApiService) { }
+  notifications: NotificationData[] = [];
+
+  constructor(private notificationsApi: NotificationsApiService) {
+  }
 
   async ngOnInit() {
-    const count = await this.notificationsApi.getUnreadCount();
-    const notifications = await this.notificationsApi.getNotifications();
+    const self = this;
+    await this.notificationsApi.getUnreadCount();
+    self.notifications = await this.notificationsApi.getNotifications();
   }
 }

@@ -1,5 +1,6 @@
 import {
   $activityId,
+  $contextExtraId,
   $contextId,
   $id,
   $objectId,
@@ -56,6 +57,7 @@ export class Notification extends DatabaseRecordBase {
   [$subjectId]: number;
   [$objectId]: number;
   [$contextId]: number;
+  [$contextExtraId]?: number;
 
 
   constructor(id: number, subjectId: number,
@@ -80,6 +82,9 @@ export class Notification extends DatabaseRecordBase {
     obj.objectId = ObjectIdObfuscator[obj.objectType].obfuscate(self[$objectId]);
     if (obj[$contextId]) {
       obj.contextId = ContextIdObfuscator[obj.contextType].obfuscate(self[$contextId]);
+      if (Activity.ContextTypes.Comment === self.contextType) {
+        obj.contextExtraId = postObfuscator.obfuscate(self[$contextExtraId]!);
+      }
     }
   }
 
@@ -89,6 +94,7 @@ export class Notification extends DatabaseRecordBase {
     self[$subjectId] = obj.subjectId;
     self[$objectId] = obj.objectId;
     self[$contextId] = obj.contextId;
+    self[$contextExtraId] = obj.contextExtraId;
   }
 }
 
@@ -150,9 +156,25 @@ export class NotificationModel {
   }
 
   static async getUserNotifications(userId: number, driver: DatabaseDriver = db): Promise<Notification[]> {
-    const [rows] = await driver.query(SQLs.USER_NOTIFICATIONS as string, {userId});
-    return _.map(rows, (row) => {
-      return fromDatabaseRow(row, Notification);
+    const [rows] = await driver.query(SQLs.USER_NOTIFICATIONS as string, {userId}) as any;
+    const contextIdToNotification: any = {};
+    const commentIds: number[] = [];
+    const results = _.map(rows, (row) => {
+      const notification = fromDatabaseRow(row, Notification);
+      if (notification.contextType === Activity.ContextTypes.Post) {
+        contextIdToNotification[row.contextId] = notification;
+        commentIds.push(notification[$contextId]);
+      }
+      return notification;
     });
+    if (commentIds.length) {
+      const [postIds] = await driver.query(`SELECT id AS commentId, postId FROM Comments WHERE id IN (:commentIds)`, {
+        commentIds
+      });
+      _.each(postIds, ({commentId, postId}) => {
+        contextIdToNotification[commentId][$contextExtraId] = postId;
+      });
+    }
+    return results;
   }
 }

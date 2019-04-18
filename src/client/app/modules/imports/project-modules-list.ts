@@ -4,6 +4,7 @@ import {PostWidgetsModule} from "../post-widgets/post-widgets.module";
 import {WidgetsModule} from "../widgets/widgets.module";
 import {CommonPipesModule} from "../common-pipes/common-pipes.module";
 import {I18nModule} from "../i18n/i18n.module";
+import {NotificationModule} from "../notification/notification.module";
 
 
 export const projectModules = [
@@ -13,4 +14,5 @@ export const projectModules = [
   WidgetsModule,
   CommonPipesModule,
   I18nModule,
+  NotificationModule,
 ];

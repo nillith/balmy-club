@@ -1,6 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {API_URLS} from "../../constants";
+import {MinimumUser, NotificationResponse} from "../../../shared/contracts";
+
+export interface NotificationData extends NotificationResponse {
+  subject: MinimumUser;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +16,16 @@ export class NotificationsApiService {
   constructor(private http: HttpClient) {
   }
 
-  async getNotifications() {
-    return await this.http.get(API_URLS.NOTIFICATIONS).toPromise();
+  async getNotifications(): Promise<NotificationData[]> {
+    const notifications = await this.http.get(API_URLS.NOTIFICATIONS).toPromise() as NotificationData[];
+    for (let n of notifications) {
+      n.subject = {
+        id: n.subjectId,
+        nickname: n.subjectNickname,
+        avatarUrl: n.subjectAvatarUrl
+      };
+    }
+    return notifications;
   }
 
   async getUnreadCount() {

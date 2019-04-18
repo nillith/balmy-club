@@ -47,5 +47,7 @@ export const values = {
   [StringIds.Share]: 'Share',
   [StringIds.Menu]: 'Menu',
   [StringIds.Publish]: 'Publish',
+  [StringIds.PlusOnePost]: '+1 Your Post',
+  [StringIds.PublishedPost]: 'Published One Post',
 };
 
