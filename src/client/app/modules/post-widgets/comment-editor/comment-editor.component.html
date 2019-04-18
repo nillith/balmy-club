@@ -20,6 +20,7 @@
     <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
       <div class="app-fill-space"></div>
       <app-plus-one-button [initialOn]="comment.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
+      <span>{{comment.plusCount}}</span>
       <button [disabled]="menuBusy" mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>

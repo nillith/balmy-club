@@ -6,6 +6,15 @@ import {IService} from "../../services/i.service";
 import {ToastService} from "../../services/toast.service";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
 
+const settingFields = [
+  'username',
+  'nickname',
+  'avatarUrl',
+  'bannerUrl',
+  'email',
+  'password',
+];
+
 @Component({
   selector: 'app-setting',
   templateUrl: './settings.component.html',
@@ -24,8 +33,7 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
-    self.iService.me.assignOut(self.settingsData);
+    this.copyMeToSettingsData();
   }
 
   confirmDisabled() {
@@ -43,8 +51,14 @@ export class SettingsComponent implements OnInit {
   }
 
   cancelSettings() {
+    this.copyMeToSettingsData();
+  }
+
+  copyMeToSettingsData() {
     const self = this;
-    self.iService.me.assignOut(self.settingsData);
+    for (const k of settingFields) {
+      self.settingsData[k] = self.iService.me[k];
+    }
   }
 
   async saveSettings() {

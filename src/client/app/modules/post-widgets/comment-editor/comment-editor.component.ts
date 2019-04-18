@@ -4,7 +4,7 @@ import {PostEditorComponent} from "../post-editor/post-editor.component";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
 import {IService} from "../../../services/i.service";
-import {getIconMenuOption, MenuActions} from "../../../../constants";
+import {getIconMenuOption, IconMenuOption, MenuActions} from "../../../../constants";
 import {CommentsApiService} from "../../../api/comments-api.service";
 import {ToastService} from "../../../services/toast.service";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
@@ -23,7 +23,7 @@ export class CommentEditorComponent implements OnInit {
   @Input() post: any;
   loading: boolean;
   menuBusy = false;
-  enabledActions: MenuActions[] = [];
+  enabledActions: IconMenuOption[] = [];
   plusAction: NullaryAsyncAction;
   unPlusAction: NullaryAsyncAction;
 

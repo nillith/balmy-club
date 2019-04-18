@@ -103,7 +103,7 @@ export class IService {
 
   updateUserData(data: UserData) {
     const self = this;
-    self.me.assign(data);
+    self.me = data;
     self.storage.saveObject(self.tokenContent.id, data);
   }
 
