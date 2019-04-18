@@ -6,7 +6,7 @@ import db from "../../persistence/index";
 import {$id, commentObfuscator, INVALID_NUMERIC_ID} from "../../service/obfuscator.service";
 import {ActivityModel} from "../../models/activity.model";
 import {NotificationModel, RawNotification} from "../../models/notification.model";
-import {CommentModel, CommentViewer} from "../../models/comment.model";
+import {CommentModel, CommentObserver} from "../../models/comment.model";
 import {getRequestUser} from "../../service/auth.service";
 
 
@@ -15,7 +15,7 @@ export const plusComment = async function(req: Request, res: Response, next: Nex
   const commentId = commentObfuscator.unObfuscate(id);
   if (INVALID_NUMERIC_ID !== commentId) {
     const observer = getRequestUser(req);
-    const postViewer: CommentViewer = {
+    const postViewer: CommentObserver = {
       commentId, observerId: observer[$id]
     };
     if (await CommentModel.isAccessible(postViewer)) {
@@ -49,7 +49,7 @@ export const unPlusComment = async function(req: Request, res: Response, next: N
   const commentId = commentObfuscator.unObfuscate(id);
   if (INVALID_NUMERIC_ID !== commentId) {
     const observer = getRequestUser(req);
-    const postViewer: CommentViewer = {
+    const postViewer: CommentObserver = {
       commentId, observerId: observer[$id]
     };
     if (await CommentModel.isAccessible(postViewer)) {

@@ -29,7 +29,7 @@ class UserStreamFetcher extends DefaultStreamFetcher {
             id: comment.authorId,
             nickname: comment.authorNickname,
             avatarUrl: comment.authorAvatarUrl,
-            isMe: this.iService.isMeById(comment.authorId),
+            isMe: this.iService.isMyId(comment.authorId),
           };
         }
       }

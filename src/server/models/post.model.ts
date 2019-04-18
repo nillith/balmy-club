@@ -203,6 +203,7 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 
 
   const ands = [
+    'Posts.deletedAt IS NULL',
     'Posts.createdAt < :timestamp',
   ];
 
@@ -215,7 +216,7 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 
 const GET_POST_BY_ID_SQL = (function() {
   const leftJoins = ['Posts LEFT JOIN Users ON (Posts.authorId = Users.id)'];
-  const ands = ['Posts.id = :postId'];
+  const ands = ['Posts.id = :postId', 'Posts.deletedAt IS NULL'];
   processVisibilityOption({
     withPrivatePost: true,
   }, ands, leftJoins);
@@ -224,7 +225,7 @@ const GET_POST_BY_ID_SQL = (function() {
 
 const IS_POST_ACCESSIBLE_SQL = (function() {
   const leftJoins = ['Posts'];
-  const ands = ['Posts.id = :postId'];
+  const ands = ['Posts.id = :postId', 'Posts.deletedAt IS NULL'];
   processVisibilityOption({
     withPrivatePost: true,
   }, ands, leftJoins);

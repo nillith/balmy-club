@@ -4,42 +4,11 @@ import {PostEditorComponent} from "../post-editor/post-editor.component";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
 import {IService} from "../../../services/i.service";
-
-const enum PostActions {
-  Edit,
-  Delete,
-  Mute,
-  UnMute,
-  Report,
-}
-
-const ActionOption = {
-  [PostActions.Edit]: {
-    action: PostActions.Edit,
-    icon: 'edit',
-    name: 'Edit'
-  },
-  [PostActions.Delete]: {
-    action: PostActions.Delete,
-    icon: 'delete',
-    name: 'Delete'
-  },
-  [PostActions.UnMute]: {
-    action: PostActions.UnMute,
-    icon: 'notifications_off',
-    name: 'Muted'
-  },
-  [PostActions.Mute]: {
-    action: PostActions.Mute,
-    icon: 'notifications_on',
-    name: 'Mute'
-  },
-  [PostActions.Report]: {
-    action: PostActions.Report,
-    icon: 'report',
-    name: 'Report'
-  }
-};
+import {getIconMenuOption, MenuActions} from "../../../../constants";
+import {CommentsApiService} from "../../../api/comments-api.service";
+import {ToastService} from "../../../services/toast.service";
+import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
+import {CommentResponse} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-comment-editor',
@@ -49,11 +18,14 @@ const ActionOption = {
 export class CommentEditorComponent implements OnInit {
 
   readonly StringIds = StringIds;
-  @Input() comment: CommentData;
+  @Input() comment: CommentResponse;
   @Input() editMode = false;
   @Input() post: any;
   loading: boolean;
-  enabledActions = [PostActions.Edit, PostActions.Mute, PostActions.UnMute, PostActions.Delete, PostActions.Report].map(action => ActionOption[action]);
+  menuBusy = false;
+  enabledActions: MenuActions[] = [];
+  plusAction: NullaryAsyncAction;
+  unPlusAction: NullaryAsyncAction;
 
   private editor: MarkdownEditorComponent;
 
@@ -62,13 +34,31 @@ export class CommentEditorComponent implements OnInit {
     this.editor = editor;
   }
 
-  constructor(private postEditor: PostEditorComponent, public iService: IService) {
+  constructor(private postEditor: PostEditorComponent,
+              public iService: IService,
+              private toast: ToastService,
+              private commentsApi: CommentsApiService) {
+    const self = this;
+    self.plusAction = async () => {
+      await self.commentsApi.plusOne(self.comment.id);
+      self.comment.plusedByMe = true;
+    };
 
+    self.unPlusAction = async () => {
+      await self.commentsApi.unPlusOne(self.comment.id);
+      self.comment.plusedByMe = false;
+    };
   }
 
   ngOnInit() {
+    const self = this;
     if (!this.post) {
       throw Error('post required!');
+    }
+    if (self.comment) {
+      if (self.iService.isMyId(self.comment.authorId)) {
+        self.enabledActions = getIconMenuOption([MenuActions.Edit, MenuActions.Delete]);
+      }
     }
   }
 
@@ -81,7 +71,7 @@ export class CommentEditorComponent implements OnInit {
   createComment() {
     this.comment = {
       content: ''
-    };
+    } as CommentResponse;
     this.toggleEditMode();
   }
 
@@ -108,9 +98,44 @@ export class CommentEditorComponent implements OnInit {
         self.post.comments.push(comment);
       }
     } catch (e) {
-      console.log(e);
+      self.toast.showToast(e.error || e.mentionIds);
     } finally {
       self.loading = false;
     }
+  }
+
+
+  async onMenu(action: MenuActions) {
+    const self = this;
+    try {
+      self.menuBusy = true;
+      switch (action) {
+        case MenuActions.Edit:
+          console.log('edit');
+          self.toggleEditMode();
+          break;
+        case MenuActions.Delete:
+          console.log('delete');
+          try {
+            console.log(self.comment);
+            if (self.comment.id) {
+              console.log('remote delete!');
+              await self.commentsApi.deleteCommentById(self.comment.id);
+            }
+            if (self.post.comments) {
+              const index = self.post.comments.indexOf(self.comment);
+              if (index !== -1) {
+                self.post.comments.splice(index, 1);
+              }
+            }
+          } catch (e) {
+            self.toast.showToast(e.error || e.mentionIds);
+          }
+          break;
+      }
+    } finally {
+      self.menuBusy = false;
+    }
+
   }
 }

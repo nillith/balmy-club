@@ -153,7 +153,7 @@ export class IService {
     return new CircleModel(self.http, self.me.id, self);
   }
 
-  isMeById(id: string): boolean {
+  isMyId(id: string): boolean {
     return id === this.me.id;
   }
 

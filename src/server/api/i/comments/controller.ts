@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import _ from 'lodash';
 import {isValidPostContent, utcTimestamp} from "../../../../shared/utils";
-import {$id, postObfuscator} from "../../../service/obfuscator.service";
+import {$id, commentObfuscator, INVALID_NUMERIC_ID, postObfuscator} from "../../../service/obfuscator.service";
 import {isNumericId, respondWith} from "../../../utils/index";
 import {isString} from "util";
 import db from "../../../persistence/index";
@@ -92,4 +92,17 @@ export const publishComment = async function(req: Request, res: Response, next: 
     }
   });
   respondWith(res, 200);
+};
+
+export const deleteCommentById = async function(req: Request, res: Response, next: NextFunction) {
+  const commentId = commentObfuscator.unObfuscate(req.params.id);
+  if (INVALID_NUMERIC_ID === commentId) {
+    return respondWith(res, 404);
+  }
+  const author = getRequestUser(req);
+  const result = await CommentModel.deleteCommentById({
+    commentId,
+    authorId: author[$id]
+  });
+  return respondWith(res, result ? 200 : 404);
 };

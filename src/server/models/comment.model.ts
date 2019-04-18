@@ -17,6 +17,7 @@ import {
   obfuscatorFuns
 } from "../service/obfuscator.service";
 import {PostViewer} from "./post.model";
+import {utcTimestamp} from "../../shared/utils";
 
 
 export interface PublishCommentData {
@@ -83,23 +84,34 @@ const assertValidRawComment = devOnly(function(data: any) {
 });
 
 
-const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl, CommentPlusOnes.id IS NOT NULL AS plusedByMe FROM Comments LEFT JOIN (SELECT * FROM CommentPlusOnes WHERE userId = :observerId) CommentPlusOnes ON (Comments.id = CommentPlusOnes.commentId) LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :observerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)))';
+const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl, CommentPlusOnes.id IS NOT NULL AS plusedByMe FROM (SELECT * FROM Comments WHERE deletedAt IS NULL) Comments LEFT JOIN (SELECT * FROM CommentPlusOnes WHERE userId = :observerId) CommentPlusOnes ON (Comments.id = CommentPlusOnes.commentId) LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :observerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)))';
 
 const IS_COMMENT_ACCESSIBLE_SQL = 'SELECT id FROM Comments WHERE id = :commentId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
 
-export interface CommentViewer {
+export interface CommentObserver {
   commentId: number;
   observerId: number;
 }
 
 const assertValidCommentViewer = devOnly(function(params: any) {
-  console.assert(isNumericId(params.commentId), `invalid commentId ${params.postId}`);
+  console.assert(isNumericId(params.commentId), `invalid commentId ${params.commentId}`);
   console.assert(isNumericId(params.observerId), `invalid observerId ${params.observerId}`);
 });
 
 const enum SQLs {
   INSERT = 'INSERT INTO Comments (postId, authorId, content, createdAt, mentionIds) VALUES(:postId, :authorId, :content, :createdAt, :mentionIds)',
+  DELETE = 'UPDATE Comments SET deletedAt = :timestamp WHERE id = :commentId AND authorId = :authorId'
 }
+
+export interface CommentAuthor {
+  commentId: number;
+  authorId: number;
+}
+
+const assertValidCommentOwner = devOnly(function(params: any) {
+  console.assert(isNumericId(params.commentId), `invalid commentId ${params.commentId}`);
+  console.assert(isNumericId(params.authorId), `invalid authorId ${params.authorId}`);
+});
 
 export class CommentModel {
   static async insert(raw: RawComment, drive: DatabaseDriver = db): Promise<number> {
@@ -114,9 +126,17 @@ export class CommentModel {
     });
   }
 
-  static async isAccessible(params: CommentViewer, driver: DatabaseDriver = db): Promise<boolean> {
+  static async isAccessible(params: CommentObserver, driver: DatabaseDriver = db): Promise<boolean> {
     assertValidCommentViewer(params);
     const [rows] = await driver.query(IS_COMMENT_ACCESSIBLE_SQL, params);
     return !!rows && !!rows[0] && !!rows[0].id;
+  }
+
+  static async deleteCommentById(params: CommentAuthor, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidCommentOwner(params);
+    const replacements = Object.create(params);
+    replacements.timestamp = utcTimestamp();
+    const [rows] = await driver.query(SQLs.DELETE as string, replacements) as any;
+    return rows.affectedRows === 1;
   }
 }

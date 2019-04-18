@@ -19,16 +19,14 @@
     </div>
     <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
       <div class="app-fill-space"></div>
-      <button mat-icon-button color="accent">
-        <mat-icon>plus_one</mat-icon>
-      </button>
-      <button mat-icon-button [matMenuTriggerFor]="menu">
+      <app-plus-one-button [initialOn]="comment.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
+      <button [disabled]="menuBusy" mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
-        <button mat-menu-item *ngFor="let m of enabledActions" (click)="onMenu(m.action)">
+        <button [disabled]="menuBusy" mat-menu-item *ngFor="let m of enabledActions" (click)="onMenu(m.action)">
           <mat-icon>{{m.icon}}</mat-icon>
-          <span>{{m.name}}</span>
+          <span>{{m.name | i18n}}</span>
         </button>
       </mat-menu>
     </div>

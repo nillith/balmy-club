@@ -47,7 +47,7 @@ export class DefaultStreamFetcher {
         id: post.authorId,
         nickname: post.authorNickname,
         avatarUrl: post.authorAvatarUrl,
-        isMe: this.iService.isMeById(post.authorId),
+        isMe: this.iService.isMyId(post.authorId),
       };
       if (post.comments) {
         for (const comment of post.comments) {
@@ -55,7 +55,7 @@ export class DefaultStreamFetcher {
             id: comment.authorId,
             nickname: comment.authorNickname,
             avatarUrl: comment.authorAvatarUrl,
-            isMe: this.iService.isMeById(comment.authorId),
+            isMe: this.iService.isMyId(comment.authorId),
           };
         }
       }
