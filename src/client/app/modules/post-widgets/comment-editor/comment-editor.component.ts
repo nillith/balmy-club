@@ -8,7 +8,7 @@ import {getIconMenuOption, IconMenuOption, MenuActions} from "../../../../consta
 import {CommentsApiService} from "../../../api/comments-api.service";
 import {ToastService} from "../../../services/toast.service";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
-import {CommentResponse} from "../../../../../shared/contracts";
+import {CommentResponse, MinimumUser} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-comment-editor',
@@ -26,6 +26,7 @@ export class CommentEditorComponent implements OnInit {
   enabledActions: IconMenuOption[] = [];
   plusAction: NullaryAsyncAction;
   unPlusAction: NullaryAsyncAction;
+  @Input() contextUsers: MinimumUser[] = [];
 
   private editor: MarkdownEditorComponent;
 
@@ -111,15 +112,11 @@ export class CommentEditorComponent implements OnInit {
       self.menuBusy = true;
       switch (action) {
         case MenuActions.Edit:
-          console.log('edit');
           self.toggleEditMode();
           break;
         case MenuActions.Delete:
-          console.log('delete');
           try {
-            console.log(self.comment);
             if (self.comment.id) {
-              console.log('remote delete!');
               await self.commentsApi.deleteCommentById(self.comment.id);
             }
             if (self.post.comments) {

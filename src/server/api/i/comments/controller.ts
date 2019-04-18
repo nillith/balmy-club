@@ -49,7 +49,6 @@ export const publishComment = async function(req: Request, res: Response, next: 
 
   const timestamp = utcTimestamp();
   const comment = new CommentBuilder(commenter[$id], payload.postId, payload.content, timestamp);
-
   const [mentions, rawComment] = await comment.build();
   const commenterIds = await PostModel.getOtherCommenterIds(postViewer);
   await db.inTransaction(async (connection) => {

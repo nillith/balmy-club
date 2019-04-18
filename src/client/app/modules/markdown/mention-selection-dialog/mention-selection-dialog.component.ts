@@ -3,8 +3,11 @@ import {UserNickname} from "../../../../../shared/interf";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {IService} from "../../../services/i.service";
 import {makeBackdropTransparent} from "../../../../utils/index";
+import {MinimumUser} from "../../../../../shared/contracts";
 
 export interface MentionSelectionListener {
+  contextUsers: MinimumUser[];
+
   onUserSelected(user: UserNickname): void;
 }
 
@@ -17,32 +20,8 @@ const gap = 4;
 })
 export class MentionSelectionDialogComponent implements OnInit {
 
-  allUsers: UserNickname[] = [
-    {
-      id: 'b1f7fe3e36e5802ea357744104734340',
-      nickname: 'Mike',
-    },
-    {
-      id: 'ec25aafdb1ca400b4f4b75cc33519b34',
-      nickname: 'Jim',
-    },
-    {
-      id: 'ff7dccafda927571b09a7e21bc4041ea',
-      nickname: 'Mary',
-    },
-    {
-      id: 'b1f7fe3e36e5802ea357744104734340',
-      nickname: 'Tom',
-    },
-    {
-      id: 'ec25aafdb1ca400b4f4b75cc33519b34',
-      nickname: 'Jay',
-    },
-    {
-      id: 'ff7dccafda927571b09a7e21bc4041ea',
-      nickname: 'Malina',
-    }
-  ];
+  allUsers: MinimumUser[] = [];
+  contextUsers: MinimumUser[] = [];
   filteredUsers?: UserNickname[];
   private anchor: HTMLElement;
   selectionListener?: MentionSelectionListener;
@@ -50,10 +29,16 @@ export class MentionSelectionDialogComponent implements OnInit {
 
   constructor(public hostElement: ElementRef,
               public dialogRef: MatDialogRef<MentionSelectionDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) data: { anchor: HTMLElement },
+              @Inject(MAT_DIALOG_DATA) data: {
+                anchor: HTMLElement,
+                contextUsers: MinimumUser[]
+              },
               public i: IService) {
-    this.anchor = data.anchor;
-    this.filteredUsers = this.allUsers;
+    const self = this;
+    self.anchor = data.anchor;
+    self.contextUsers = data.contextUsers;
+    self.allUsers = self.contextUsers.concat(self.i.allUsers);
+    self.filteredUsers = self.allUsers;
   }
 
 

@@ -19,7 +19,7 @@
   <mat-card-content fxLayout="column">
     <div *ngIf="editMode">
       <div class="markdown-editor-container">
-        <app-markdown-editor #markdownEditor [content]="post.content"></app-markdown-editor>
+        <app-markdown-editor #markdownEditor [content]="post.content" [contextUsers]="post.contextUsers"></app-markdown-editor>
         <mat-divider></mat-divider>
         <mat-card-actions align="end" class="post-editor-content-section">
           <button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}</button>
@@ -48,11 +48,11 @@
       <div [ngClass]="{'limit-comment-height':limitCommentHeight}">
         <div *ngFor="let comment of post.comments; let i = index">
           <hr class="comment-hr">
-          <app-comment-editor id="{{comment.id}}" [comment]="comment" [post]="post"></app-comment-editor>
+          <app-comment-editor id="{{comment.id}}" [comment]="comment" [post]="post" [contextUsers]="contextUsers"></app-comment-editor>
         </div>
       </div>
     </mat-expansion-panel>
   </div>
   <mat-divider></mat-divider>
-  <app-comment-editor [comment]="comment" [post]="post"></app-comment-editor>
+  <app-comment-editor [comment]="comment" [post]="post" [contextUsers]="post.contextUsers"></app-comment-editor>
 </mat-card>

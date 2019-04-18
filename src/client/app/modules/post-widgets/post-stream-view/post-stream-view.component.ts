@@ -49,6 +49,8 @@ export class DefaultStreamFetcher {
         avatarUrl: post.authorAvatarUrl,
         isMe: this.iService.isMyId(post.authorId),
       };
+      post.contextUsers = [];
+      post.contextUsers.push(post.author);
       if (post.comments) {
         for (const comment of post.comments) {
           comment.author = {
@@ -57,6 +59,7 @@ export class DefaultStreamFetcher {
             avatarUrl: comment.authorAvatarUrl,
             isMe: this.iService.isMyId(comment.authorId),
           };
+          post.contextUsers.push(comment.author);
         }
       }
     }

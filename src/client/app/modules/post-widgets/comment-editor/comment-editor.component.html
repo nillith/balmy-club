@@ -4,7 +4,7 @@
   </div>
   <div class="app-fill-space">
     <div *ngIf="editMode && comment">
-      <app-markdown-editor #markdownEditor [initialFocus]="true" [content]="comment.content"></app-markdown-editor>
+      <app-markdown-editor #markdownEditor [initialFocus]="true" [content]="comment.content" [contextUsers]="contextUsers"></app-markdown-editor>
       <mat-card-actions align="end">
         <button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}</button>
         <button mat-raised-button (click)="saveEdit()">{{StringIds.Publish | i18n}}</button>

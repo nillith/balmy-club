@@ -110,6 +110,7 @@ export interface PostResponse extends TextContentResponse {
   visibility: PostVisibilities;
   reShareCount: number;
   comments: CommentResponse[];
+  contextUsers?: MinimumUser[];
 }
 
 export interface NotificationResponse {

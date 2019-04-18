@@ -1,12 +1,11 @@
 import {Component, Input, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
-import {PostData} from "../../../../../shared/interf";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
 import {PostsApiService} from "../../../api/posts-api.service";
 import {noop} from "../../../../../shared/utils";
 import {getIconMenuOption, MenuActions} from "../../../../constants";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
-import {PostResponse} from "../../../../../shared/contracts";
+import {MinimumUser, PostResponse} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-post-editor',
@@ -24,6 +23,7 @@ export class PostEditorComponent implements OnInit {
   @Input() showComments = true;
   plusAction: NullaryAsyncAction;
   unPlusAction: NullaryAsyncAction;
+
 
 
   notifyParent = noop;

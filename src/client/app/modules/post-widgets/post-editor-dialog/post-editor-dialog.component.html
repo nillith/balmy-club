@@ -22,7 +22,7 @@
     <div class="app-fill-space"></div>
   </div>
   <mat-divider></mat-divider>
-  <app-markdown-editor class="post-editor-dialog-content" [disabled]="loading" #markdownEditor [content]="post.content"></app-markdown-editor>
+  <app-markdown-editor class="post-editor-dialog-content" [disabled]="loading" #markdownEditor [content]="post.content" [contextUsers]="contextUsers"></app-markdown-editor>
   <mat-divider></mat-divider>
   <div class="post-editor-dialog-action" fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="15px">
     <div class="app-fill-space"></div>

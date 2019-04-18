@@ -25,6 +25,7 @@ export class IService {
   public circles: CircleModel[] = [];
   private storage?: DataStorage;
   public loading = false;
+  public allUsers: MinimumUser[] = [];
 
 
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
@@ -63,6 +64,16 @@ export class IService {
     for (const c of self.circles) {
       c.buildLookTable();
     }
+
+    const users: any = {};
+    for (const c of self.circles) {
+      if (c.users) {
+        for (const u of c.users) {
+          users[u.id] = u;
+        }
+      }
+    }
+    self.allUsers = Object.values(users) as MinimumUser[];
   }
 
   private unpackToken(token: string) {

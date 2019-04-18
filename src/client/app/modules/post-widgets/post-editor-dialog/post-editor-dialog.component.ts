@@ -7,6 +7,7 @@ import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-e
 import {ToastService} from "../../../services/toast.service";
 import {MAX_POST_LENGTH} from "../../../../../shared/constants";
 import {StringIds} from "../../i18n/translations/string-ids";
+import {MinimumUser} from "../../../../../shared/contracts";
 
 const VisibilityText = {
   [PostVisibilities.Public]: StringIds.Public,
@@ -41,6 +42,7 @@ export class PostEditorDialogComponent implements OnInit {
   @ViewChild('visibilitySelector') visibilitySelector: MatSelect;
   @ViewChild('circleSelector') circleSelector: MatSelect;
   visibilityOptions = VisibilityOptions;
+  contextUsers: MinimumUser[] = [];
 
   @ViewChild('markdownEditor')
   private editor: MarkdownEditorComponent;

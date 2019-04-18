@@ -4,6 +4,7 @@ import {MarkdownEditor, MarkdownService} from "../markdown.service";
 import {MentionSelectionDialogService} from "../mention-selection-dialog/mention-selection-dialog.service";
 import {MentionSelectionListener} from "../mention-selection-dialog/mention-selection-dialog.component";
 import {UserNickname} from "../../../../../shared/interf";
+import {MinimumUser} from "../../../../../shared/contracts";
 
 @Component({
   selector: 'app-markdown-editor',
@@ -17,6 +18,7 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
   @Input() placeholder = '';
   @Input() initialFocus = false;
   @Input() content = '';
+  @Input() contextUsers: MinimumUser[] = [];
 
   private __disabled = false;
 

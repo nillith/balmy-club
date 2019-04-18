@@ -114,7 +114,8 @@ export class MentionSelectionDialogPopper extends MentionTriggerThrottle {
     const {matDialog} = self;
     const userSelectionDialog = matDialog.open(MentionSelectionDialogComponent, {
       data: {
-        anchor: self.sourceElement.querySelector('.CodeMirror-cursor')
+        anchor: self.sourceElement.querySelector('.CodeMirror-cursor'),
+        contextUsers: self.selectionListener.contextUsers
       },
     });
     userSelectionDialog.componentInstance.selectionListener = self.selectionListener;
