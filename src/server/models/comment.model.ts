@@ -86,7 +86,7 @@ const assertValidRawComment = devOnly(function(data: any) {
 
 const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl, CommentPlusOnes.id IS NOT NULL AS plusedByMe FROM (SELECT * FROM Comments WHERE deletedAt IS NULL) Comments LEFT JOIN (SELECT * FROM CommentPlusOnes WHERE userId = :observerId) CommentPlusOnes ON (Comments.id = CommentPlusOnes.commentId) LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :observerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)))';
 
-const IS_COMMENT_ACCESSIBLE_SQL = 'SELECT id FROM Comments WHERE id = :commentId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
+const IS_COMMENT_ACCESSIBLE_SQL = 'SELECT id FROM Comments WHERE id = :commentId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
 
 export interface CommentObserver {
   commentId: number;

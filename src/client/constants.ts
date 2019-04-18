@@ -46,6 +46,7 @@ export const API_URLS = {
   NOTIFICATIONS: 'api/i/notifications',
   MY_COMMENTS: 'api/i/comments',
   HOME_TIMELINE: 'api/i/home-timeline',
+  COMMENTS: 'api/comments',
   USERS: 'api/users',
   LOGIN: 'auth/local',
   ACCOUNT: 'api/account'
