@@ -83,6 +83,7 @@ export const userObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfus
 export const postObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.post);
 export const commentObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.comment);
 export const circleObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.circle);
+export const notificationObfuscator = new UnsignedIntegerObfuscator(config.secrets.obfuscator.notification);
 export const batchUserObfuscator = new BatchObfuscator(userObfuscator);
 export const batchCircleObfuscator = new BatchObfuscator(circleObfuscator);
 

@@ -158,7 +158,6 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
       postId: p[$id],
       observerId: observer[$id]
     });
-    console.log(p.comments);
   }
   respondWith(res, 200, JSON.stringify(posts));
 };

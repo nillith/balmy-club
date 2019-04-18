@@ -49,6 +49,7 @@ export const config = {
       post: env.OBFUSCATOR_SECRET_POST,
       circle: env.OBFUSCATOR_SECRET_CIRCLE,
       comment: env.OBFUSCATOR_SECRET_COMMENT,
+      notification: env.OBFUSCATOR_SECRET_NOTIFICATION,
     }
   },
   password: {
