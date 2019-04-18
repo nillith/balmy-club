@@ -203,7 +203,7 @@ export class IService {
       return;
     }
     const self = this;
-    await self.http.patch(API_URLS.CIRCLES, {
+    await self.http.patch(`${API_URLS.CIRCLES}/user`, {
       userId: user.id,
       addCircleIds,
       removeCircleIds

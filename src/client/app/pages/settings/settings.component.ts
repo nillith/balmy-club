@@ -6,6 +6,11 @@ import {IService} from "../../services/i.service";
 import {ToastService} from "../../services/toast.service";
 import {StringIds} from "../../modules/i18n/translations/string-ids";
 
+
+interface ChangeSettingsData extends ChangeSettingsRequest {
+  passwordConfirm?: string;
+}
+
 const settingFields = [
   'username',
   'nickname',
@@ -26,7 +31,7 @@ export class SettingsComponent implements OnInit {
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;
   @ViewChild('password') passwordModel: NgModel;
   readonly appConstants = appConstants;
-  settingsData: ChangeSettingsRequest = {};
+  settingsData: ChangeSettingsData = {};
   loading = false;
 
   constructor(public iService: IService, private toastService: ToastService) {

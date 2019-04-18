@@ -70,7 +70,7 @@ function createMentionRegexp() {
 }
 
 const assertSanitizeParams = devOnly(function(model: any, mentions: Mentions) {
-  console.assert(isNumericId(model.authorId), `invalid authorId ${model.authorId}`);
+  console.assert(isNumericId(model[$authorId]), `invalid authorId ${model[$authorId]}`);
   console.assert(model.content, `empty content`);
   console.assert(mentions && mentions.length, `empty mentions`);
   const mentionsMsg = `invalid mentions ${JSON.stringify(mentions)}`;

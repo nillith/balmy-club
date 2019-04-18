@@ -45,7 +45,7 @@ export class PostEditorDialogComponent implements OnInit {
   contextUsers: MinimumUser[] = [];
 
   @ViewChild('markdownEditor')
-  private editor: MarkdownEditorComponent;
+  editor: MarkdownEditorComponent;
 
   constructor(public dialogRef: MatDialogRef<PostEditorDialogComponent>,
               @Inject(MAT_DIALOG_DATA) data: { post: PostModel },

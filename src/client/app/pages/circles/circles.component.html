@@ -27,7 +27,7 @@
                 (click)="onRemoveUser(i)">
           <mat-icon>cancel</mat-icon>
         </button>
-        <app-avatar [user]="user"></app-avatar>
+        <app-avatar [user]="user" [size]="72"></app-avatar>
       </mat-card>
       <mat-card class="user-name" fxLayout="row" fxLayoutAlign="center center">
         <a href="{{user.link}}">{{user.nickname}}</a>

@@ -1,4 +1,4 @@
-import {isValidTimestamp, makeInstance} from "../../shared/utils";
+import {isValidTimestamp} from "../../shared/utils";
 import {
   $authorId,
   $id,
@@ -293,8 +293,7 @@ export class PostModel {
   static async getOtherCommenterIds(params: PostViewer, driver: DatabaseDriver = db): Promise<number[]> {
     assertValidPostViewer(params);
     const [rows] = await driver.query(POST_OTHER_COMMENTER_IDS_SQL, params);
-
-    return rows as any as number[];
+    return _.map(rows as any[], row => row.id);
   }
 
   reShareFromPostId?: number | string;

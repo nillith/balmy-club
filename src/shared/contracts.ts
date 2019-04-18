@@ -69,10 +69,10 @@ export interface LoginResponse {
 export interface ChangeSettingsRequest {
   email?: string;
   password?: string;
-  passwordConfirm?: string;
   username?: string;
   nickname?: string;
   avatarUrl?: string;
+  bannerUrl?: string;
 }
 
 
