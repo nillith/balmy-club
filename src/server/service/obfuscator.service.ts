@@ -1,6 +1,6 @@
 import config from "../config/index";
 import crypto from 'crypto';
-import {isValidStringId, makeInstance} from "../../shared/utils";
+import {isValidStringId} from "../../shared/utils";
 import {isString} from "util";
 import _ from 'lodash';
 
@@ -19,7 +19,6 @@ export const unsignedIntegerToBuffer = function(n: number): Buffer {
 export const bufferToUnsignedInteger = function(buf: Buffer): number {
   return parseInt(buf.toString('HEX'), RADIX);
 };
-
 
 
 const $key = Symbol();
@@ -110,46 +109,55 @@ const haveDuplicateIdNameObfuscatorMap = function(maps: IdNameObfuscatorMap[]) {
   return false;
 };
 
-export const obfuscatorFuns = function <T>(maps: IdNameObfuscatorMap[], t: { new(...arg: any[]): T }) {
+export const obfuscatorFuns = function(maps: IdNameObfuscatorMap[]) {
   if (haveDuplicateIdNameObfuscatorMap(maps)) {
     throw Error("DuplicateIdNameObfuscatorMap");
   }
 
-  const unObfuscateFrom = function(obj: object): T | undefined {
-    if (!obj) {
-      return;
-    }
-
-    for (const {name, obfuscator} of maps) {
-      const v = obj[name];
+  const unObfuscateCloneFrom = function(this: any, from: any): boolean {
+    const to = this;
+    for (const {name, symbol, obfuscator} of maps) {
+      const v = from[name];
       if (v) {
         const id = obfuscator.unObfuscate(v);
         if (INVALID_NUMERIC_ID === id) {
-          return;
+          return false;
         }
-        obj[name] = id;
+        to[symbol] = id;
       }
     }
 
-    return makeInstance(obj, t);
+    return true;
   };
 
-  const obfuscate = function(this: T) {
+  const obfuscateCloneTo = function(this: any, to: any) {
+    const from = this;
     for (const {name, symbol, obfuscator} of maps) {
-      const v = this[name];
+      const v = from[symbol];
       if (v) {
-        this[symbol] = obfuscator.obfuscate(v);
+        to[name] = obfuscator.obfuscate(v);
+      }
+    }
+  };
+
+  const hideCloneFrom = function(this: any, from: any) {
+    const to = this;
+    for (const {name, symbol} of maps) {
+      const v = from[name];
+      if (v) {
+        to[symbol] = v;
       }
     }
   };
 
   return {
-    unObfuscateFrom,
-    obfuscate
+    unObfuscateCloneFrom,
+    obfuscateCloneTo,
+    hideCloneFrom,
   };
 };
 
-export const $outboundFields = Symbol();
+export const $outboundCloneFields = Symbol();
 export const $obfuscator = Symbol();
 export const $id = Symbol('id');
 export const $postId = Symbol('$postId');
@@ -184,7 +192,7 @@ const USER_IDS = new IdNameObfuscatorMap($userIds, batchUserObfuscator);
 export const USER_OBFUSCATE_MAPS = [ID_USER];
 export const POST_OBFUSCATE_MAPS = [ID_POST, AUTHOR_ID, RE_SHARE_FROM_POST_ID, SHARE_CIRCLE_IDS];
 export const COMMENT_OBFUSCATE_MAPS = [ID_COMMENT, POST_ID, AUTHOR_ID];
-export const CIRCLE_OBFUSCATE_MAPS = [ID_CIRCLE, OWNER_ID, USER_IDS];
+export const CIRCLE_OBFUSCATE_MAPS = [ID_CIRCLE, USER_IDS];
 
 
 export interface JsonFieldMap {

@@ -3,10 +3,10 @@ import {assert} from 'chai';
 import {
   MentionableUsers,
   Mentions,
-  sanitizeContentMentions,
-  TextContentModel,
+  sanitizeContentMentions, TextContentBuilder,
   unObfuscateIdAnReturnValidMentions
 } from "./text-content.model";
+import {utcTimestamp} from "../../shared/utils";
 
 const createValidMentions = function() {
   const results: any[] = [
@@ -94,8 +94,7 @@ describe('TextContentModel', () => {
   });
 
   it('should get all mentions', () => {
-    const textContent = new TextContentModel();
-    textContent.content = content;
+    const textContent = new TextContentBuilder(1, content, utcTimestamp());
     const mentions = textContent.extractMentionsFromContent();
     assert.isAtLeast(mentions.length, 1);
     assert.strictEqual(mentions.length, validMentions.length);
@@ -115,8 +114,7 @@ describe('TextContentModel', () => {
       assert.strictEqual(c.obfuscatedId, v.obfuscatedId);
       idNicknameMap[c.obfuscatedId] = c.nickname;
     }
-    const textContent = new TextContentModel();
-    textContent.content = sanitizeContentMentions(content, idNicknameMap);
+    const textContent = new TextContentBuilder(1, sanitizeContentMentions(content, idNicknameMap), utcTimestamp());
     const mentions = textContent.extractMentionsFromContent();
     assert.strictEqual(mentions.length, clonedMentions.length);
 
@@ -139,8 +137,7 @@ describe('TextContentModel', () => {
   };
 
   it('should not remove allowed mentions', () => {
-    const textContent = new TextContentModel();
-    textContent.content = content;
+    const textContent = new TextContentBuilder(1, content, utcTimestamp());
     let mentions = textContent.__sanitizeContentMentions(validMentions, makeMentionableUsers(validMentions));
     assert.isTrue(isNonEmptySameMentions(mentions, validMentions));
     assert.isTrue(isNonEmptySameMentions(validMentions, textContent.extractMentionsFromContent()));
@@ -151,8 +148,7 @@ describe('TextContentModel', () => {
     assert.strictEqual(allowedMentions.length, validMentions.length - 1);
     assert.isAtLeast(allowedMentions.length, 1);
 
-    const textContent = new TextContentModel();
-    textContent.content = content;
+    const textContent = new TextContentBuilder(1, content, utcTimestamp());
     let mentions = textContent.__sanitizeContentMentions(validMentions, makeMentionableUsers(allowedMentions));
     assert.isTrue(isNonEmptySameMentions(mentions, allowedMentions));
 

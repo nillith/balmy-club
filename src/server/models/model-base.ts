@@ -1,70 +1,78 @@
-import {$id, $outboundFields} from '../service/obfuscator.service';
-import {isNumber, isSymbol} from "util";
+import {$id, $outboundCloneFields} from '../service/obfuscator.service';
 import {Connection, Pool} from 'mysql2/promise';
-import {OutboundData} from "../init";
+import {devOnly, isNumericId} from "../utils/index";
+import {cloneFields} from "../../shared/utils";
 
 
 export type DatabaseDriver = Connection | Pool;
 
-export interface FieldMap {
-  from: string | symbol;
-  to: string;
+export interface Observer {
+  observerId: number;
 }
 
-type FieldMaps = FieldMap[];
+export interface Observation extends Observer {
+  targetId: number;
+}
 
+export const assertValidObservation = devOnly(function(data: any) {
+  console.assert(isNumericId(data.targetId), `invalid targetId: ${data.targetId}`);
+  console.assert(isNumericId(data.observerId), `invalid targetId: ${data.observerId}`);
+});
 
-export const makeFieldMaps = function(fields: Array<string | symbol>): FieldMaps {
-  const toMap: any = {};
-  return fields.map(from => {
-    const to = isSymbol(from) ? (from as any).description : from;
-    if (!to) {
-      throw Error('Invalid FieldMap');
-    }
-    if (toMap[to]) {
-      throw Error(`Duplicate key: ${to}`);
-    }
-    toMap[to] = true;
-    return {from, to};
-  });
-};
+export const assertValidId = devOnly(function(id: any) {
+  console.assert(isNumericId(id), `invalid id: ${id}`);
+});
 
-export const cloneByFieldMaps = function(obj: any, fields: FieldMaps) {
-  const result: any = {};
-  for (const {from, to} of fields) {
-    if (undefined !== obj[from]) {
-      result[to] = obj[from];
-    }
+export class DatabaseRecordBase {
+  static readonly [$outboundCloneFields]: string[] = [];
+  [$id]: number;
+
+  constructor(id: number) {
+    this[$id] = id;
   }
+
+  unObfuscateCloneFrom(obj: any): void {
+    throw Error('Not Implemented!');
+  }
+
+  obfuscateCloneTo(obj: any): void {
+    throw Error('Not Implemented!');
+  }
+
+  hideCloneFrom(obj: any): void {
+    throw Error('Not Implemented!');
+  }
+
+  toJSON() {
+    const self = this;
+    const result: any = {};
+    cloneFields(self, self.constructor[$outboundCloneFields], result);
+    self.obfuscateCloneTo(result);
+    return result;
+  }
+
+  assign(from: any) {
+    const self = this;
+    cloneFields(from, self.constructor[$outboundCloneFields], self);
+    self.hideCloneFrom(from);
+  }
+
+  unObfuscateAssign(from: any) {
+    const self = this;
+    cloneFields(from, self.constructor[$outboundCloneFields], self);
+    self.unObfuscateCloneFrom(from);
+  }
+}
+
+(DatabaseRecordBase as any)[$outboundCloneFields] = null;
+
+export async function insertReturnId(sql: string, replacements: any, driver: DatabaseDriver): Promise<number> {
+  const [result] = await driver.query(sql, replacements);
+  return (result as any).insertId;
+}
+
+export const fromDatabaseRow = function <T extends DatabaseRecordBase>(row: any, t: { new(...arg: any[]): T }): T {
+  const result = Object.create(t.prototype);
+  result.assign(row);
   return result;
 };
-
-export const jsonStringifyByFields = function(obj: any, fields: FieldMaps) {
-  return JSON.stringify(cloneByFieldMaps(obj, fields));
-};
-
-
-export abstract class ModelBase extends OutboundData {
-  id?: number | string;
-  [$id]?: string;
-
-  isNew() {
-    return !this.id;
-  }
-
-  obfuscate() {
-    throw Error('Not implemented');
-  }
-
-  getOutboundData(): any {
-    const self = this;
-    self.obfuscate();
-    return cloneByFieldMaps(self, self.constructor[$outboundFields]);
-  }
-
-  protected async insertIntoDatabaseAndRetrieveId(driver: DatabaseDriver, sql: string, replacements: any): Promise<void> {
-    const [result] = await driver.query(sql, replacements);
-    this.id = (result as any).insertId;
-    console.assert(isNumber(this.id));
-  }
-}

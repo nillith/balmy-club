@@ -4,7 +4,7 @@ const deviation = 20;
 export class SwitchDebouncer {
   private checkpoint = 0;
   private pending = false;
-  private snapshotState:boolean;
+  private snapshotState: boolean;
 
   constructor(public isOn: boolean, private onAction: NullaryAsyncAction, private offAction: NullaryAsyncAction, private delay: number = 233) {
     this.snapshotState = isOn;
@@ -18,12 +18,14 @@ export class SwitchDebouncer {
       const delta = self.delay - elapsed;
       if (delta < deviation) {
         try {
-          if (self.isOn) {
-            await self.onAction();
-          } else {
-            await self.offAction();
+          if (self.isOn !== self.snapshotState) {
+            if (self.isOn) {
+              await self.onAction();
+            } else {
+              await self.offAction();
+            }
+            self.snapshotState = self.isOn;
           }
-          self.snapshotState = self.isOn;
         } catch (e) {
           console.log(e);
           self.isOn = self.snapshotState;

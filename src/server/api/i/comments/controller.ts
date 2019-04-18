@@ -1,23 +1,20 @@
 import {NextFunction, Request, Response} from "express";
 import _ from 'lodash';
 import {isValidPostContent, utcTimestamp} from "../../../../shared/utils";
-import {postObfuscator} from "../../../service/obfuscator.service";
+import {$id, postObfuscator} from "../../../service/obfuscator.service";
 import {isNumericId, respondWith} from "../../../utils/index";
 import {isString} from "util";
-import {$user} from "../../../constants/symbols";
-import {CommentModel} from "../../../models/comment.model";
 import db from "../../../persistence/index";
 import {Activity} from "../../../../shared/interf";
-import {ActivityModel} from "../../../models/activity.model";
-import {NotificationModel} from "../../../models/notification.model";
 import {PostModel, PostViewer} from "../../../models/post.model";
+import {ActivityModel, RawActivity} from "../../../models/activity.model";
+import {BroadcastParams, NotificationModel, RawNotification} from "../../../models/notification.model";
+import {CommentBuilder, CommentModel, PublishCommentData} from "../../../models/comment.model";
+import {getRequestUser} from "../../../service/auth.service";
+import {PublishCommentRequest} from "../../../../shared/contracts";
 
-export interface PublishCommentRequestPayload {
-  postId: number;
-  content: string;
-}
 
-const getNewCommentPayloadOrErr = function(body: any): PublishCommentRequestPayload | string {
+const getNewCommentPayloadOrErr = function(body: PublishCommentRequest): PublishCommentData | string {
   let {postId, content} = body;
   content = _.trim(content);
 
@@ -26,11 +23,11 @@ const getNewCommentPayloadOrErr = function(body: any): PublishCommentRequestPayl
     return `invalid comment length`;
   }
 
-  postId = postObfuscator.unObfuscate(postId);
-  if (!isNumericId(postId)) {
+  const postNumId = postObfuscator.unObfuscate(postId);
+  if (!isNumericId(postNumId)) {
     return `invalid id`;
   }
-  return {postId, content};
+  return {postId: postNumId, content};
 };
 
 
@@ -41,47 +38,57 @@ export const publishComment = async function(req: Request, res: Response, next: 
     return respondWith(res, 400, payload);
   }
 
-  const commenter = req[$user];
+  const commenter = getRequestUser(req);
   const postViewer: PostViewer = {
     postId: payload.postId,
-    viewerId: commenter.id
+    observerId: commenter[$id]
   };
-  if (await PostModel.isAccessible(postViewer)) {
+  if (!await PostModel.isAccessible(postViewer)) {
     return respondWith(res, 400);
   }
 
-  const comment = new CommentModel();
   const timestamp = utcTimestamp();
-  comment.postId = postViewer.postId;
-  comment.authorId = commenter.id;
-  comment.createdAt = timestamp;
-  comment.content = payload.content;
+  const comment = new CommentBuilder(commenter[$id], payload.postId, payload.content, timestamp);
 
-  let mentions = comment.extractMentionsFromContent();
-  if (!_.isEmpty(mentions)) {
-    mentions = await comment.sanitizeContentMentions(mentions);
-  }
-  comment.mentionIds = mentions.map((m) => m.id);
-  const commenterIds = PostModel.getOtherCommenterIds(postViewer);
+  const [mentions, rawComment] = await comment.build();
+  const commenterIds = await PostModel.getOtherCommenterIds(postViewer);
   await db.inTransaction(async (connection) => {
-    await comment.insertIntoDatabase(connection);
-    const commentActivity = new ActivityModel(commenter.id, comment.id as number, Activity.ObjectTypes.Comment, Activity.ContentActions.Create, timestamp);
-    await commentActivity.insertIntoDatabase(connection);
+    const commentId = await CommentModel.insert(rawComment, connection);
+    const rawActivity: RawActivity = {
+      subjectId: commenter[$id],
+      objectId: commentId,
+      objectType: Activity.ObjectTypes.Comment,
+      actionType: Activity.ContentActions.Create,
+      timestamp,
+    };
+    const commentActivityId = await ActivityModel.insert(rawActivity, connection);
     if (!_.isEmpty(mentions)) {
       await (Promise as any).map(mentions, async (m) => {
-        const mentionActivity = new ActivityModel(commenter.id, m.id, Activity.ObjectTypes.User, Activity.UserActions.Mention, timestamp, comment.id as number, Activity.ContextTypes.Post);
-        await mentionActivity.insertIntoDatabase(connection);
-        const notification = new NotificationModel(m.id as number, mentionActivity.id as number, timestamp);
-        await notification.insertIntoDatabase(connection);
+        const rawMentionActivity = {
+          subjectId: commenter[$id],
+          objectId: m.id,
+          objectType: Activity.ObjectTypes.User,
+          actionType: Activity.UserActions.Mention,
+          timestamp,
+        };
+        const mentionActivityId = await ActivityModel.insert(rawMentionActivity as RawActivity, connection);
+        const rawNotification: RawNotification = {
+          recipientId: m.id,
+          activityId: mentionActivityId,
+          timestamp,
+        };
+        await NotificationModel.insert(rawNotification, connection);
       });
     }
 
     if (!_.isEmpty(commenterIds)) {
-      await Promise.all(
-        _.map(commenterIds, async (commenterId) => {
-          const notification = new NotificationModel(commenterId as any as number, commentActivity.id as number, timestamp);
-          await notification.insertIntoDatabase(connection);
-        }));
+      const params: BroadcastParams = {
+        recipientIds: commenterIds as number[],
+        activityId: commentActivityId,
+        timestamp,
+      };
+
+      await NotificationModel.broadcastInsert(params, connection);
     }
   });
   respondWith(res, 200);

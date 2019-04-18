@@ -1,75 +1,116 @@
-import {isValidPostContent, isValidTimestamp, makeInstance} from "../../shared/utils";
-import {
-  $authorId,
-  $id,
-  $obfuscator,
-  $outboundFields,
-  $postId,
-  COMMENT_OBFUSCATE_MAPS,
-  obfuscatorFuns,
-  postObfuscator,
-} from "../service/obfuscator.service";
 import {devOnly, isNumericId} from "../utils/index";
-import {TextContentModel} from "./text-content.model";
-import {DatabaseDriver, makeFieldMaps} from "./model-base";
+import {DatabaseDriver, fromDatabaseRow, insertReturnId,} from "./model-base";
 import db from "../persistence/index";
 import _ from 'lodash';
+import {
+  assertValidRawTextContent,
+  Mentions,
+  TextContentBuilder,
+  TextContentOutboundCloneFields,
+  TextContentRecord
+} from "./text-content.model";
+import {
+  $authorId,
+  $outboundCloneFields,
+  $postId,
+  COMMENT_OBFUSCATE_MAPS,
+  obfuscatorFuns
+} from "../service/obfuscator.service";
 import {PostViewer} from "./post.model";
 
-const assertValidNewModel = devOnly(function(model: CommentModel) {
-  console.assert(model.isNew(), `is not new`);
-  console.assert(isNumericId(model.authorId), `invalid authorId: ${model.authorId}`);
-  console.assert(isNumericId(model.postId), `invalid postId: ${model.postId}`);
-  console.assert(isValidPostContent(model.content), `invalid content`);
-  console.assert(isValidTimestamp(model.createdAt), `invalid timestamp ${model.createdAt}`);
+
+export interface PublishCommentData {
+  postId: number;
+  content: string;
+}
+
+export class CommentBuilder extends TextContentBuilder {
+  [$postId]: number;
+
+  constructor(authorId: number, postId: number, content: string, createdAt: number) {
+    super(authorId, content, createdAt);
+    this[$postId] = postId;
+  }
+
+  async build(): Promise<[Mentions, RawComment]> {
+    const self = this;
+    let mentions = self.extractMentionsFromContent();
+    if (!_.isEmpty(mentions)) {
+      mentions = await self.sanitizeContentMentions(mentions);
+    }
+    const mentionIds = JSON.stringify(mentions.map((m) => m.id));
+    const raw: RawComment = {
+      authorId: self[$authorId],
+      postId: self[$postId],
+      content: self.content,
+      createdAt: self.createdAt,
+      mentionIds
+    };
+    return [mentions, raw];
+  }
+}
+
+export class CommentRecord extends TextContentRecord {
+  static readonly [$outboundCloneFields] = TextContentOutboundCloneFields.concat([]);
+  [$postId]: number;
+
+  constructor(id: number, authorId: number, postId: number, content: string, createdAt: number) {
+    super(id, authorId, content, createdAt);
+    this[$postId] = postId;
+  }
+}
+
+const {
+  unObfuscateCloneFrom, obfuscateCloneTo, hideCloneFrom
+} = obfuscatorFuns(COMMENT_OBFUSCATE_MAPS);
+
+CommentRecord.prototype.obfuscateCloneTo = obfuscateCloneTo;
+CommentRecord.prototype.unObfuscateCloneFrom = unObfuscateCloneFrom;
+CommentRecord.prototype.hideCloneFrom = hideCloneFrom;
+
+export interface RawComment {
+  authorId: number;
+  postId: number;
+  content: string;
+  createdAt: number;
+  mentionIds: string;
+}
+
+
+const assertValidRawComment = devOnly(function(data: any) {
+  console.assert(isNumericId(data.postId), `invalid postId: ${data.postId}`);
+  assertValidRawTextContent(data);
 });
 
-const INSERT_SQL = 'INSERT INTO Comments (id, postId, authorId, content, createdAt, updatedAt, mentionIds) VALUES(:id, :postId, :authorId, :content, :createdAt, :updatedAt, :mentionIds)';
 
-const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl FROM Comments LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :viewerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)))';
+const GET_COMMENTS_BY_POST_ID_SQL = 'SELECT Comments.id, postId, authorId, content, createdAt, updatedAt, Users.nickname AS authorNickname, Users.avatarUrl AS authorAvatarUrl, CommentPlusOnes.id IS NOT NULL AS plusedByMe FROM Comments LEFT JOIN (SELECT * FROM CommentPlusOnes WHERE userId = :observerId) CommentPlusOnes ON (Comments.id = CommentPlusOnes.commentId) LEFT JOIN Users ON (Comments.authorId = Users.id) WHERE postId = :postId AND (Comments.authorId = :observerId OR (Comments.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Comments.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)))';
 
-const IS_COMMENT_ACCESSIBLE_SQL = 'SELECT id FROM Comments WHERE id = :commentId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)';
+const IS_COMMENT_ACCESSIBLE_SQL = 'SELECT id FROM Comments WHERE id = :commentId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
 
 export interface CommentViewer {
   commentId: number;
-  viewerId: number;
+  observerId: number;
 }
 
 const assertValidCommentViewer = devOnly(function(params: any) {
   console.assert(isNumericId(params.commentId), `invalid commentId ${params.postId}`);
-  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
+  console.assert(isNumericId(params.observerId), `invalid observerId ${params.observerId}`);
 });
 
+const enum SQLs {
+  INSERT = 'INSERT INTO Comments (postId, authorId, content, createdAt, mentionIds) VALUES(:postId, :authorId, :content, :createdAt, :mentionIds)',
+}
 
-export class CommentModel extends TextContentModel {
-  static readonly [$obfuscator] = postObfuscator;
-  static readonly [$outboundFields] = makeFieldMaps([
-    $id,
-    $authorId,
-    'content', 'plusCount', 'createdAt', 'authorNickname', 'authorAvatarUrl'
-  ]);
-
-  static unObfuscateFrom(obj: any): CommentModel | undefined {
-    throw Error('Not implemented');
+export class CommentModel {
+  static async insert(raw: RawComment, drive: DatabaseDriver = db): Promise<number> {
+    assertValidRawComment(raw);
+    return insertReturnId(SQLs.INSERT as string, raw, drive);
   }
 
-  postId?: number | string;
-  [$postId]?: string;
-
-
-  async insertIntoDatabase(driver: DatabaseDriver = db): Promise<void> {
-    const self = this;
-    assertValidNewModel(self);
-
-    let replacements: any = Object.create(self);
-    replacements.mentionIds = JSON.stringify(self.mentionIds || []);
-    await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, replacements);
-  }
-
-  static async getCommentsByPostId(params: PostViewer, driver: DatabaseDriver = db): Promise<CommentModel[]> {
+  static async getCommentsForPost(params: PostViewer, driver: DatabaseDriver = db): Promise<CommentRecord[]> {
     const [rows] = await driver.query(GET_COMMENTS_BY_POST_ID_SQL, params);
     return _.map(rows, (row) => {
-      return makeInstance(row, CommentModel);
+      return fromDatabaseRow(row, CommentRecord);
     });
   }
 
@@ -79,9 +120,3 @@ export class CommentModel extends TextContentModel {
     return !!rows && !!rows[0] && !!rows[0].id;
   }
 }
-
-
-({
-  unObfuscateFrom: CommentModel.unObfuscateFrom,
-  obfuscate: CommentModel.prototype.obfuscate
-} = obfuscatorFuns(COMMENT_OBFUSCATE_MAPS, CommentModel));

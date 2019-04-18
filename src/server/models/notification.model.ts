@@ -1,58 +1,77 @@
-import {ModelBase} from "./model-base";
-import {Connection} from "mysql2/promise";
+import {$activityId, $recipientId} from "../service/obfuscator.service";
+import {DatabaseDriver, DatabaseRecordBase, insertReturnId} from "./model-base";
 import {devOnly, isNumericId} from "../utils/index";
 import {isValidTimestamp} from "../../shared/utils";
-import {$activityId, $recipientId} from "../service/obfuscator.service";
+import db from "../persistence/index";
 
-const BULK_INSERT_SQL = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES ?';
+export class NotificationRecord extends DatabaseRecordBase {
+  [$recipientId]: number;
+  [$activityId]?: number;
+  timestamp: number;
+  isRead: boolean;
 
-const INSERT_SQL = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES (:recipientId, :activityId, :timestamp)';
-
-const assertBulkInsert = devOnly(function(recipientIds: number[], activityId: number, timestamp: number) {
-  console.assert(recipientIds);
-  console.assert(recipientIds.length);
-  for (let id of recipientIds) {
-    console.assert(isNumericId(id));
+  constructor(id: number, recipientId: number, activityId: number, timestamp: number, isRead: boolean) {
+    super(id);
+    this[$recipientId] = recipientId;
+    this[$activityId] = activityId;
+    this.timestamp = timestamp;
+    this.isRead = isRead;
   }
-  console.assert(isNumericId(activityId));
-  console.assert(isValidTimestamp(timestamp));
+}
+
+export interface RawNotification {
+  recipientId: number;
+  activityId: number;
+  timestamp: number;
+}
+
+const assertValidRawNotification = devOnly(function(data: any) {
+  console.assert(isNumericId(data.recipientId), `invalid recipientId: ${data.recipientId}`);
+  console.assert(isNumericId(data.activityId), `invalid activityId: ${data.activityId}`);
+  console.assert(isValidTimestamp(data.timestamp), `invalid timestamp: ${data.timestamp}`);
 });
 
-const assertValidNew = devOnly(function(model: NotificationModel) {
-  console.assert(model.isNew());
-  console.assert(isNumericId(model.recipientId));
-  console.assert(isNumericId(model.activityId));
-  console.assert(isValidTimestamp(model.timestamp));
+export interface BroadcastParams {
+  recipientIds: number[];
+  activityId: number;
+  timestamp: number;
+}
+
+const assertBroadcastParams = devOnly(function(data: any) {
+  const {recipientIds, activityId, timestamp} = data;
+  console.assert(!recipientIds || !recipientIds.length, `no recipients`);
+  for (let id of recipientIds) {
+    console.assert(isNumericId(id), `invalid recipient id ${id}`);
+  }
+  console.assert(isNumericId(activityId), `invalid activityId ${activityId}`);
+  console.assert(isValidTimestamp(timestamp), `invalid timestamp ${timestamp}`);
 });
 
-export class NotificationModel extends ModelBase {
-  static async bulkInsertIntoDatabase(con: Connection, recipientIds: number[], activityId: number, timestamp: number) {
-    assertBulkInsert(recipientIds, activityId, timestamp);
-    return con.query(BULK_INSERT_SQL, [recipientIds.map((id) => {
+const enum SQLs {
+  INSERT = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES (:recipientId, :activityId, :timestamp)',
+  BROADCAST_INSERT = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES ?',
+  UNREAD_COUNT = 'SELECT COUNT(id) AS count FROM Notifications WHERE recipientId = :userId AND NOT isRead',
+}
+
+export class NotificationModel {
+
+  static async insert(raw: RawNotification, drive: DatabaseDriver = db): Promise<number> {
+    assertValidRawNotification(raw);
+    return insertReturnId(SQLs.INSERT as string, raw, drive);
+  }
+
+  static async broadcastInsert(params: BroadcastParams, drive: DatabaseDriver = db) {
+    assertBroadcastParams(params);
+    const {recipientIds, activityId, timestamp} = params;
+    return drive.query(SQLs.BROADCAST_INSERT as string, [recipientIds.map((id) => {
       return [id, activityId, timestamp];
     })]);
   }
 
-  recipientId?: number | string;
-  [$recipientId]?: string;
-  activityId?: number | string;
-  [$activityId]?: string;
-  timestamp?: number;
-  isRead?: boolean;
-
-  constructor(recipientId: number, activityId: number, timestamp: number) {
-    super();
-    const self = this;
-    self.recipientId = recipientId;
-    self.activityId = activityId;
-    self.timestamp = timestamp;
-    assertValidNew(self);
-  }
-
-  async insertIntoDatabase(conn: Connection): Promise<void> {
-    const self = this;
-    assertValidNew(self);
-    await self.insertIntoDatabaseAndRetrieveId(conn, INSERT_SQL, self);
+  static async getUnreadCountForUser(userId: number, drive: DatabaseDriver = db): Promise<number> {
+    const [[{count}]] = await db.query(SQLs.UNREAD_COUNT as string, {
+      userId
+    }) as any;
+    return count;
   }
 }
-

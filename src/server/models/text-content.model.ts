@@ -1,16 +1,11 @@
-import {ModelBase} from "./model-base";
-import {
-  $authorId,
-  $mentionIds,
-  INVALID_NUMERIC_ID,
-  userObfuscator
-} from "../service/obfuscator.service";
+import {$authorId, $mentionIds, INVALID_NUMERIC_ID, userObfuscator} from "../service/obfuscator.service";
 import {MENTION_PATTERN} from "../../shared/constants";
 import db from "../persistence/index";
 import _ from 'lodash';
 import {devOnly, isNumericId} from "../utils/index";
 import {isString} from "util";
-import {isValidStringId} from "../../shared/utils";
+import {isValidPostContent, isValidStringId, isValidTimestamp} from "../../shared/utils";
+import {DatabaseRecordBase} from "./model-base";
 
 export interface Mention {
   nickname: string;
@@ -74,7 +69,7 @@ function createMentionRegexp() {
   return new RegExp(MENTION_PATTERN, 'g');
 }
 
-const assertSanitizeParams = devOnly(function(model: TextContentModel, mentions: Mentions) {
+const assertSanitizeParams = devOnly(function(model: any, mentions: Mentions) {
   console.assert(isNumericId(model.authorId), `invalid authorId ${model.authorId}`);
   console.assert(model.content, `empty content`);
   console.assert(mentions && mentions.length, `empty mentions`);
@@ -86,16 +81,45 @@ const assertSanitizeParams = devOnly(function(model: TextContentModel, mentions:
   }
 });
 
-export class TextContentModel extends ModelBase {
-  authorId?: number | string;
-  [$authorId]?: string;
-  content?: string;
-  createdAt?: number;
+
+export class TextContentRecord extends DatabaseRecordBase {
+  [$authorId]: number;
+  [$mentionIds]?: number[];
+  content: string;
+  createdAt: number;
   updatedAt?: number;
   deletedAt?: number;
-  mentionIds?: (number[]) | (string[]);
-  plusCount?: number;
-  [$mentionIds]?: string[];
+  plusCount = 0;
+  plusedByMe?: boolean;
+  authorNickname?: string;
+  authorAvatarUrl?: string;
+
+  constructor(id: number, authorId: number, content: string, createdAt: number) {
+    super(id);
+    this.content = content;
+    this.createdAt = createdAt;
+    this[$authorId] = authorId;
+  }
+}
+
+export const TextContentOutboundCloneFields = [
+  'content', 'plusCount', 'createdAt', 'authorNickname', 'authorAvatarUrl', 'plusedByMe'
+];
+
+
+export class TextContentBuilder {
+  [$authorId]: number;
+  [$mentionIds]?: number[];
+  content: string;
+  updatedAt?: number;
+  deletedAt?: number;
+  plusCount = 0;
+
+
+  constructor(authorId: number, content: string, public createdAt: number) {
+    this[$authorId] = authorId;
+    this.content = content;
+  }
 
   extractMentionsFromContent(): Mentions {
     const self = this;
@@ -140,7 +164,25 @@ export class TextContentModel extends ModelBase {
   async sanitizeContentMentions(mentions: Mentions): Promise<Mentions> {
     const self = this;
     assertSanitizeParams(self, mentions);
-    return self.__sanitizeContentMentions(mentions, await getMentionableUsers(mentions, self.authorId as number));
+    return self.__sanitizeContentMentions(mentions, await getMentionableUsers(mentions, self[$authorId]));
   }
 }
 
+
+export const assertValidRawTextContent = devOnly(function(data: any) {
+  console.assert(isNumericId(data.authorId), `invalid authorId: ${data.authorId}`);
+  console.assert(isValidPostContent(data.content), `invalid content`);
+  console.assert(isValidTimestamp(data.createdAt), `invalid timestamp ${data.createdAt}`);
+  console.assert(data.mentionIds, `no mentionIds`);
+  const ids = JSON.parse(data.mentionIds);
+  for (const id of ids) {
+    console.assert(isNumericId(id), `invalid mention id ${id}`);
+  }
+});
+
+export interface RawTextContent {
+  authorId: number;
+  content: string;
+  createdAt: number;
+  mentionIds: string;
+}

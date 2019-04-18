@@ -60,7 +60,6 @@ export class CommentEditorComponent implements OnInit {
   @ViewChild('markdownEditor')
   set markdownEditor(editor: MarkdownEditorComponent) {
     this.editor = editor;
-    console.log(editor);
   }
 
   constructor(private postEditor: PostEditorComponent, public iService: IService) {

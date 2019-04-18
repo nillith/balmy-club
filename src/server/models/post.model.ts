@@ -1,44 +1,120 @@
-import {isValidPostContent, isValidTimestamp, makeInstance} from "../../shared/utils";
+import {isValidTimestamp, makeInstance} from "../../shared/utils";
 import {
   $authorId,
   $id,
-  $obfuscator,
-  $outboundFields,
+  $outboundCloneFields,
   $reShareFromPostId,
   $visibleCircleIds,
   obfuscatorFuns,
   POST_OBFUSCATE_MAPS,
-  postObfuscator,
 } from "../service/obfuscator.service";
 import {isValidPostVisibility, PostVisibilities} from "../../shared/interf";
 import {devOnly, isNumericId} from "../utils/index";
-import {TextContentModel} from "./text-content.model";
-import {DatabaseDriver, makeFieldMaps} from "./model-base";
+import {DatabaseDriver, fromDatabaseRow, insertReturnId, Observer} from "./model-base";
 import db from "../persistence/index";
 import {POSTS_GROUP_SIZE} from "../../shared/constants";
 import _ from 'lodash';
-import {CommentModel} from "./comment.model";
+import {
+  assertValidRawTextContent,
+  Mentions,
+  RawTextContent,
+  TextContentBuilder, TextContentOutboundCloneFields,
+  TextContentRecord
+} from "./text-content.model";
+import {CommentRecord} from "./comment.model";
+import {UserRecord} from "./user.model";
 
-const assertValidNewModel = devOnly(function(model: PostModel) {
-  console.assert(model.isNew(), `is not new`);
-  console.assert(isNumericId(model.authorId), `invalid authorId: ${model.authorId}`);
-  console.assert(!model.reShareFromPostId || isNumericId(model.reShareFromPostId), `invalid reShareFromPostId: ${model.reShareFromPostId}`);
-  console.assert(isValidPostVisibility(model.visibility), `invalid visibility: ${model.visibility}`);
-  console.assert(isValidPostContent(model.content), `invalid content`);
-  console.assert(isValidTimestamp(model.createdAt), `invalid timestamp ${model.createdAt}`);
+
+export class PostRecord extends TextContentRecord {
+  static readonly [$outboundCloneFields] = TextContentOutboundCloneFields.concat([
+    'visibility', 'reShareCount', 'comments'
+  ]);
+  [$reShareFromPostId]?: number;
+  visibility: PostVisibilities;
+  comments?: CommentRecord[];
+
+  constructor(id: number, authorId: number, content: string, createdAt: number, visibility: PostVisibilities) {
+    super(id, authorId, content, createdAt);
+    this.visibility = visibility;
+  }
+}
+
+const {
+  unObfuscateCloneFrom, obfuscateCloneTo, hideCloneFrom
+} = obfuscatorFuns(POST_OBFUSCATE_MAPS);
+
+PostRecord.prototype.obfuscateCloneTo = obfuscateCloneTo;
+PostRecord.prototype.unObfuscateCloneFrom = unObfuscateCloneFrom;
+PostRecord.prototype.hideCloneFrom = hideCloneFrom;
+
+
+export interface PublishPostData {
+  reShareFromPostId?: number;
+  visibility: PostVisibilities;
+  content: string;
+  visibleCircleIds?: number[];
+}
+
+export class PostBuilder extends TextContentBuilder {
+  [$reShareFromPostId]?: number;
+  [$visibleCircleIds]?: number[];
+  visibility: PostVisibilities;
+
+
+  constructor(author: UserRecord, data: PublishPostData, timestamp: number) {
+    super(author[$id], data.content, timestamp);
+    if (data.reShareFromPostId) {
+      this[$reShareFromPostId] = data.reShareFromPostId;
+    }
+
+    if (data.visibleCircleIds) {
+      this[$visibleCircleIds] = data.visibleCircleIds;
+    }
+    this.visibility = data.visibility;
+  }
+
+  async build(): Promise<[Mentions, RawPost]> {
+    const self = this;
+    let mentions = self.extractMentionsFromContent();
+    if (!_.isEmpty(mentions)) {
+      mentions = await self.sanitizeContentMentions(mentions);
+    }
+    const mentionIds = JSON.stringify(mentions.map((m) => m.id));
+    const raw: RawPost = {
+      authorId: self[$authorId],
+      content: self.content,
+      createdAt: self.createdAt,
+      mentionIds,
+      reShareFromPostId: self[$reShareFromPostId] || null,
+      visibility: self.visibility,
+    };
+    return [mentions, raw];
+  }
+}
+
+export interface RawPost extends RawTextContent {
+  reShareFromPostId: number | null;
+  visibility: PostVisibilities;
+}
+
+const assertValidRawModel = devOnly(function(data: any) {
+  assertValidRawTextContent(data);
+  console.assert(!data.reShareFromPostId || isNumericId(data.reShareFromPostId), `invalid reShareFromPostId: ${data.reShareFromPostId}`);
+  console.assert(isValidPostVisibility(data.visibility), `invalid visibility: ${data.visibility}`);
 });
 
-const INSERT_SQL = `INSERT INTO Posts (authorId, reShareFromPostId, content, createdAt, visibility, mentionIds) VALUES(:authorId, :reShareFromPostId, :content, :createdAt, :visibility, :mentionIds)`;
+const enum SQLs {
+  INSERT = 'INSERT INTO Posts (authorId, reShareFromPostId, content, createdAt, visibility, mentionIds) VALUES(:authorId, :reShareFromPostId, :content, :createdAt, :visibility, :mentionIds)'
+}
 
-interface TimelineParams {
+interface TimelineParams extends Observer {
   timestamp: number;
   offset: number;
-  viewerId: number;
+  observerId: number;
 }
 
 interface UserTimelineParams extends TimelineParams {
   userId: number;
-
 }
 
 const isValidStreamOffset = function(offset: any) {
@@ -46,7 +122,7 @@ const isValidStreamOffset = function(offset: any) {
 };
 
 const assertValidTimelineParams = devOnly(function(params: any) {
-  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
+  console.assert(isNumericId(params.observerId), `invalid observerId ${params.observerId}`);
   console.assert(isValidTimestamp(params.timestamp), `invalid timestamp ${params.timestamp}`);
   console.assert(isValidStreamOffset(params.offset), `invalid offset ${params.offset}`);
 });
@@ -58,12 +134,12 @@ const assertIsValidUserTimelineParams = devOnly(function(params: any) {
 
 export interface PostViewer {
   postId: number;
-  viewerId: number;
+  observerId: number;
 }
 
 const assertValidPostViewer = devOnly(function(params: any) {
   console.assert(isNumericId(params.postId), `invalid postId ${params.postId}`);
-  console.assert(isNumericId(params.viewerId), `invalid viewerId ${params.viewerId}`);
+  console.assert(isNumericId(params.observerId), `invalid observerId ${params.observerId}`);
 });
 
 interface TimelineSqlCreateOptions {
@@ -80,19 +156,20 @@ const POST_PUBLIC_SQL_COLUMNS = [
   'Posts.visibility',
   'Posts.plusCount',
   'Posts.reShareCount',
-  'Posts.createdAt'
+  'Posts.createdAt',
+  'PostPlusOnes.id IS NOT NULL AS plusedByMe',
 ];
 
 const POST_PUBLIC_SQL_COLUMNS_WITH_USER = POST_PUBLIC_SQL_COLUMNS.concat(['Users.nickname AS authorNickname', 'Users.avatarUrl AS authorAvatarUrl']);
 
 const processVisibilityOption = function(options: TimelineSqlCreateOptions, ands: string[], leftJoins: string[]) {
   const visibilityOr = [
-    'Posts.authorId = :viewerId'
+    'Posts.authorId = :observerId'
   ];
 
   const visibilitySubAnd = [
-    'Posts.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId)',
-    'Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)',
+    'Posts.authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId)',
+    'Posts.authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)',
   ];
 
 
@@ -102,7 +179,7 @@ const processVisibilityOption = function(options: TimelineSqlCreateOptions, ands
 
   if (options.withPrivatePost) {
     leftJoins.push('PostCircle ON (Posts.id = PostCircle.postId)');
-    visibilitySubAndSubOr.push(`(visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE userId = :viewerId))`);
+    visibilitySubAndSubOr.push(`(visibility = ${PostVisibilities.Private} AND PostCircle.circleId IN (SELECT circleId FROM CircleUser WHERE userId = :observerId))`);
   }
 
   visibilitySubAnd.push(`(${visibilitySubAndSubOr.join(' OR ')})`);
@@ -115,7 +192,10 @@ const processVisibilityOption = function(options: TimelineSqlCreateOptions, ands
 const createTimelineSql = function(options: TimelineSqlCreateOptions) {
   let cols = POST_PUBLIC_SQL_COLUMNS;
 
-  const leftJoins = ['Posts'];
+  const leftJoins = [
+    'Posts',
+    '(SELECT * FROM PostPlusOnes WHERE userId = :observerId) PostPlusOnes ON (PostPlusOnes.postId = Posts.id)'
+  ];
   if (options.withUser) {
     leftJoins.push('Users ON (Posts.authorId = Users.id)');
     cols = POST_PUBLIC_SQL_COLUMNS_WITH_USER;
@@ -152,7 +232,7 @@ const IS_POST_ACCESSIBLE_SQL = (function() {
 })();
 
 
-const POST_OTHER_COMMENTER_IDS_SQL = 'SELECT id FROM Comments WHERE postId = :postId AND authorId != :viewerId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :viewerId) AND authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :viewerId)';
+const POST_OTHER_COMMENTER_IDS_SQL = 'SELECT id FROM Comments WHERE postId = :postId AND authorId != :observerId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
 
 const PUBLIC_TIMELINE_POSTS_SQL = createTimelineSql({
   withUser: true,
@@ -169,45 +249,34 @@ const HOME_STREAM_POSTS_SQL = createTimelineSql({
   withPrivatePost: true
 });
 
-export class PostModel extends TextContentModel {
-  static readonly [$obfuscator] = postObfuscator;
-  static readonly [$outboundFields] = makeFieldMaps([
-    $id,
-    $authorId,
-    $reShareFromPostId,
-    'content', 'visibility', 'plusCount', 'reShareCount', 'createdAt', 'comments', 'authorNickname', 'authorAvatarUrl'
-  ]);
+export class PostModel {
 
-  static unObfuscateFrom(obj: any): PostModel | undefined {
-    throw Error('Not implemented');
-  }
-
-  private static async getPostsBySQL(sql: string, params: any, driver: DatabaseDriver = db) {
+  private static async getPostsBySQL(sql: string, params: any, driver: DatabaseDriver = db): Promise<PostRecord[]> {
     const [rows] = await driver.query(sql, params);
     return _.map(rows, (row) => {
-      return makeInstance(row, PostModel);
+      // console.log(row);
+      return fromDatabaseRow(row, PostRecord);
     });
   }
 
   static async getPostById(params: PostViewer, driver: DatabaseDriver = db) {
     const [rows] = await driver.query(GET_POST_BY_ID_SQL, params);
     if (rows && rows[0]) {
-      return makeInstance(rows[0], PostModel);
+      return makeInstance(rows[0], PostRecord);
     }
   }
 
-
-  static async getUserTimelinePosts(params: UserTimelineParams, driver: DatabaseDriver = db) {
+  static async getUserTimelinePosts(params: UserTimelineParams, driver: DatabaseDriver = db): Promise<PostRecord[]> {
     assertIsValidUserTimelineParams(params);
     return this.getPostsBySQL(USER_TIMELINE_POSTS_SQL, params, driver);
   }
 
-  static async getPublicTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db) {
+  static async getPublicTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db): Promise<PostRecord[]> {
     assertValidTimelineParams(params);
     return this.getPostsBySQL(PUBLIC_TIMELINE_POSTS_SQL, params, driver);
   }
 
-  static async getHomeTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db) {
+  static async getHomeTimelinePosts(params: TimelineParams, driver: DatabaseDriver = db): Promise<PostRecord[]> {
     assertValidTimelineParams(params);
     return this.getPostsBySQL(HOME_STREAM_POSTS_SQL, params, driver);
   }
@@ -232,21 +301,10 @@ export class PostModel extends TextContentModel {
   [$visibleCircleIds]?: string[];
   visibleCircleIds?: (number[]) | (string[]);
   reShareCount?: number;
-  comments?: CommentModel[];
+  comments?: any[];
 
-  async insertIntoDatabase(driver: DatabaseDriver = db): Promise<void> {
-    const self = this;
-    assertValidNewModel(self);
-
-    let replacements: any = Object.create(self);
-    replacements.mentionIds = JSON.stringify(self.mentionIds || []);
-    await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, replacements);
+  static async insert(raw: RawPost, drive: DatabaseDriver = db): Promise<number> {
+    assertValidRawModel(raw);
+    return insertReturnId(SQLs.INSERT as string, raw, drive);
   }
-
 }
-
-
-({
-  unObfuscateFrom: PostModel.unObfuscateFrom,
-  obfuscate: PostModel.prototype.obfuscate
-} = obfuscatorFuns(POST_OBFUSCATE_MAPS, PostModel));

@@ -1,10 +1,9 @@
 import {NextFunction, Request, Response} from "express";
-import {ChangeSettingsRequest} from "../../../../shared/contracts";
 import {isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../../../shared/utils";
 import {isValidURL, respondWith, trimFields} from "../../../utils/index";
 import {isString} from "util";
-import {$user} from "../../../constants/symbols";
 import _ from 'lodash';
+import {getRequestUser} from "../../../service/auth.service";
 
 export function getSettingsPayloadOrError(body: any) {
   trimFields(body);
@@ -42,7 +41,7 @@ export const changeSettings = async function(req: Request, res: Response, next: 
   if (isString(payload)) {
     return respondWith(res, 400, payload);
   }
-  const user = req[$user];
+  const user = getRequestUser(req);
 
   if (user && !_.isEmpty(payload)) {
     await user.saveSettings(payload);

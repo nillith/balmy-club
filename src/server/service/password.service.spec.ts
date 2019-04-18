@@ -17,7 +17,7 @@ describe('auth service', () => {
       const password = randomPassword();
       const salt = await passwordService.generateSalt();
       const hash = await passwordService.passwordHash(salt, password);
-      assert.isTrue(await passwordService.verifyPassword(salt, hash, password), password);
+      assert.isTrue(await passwordService.verifyPassword(password, salt, hash), password);
     }
   });
 
@@ -27,7 +27,7 @@ describe('auth service', () => {
       const password2 = randomPassword();
       const salt = await passwordService.generateSalt();
       const hash = await passwordService.passwordHash(salt, password);
-      assert.isFalse(await passwordService.verifyPassword(salt, hash, password2), `${password}:${password2}`);
+      assert.isFalse(await passwordService.verifyPassword(password2, salt, hash), `${password}:${password2}`);
     }
   });
 });

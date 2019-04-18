@@ -1,11 +1,13 @@
 import config from '../config';
 import jwt from 'jsonwebtoken';
-import {UserModel} from '../models/user.model';
+import {UserRecord} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {asyncMiddleware, respondWith} from "../utils/index";
-import {$status, $user} from "../constants/symbols";
+import {$status} from "../constants/symbols";
 import {ACCESS_TOKEN_COOKIE_KEY, ACCESS_TOKEN_KEY, Roles, UserRanks} from "../../shared/constants";
 import {AccessTokenData} from "../../shared/interf";
+
+const $requestUser = Symbol('request user');
 
 const getToken = (() => {
   const Bearer = 'Bearer ';
@@ -19,7 +21,7 @@ const getToken = (() => {
 })();
 
 export interface JwtSignable {
-  getJwtPayload(): object;
+  getJwtPayload(): any;
 }
 
 export class JwtHelper<TPayload extends JwtSignable, TResult = TPayload> {
@@ -54,29 +56,31 @@ export class JwtHelper<TPayload extends JwtSignable, TResult = TPayload> {
   }
 }
 
-export class AuthService extends JwtHelper<UserModel, AccessTokenData> {
+export class AuthService extends JwtHelper<UserRecord, AccessTokenData> {
 
-  async setTokenCookie(user: UserModel, res: Response) {
+  async setTokenCookie(user: UserRecord, res: Response) {
     res.cookie(ACCESS_TOKEN_COOKIE_KEY, await this.sign(user));
   }
 
-  async getRequestUser(req: Request): Promise<UserModel | undefined> {
+  async decodeRequestUser(req: Request): Promise<UserRecord | undefined> {
     const token = getToken(req);
     if (!token) {
       return;
     }
     const payload = await this.verify(token);
-    return UserModel.unObfuscateFrom(payload);
+    const user = Object.create(UserRecord.prototype);
+    user.unObfuscateAssign(payload);
+    return user;
   }
 
   requireRole(requiredRole: string): RequestHandler {
     const self = this;
     const requiredRank = UserRanks[requiredRole];
     return asyncMiddleware(async function(req: Request, res: Response, next: NextFunction) {
-      const user = await self.getRequestUser(req);
+      const user = await self.decodeRequestUser(req);
       if (user) {
-        req[$user] = user;
-        if (req[$user].role >= requiredRank) {
+        req[$requestUser] = user;
+        if (req[$requestUser].role >= requiredRank) {
           return next();
         }
       }
@@ -91,11 +95,11 @@ export const requireAdmin = authService.requireRole(Roles.Admin);
 
 export const requireLogin = asyncMiddleware(async function(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = await authService.getRequestUser(req);
+    const user = await authService.decodeRequestUser(req);
     if (!user) {
       return respondWith(res, 401);
     }
-    req[$user] = user;
+    req[$requestUser] = user;
     next();
   } catch (e) {
     (e as any)[$status] = 401;
@@ -103,6 +107,9 @@ export const requireLogin = asyncMiddleware(async function(req: Request, res: Re
   }
 });
 
+export function getRequestUser(req: Request): UserRecord {
+  return req[$requestUser];
+}
 
 export class SignUpPayload implements JwtSignable {
   constructor(readonly email: string) {

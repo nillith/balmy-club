@@ -39,7 +39,7 @@ class PasswordService extends PasswordOptions {
     });
   }
 
-  async verifyPassword(salt: Buffer, hash: Buffer, password: string): Promise<boolean> {
+  async verifyPassword(password: string, salt: Buffer, hash: Buffer): Promise<boolean> {
     return isValidPassword(password) && hash.equals(await passwordService.passwordHash(salt, password));
   }
 }

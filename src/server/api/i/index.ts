@@ -13,5 +13,5 @@ router.use('/circles', circles);
 router.use('/settings', settings);
 router.use('/notifications', notifications);
 router.use('/comments', comments);
-router.use('/home-timeline', asyncMiddleware(getHomeTimelinePosts));
+router.get('/home-timeline', asyncMiddleware(getHomeTimelinePosts));
 export default router;

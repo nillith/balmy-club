@@ -1,14 +1,27 @@
 import {assert} from 'chai';
-import {ActivityModel} from "./activity.model";
+import {ActivityRecord, assertValidRawActivity, RawActivity} from "./activity.model";
 import {Activity} from "../../shared/interf";
 import {utcTimestamp} from "../../shared/utils";
 
-const createValidActivity = function() {
-  return new ActivityModel(1, 1, Activity.ObjectTypes.Post, Activity.ContentActions.Create, utcTimestamp());
+const createValidActivity = function(): RawActivity {
+  return {
+    subjectId: 1,
+    objectId: 1,
+    objectType: Activity.ObjectTypes.Post,
+    actionType: Activity.ContentActions.Create,
+    timestamp: utcTimestamp(),
+  };
 };
 
-const cloneActivity = function(activity: ActivityModel) {
-  return new ActivityModel(activity.subjectId as number, activity.objectId as number, activity.objectType!, activity.actionType!, activity.timestamp!, activity.contextId as number, activity.contextType);
+const fields = ['subjectId', 'objectId', 'objectType', 'actionType', 'timestamp', 'contextId', 'contextType',];
+
+const cloneActivity = function(activity: RawActivity): RawActivity {
+  const result: any = {};
+  for (const f of fields) {
+    result[f] = activity[f];
+  }
+  assertValidRawActivity(result);
+  return result;
 };
 
 const assertShadowEqual = function(obj1: any, obj2: any) {
@@ -23,7 +36,6 @@ describe('ActivityModel', () => {
   beforeEach(() => {
     assert.doesNotThrow(() => {
       validActivity = createValidActivity();
-      assert.isTrue(validActivity.isNew());
       cloneActivity(validActivity);
     });
   });
@@ -39,7 +51,7 @@ describe('ActivityModel', () => {
     }
     let clone: any = null;
     assert.throw(() => {
-      clone = cloneActivity(valid as ActivityModel);
+      clone = cloneActivity(valid);
       assertShadowEqual(clone, valid);
     });
     if (clone) {
@@ -58,10 +70,6 @@ describe('ActivityModel', () => {
       assertThrowInvalidFieldValue(name, v);
     }
   };
-
-  it('should create a new model', () => {
-    assert.isTrue(validActivity.isNew());
-  });
 
   it('should throw for invalid id', () => {
     assertThrowInvalidId('subjectId');

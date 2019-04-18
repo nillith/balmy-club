@@ -1,36 +1,28 @@
 import db from '../persistence';
 import passwordService from '../service/password.service';
-import {cloneByFieldMaps, DatabaseDriver, makeFieldMaps, ModelBase} from "./model-base";
+import {
+  assertValidId,
+  assertValidObservation,
+  DatabaseDriver,
+  DatabaseRecordBase,
+  fromDatabaseRow,
+  insertReturnId,
+  Observation,
+} from "./model-base";
+import {authService, JwtSignable} from "../service/auth.service";
+import {devOnly, isNumericId} from "../utils/index";
+import isEmail from "validator/lib/isEmail";
+import {isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../shared/utils";
 import {
   $id,
-  $obfuscator,
-  $outboundFields,
+  $outboundCloneFields,
   obfuscatorFuns,
   USER_OBFUSCATE_MAPS,
   userObfuscator
 } from "../service/obfuscator.service";
-import {Roles, UserRanks} from "../../shared/constants";
-import {authService, JwtSignable} from "../service/auth.service";
-import {devOnly, isNumericId} from "../utils/index";
-import isEmail from "validator/lib/isEmail";
-import _, {map} from 'lodash';
-import {isValidEmailAddress, isValidPassword, isValidUsername, makeInstance} from "../../shared/utils";
-import {ChangeSettingsRequest} from "../../shared/contracts";
-import {CircleModel} from "./circle.model";
-import {OutboundDataHolder} from "../init";
-
-export interface UserCreateInfo {
-  username?: string;
-  nickname?: string;
-  password?: string;
-  email?: string;
-  role?: number;
-}
-
-
-const JWT_PAYLOAD_FIELD_MAPS = makeFieldMaps([
-  $id, 'username', 'role'
-]);
+import _ from 'lodash';
+import {CircleModel, CircleRecord} from "./circle.model";
+import {ChangeSettingsRequest, MinimumUser} from "../../shared/contracts";
 
 
 const createSaveSettingsSql = (function() {
@@ -55,191 +47,271 @@ const createSaveSettingsSql = (function() {
   };
 })();
 
-const assertValidNewModel = devOnly(function(model: UserModel) {
-  console.assert(model.isNew(), `is not new`);
-  console.assert(isValidPassword(model.password), `invalid password ${model.password}`);
-  console.assert(isValidUsername(model.username), `invalid username ${model.username}`);
-  console.assert(!model.email || (isValidEmailAddress(model.email) && isEmail(model.email)), `invalid email ${model.email}`);
-  console.assert(model.salt && model.salt.length === 32, `invalid salt`);
-  console.assert(model.hash && model.hash.length === 64, `invalid hash`);
+export const $username = Symbol();
+export const $hash = Symbol();
+export const $salt = Symbol();
+export const $email = Symbol();
+
+
+const assertCanVerifyPassword = devOnly(function(data: any) {
+  console.assert(data[$salt] && data[$salt].length === 32, `invalid salt`);
+  console.assert(data[$hash] && data[$hash].length === 64, `invalid hash`);
 });
-const INSERT_SQL = `INSERT INTO Users (username, nickname, email, role, salt, hash) VALUES(:username, :nickname, :email, :role, :salt, :hash)`;
 
-export interface OtherUser {
-  id: string | number;
-  nickname: string;
-  avatarUrl: string;
-}
-
-export class UserModel extends ModelBase implements JwtSignable {
-  static readonly [$outboundFields] = makeFieldMaps([
-    $id,
-    'username',
+export class UserRecord extends DatabaseRecordBase implements JwtSignable {
+  static readonly [$outboundCloneFields] = [
     'nickname',
-    'email',
     'role',
     'avatarUrl',
     'bannerUrl'
-  ]);
-
-  static readonly [$obfuscator] = userObfuscator;
-
-  role?: string;
+  ];
+  [$username]: string;
+  nickname: string;
+  [$email]: string;
+  [$hash]?: Buffer;
+  [$salt]?: Buffer;
   avatarUrl?: string;
   bannerUrl?: string;
-  hash?: Buffer;
-  salt?: Buffer;
-  username?: string;
-  password?: string;
-  email?: string;
+  role: number = 0;
 
-  static unObfuscateFrom(obj: any): UserModel | undefined {
-    throw Error('Not implemented');
+  constructor(id: number, nickname: string) {
+    super(id);
+    this.nickname = nickname;
   }
 
-  static async create(body: UserCreateInfo, driver: DatabaseDriver = db): Promise<UserModel | undefined> {
-    const user = UserModel.unObfuscateFrom({
-      email: body.email || undefined,
-      username: body.username || undefined,
-      nickname: body.nickname || undefined,
-      password: body.password || undefined,
-      role: body.role || UserRanks[Roles.User],
-    }) as UserModel;
-
-    await user.hashPassword();
-    await user.insertIntoDatabase(driver);
-    return user;
-  }
-
-  static async emailExistsInDatabase(email: string): Promise<boolean> {
-    console.assert(isEmail(email));
-    const [rows] = await db.query(`SELECT id FROM Users WHERE email = :email LIMIT 1`, {email});
-    return !!rows && !!(rows as any).length;
-  }
-
-  static async usernameExistsInDatabase(username: string): Promise<boolean> {
-    console.assert(isValidUsername(username));
-    const [rows] = await db.query(`SELECT id FROM Users WHERE username = :username LIMIT 1`, {username});
-    return !!rows && !!(rows as any).length;
-  }
-
-  static async getUserPublicDataById(viewerId: number, userId: number, driver: DatabaseDriver = db) {
-    const [rows] = await driver.query('SELECT nickname, avatarUrl, bannerUrl, circlerCount, UserBlockUser.id IS NOT NULL AS blockedByMe FROM Users LEFT JOIN (SELECT id, blockeeId FROM UserBlockUser WHERE blockeeId = :userId AND blockerId = :viewerId ) UserBlockUser ON (Users.id = UserBlockUser.blockeeId) WHERE Users.id = :userId LIMIT 1', {
-      userId,
-      viewerId
-    });
-
-    if (rows && rows[0]) {
-      rows[0].isMe = viewerId === userId;
-      return new OutboundDataHolder(rows[0]);
-    }
-  }
-
-  static async findById(id: number | string): Promise<UserModel | undefined> {
-    console.assert(isFinite(id as number));
-    const [rows] = await db.query('SELECT * FROM Users WHERE id = :id LIMIT 1', {id});
-    if (rows && (rows as any).length) {
-      return makeInstance(rows[0], UserModel);
-    }
-  }
-
-  static async authenticate(userName: string, password: string): Promise<UserModel | undefined> {
-    if (!isValidUsername(userName) || !isValidPassword(password)) {
-      return;
-    }
-    const [rows] = await db.query(`SELECT id, username, nickname, avatarUrl, bannerUrl, role, salt, hash FROM Users WHERE userName = :userName LIMIT 1`, {userName});
-    if (rows && (rows as any).length) {
-      const user = makeInstance(rows[0], UserModel);
-      if (await user!.verifyPassword(password)) {
-        return user;
-      }
-    }
-  }
-
-  async insertIntoDatabase(driver: DatabaseDriver = db): Promise<void> {
+  getJwtPayload(): any {
     const self = this;
-    assertValidNewModel(self);
-    await self.insertIntoDatabaseAndRetrieveId(driver, INSERT_SQL, self);
+    const result: any = {};
+    result.id = userObfuscator.obfuscate(self[$id]);
+    result.usename = self[$username];
+    result.role = self.role;
+    return result;
   }
 
   async verifyPassword(password: string): Promise<boolean> {
     const self = this;
-    return passwordService.verifyPassword(self.salt!, self.hash!, password);
+    assertCanVerifyPassword(self);
+    return passwordService.verifyPassword(password, self[$salt]!, self[$hash]!);
   }
 
-  async hashPassword() {
+  async hashPassword(password: string) {
     const self = this;
-    console.assert(isValidPassword(self.password));
-    self.salt = await passwordService.generateSalt();
-    self.hash = await passwordService.passwordHash(self.salt, self.password!);
+    [self[$salt], self[$hash]] = await generateSaltHashForPassword(password);
+  }
+
+  async changePassword(newPassword: string, driver: DatabaseDriver = db) {
+    const self = this;
+    await self.hashPassword(newPassword);
+    await UserModel.changePassword({
+      userId: self[$id],
+      salt: self[$salt]!,
+      hash: self[$hash]!
+    }, driver);
+  }
+
+  async getLoginData(expire?: string | number, driver: DatabaseDriver = db) {
+    const self = this;
+    const tokenPromise = authService.sign(self, expire);
+    const circlesPromise = CircleModel
+      .getCirclesByOwnerId(self[$id], driver)
+      .then((circles) => {
+        return Promise.all(_.map(circles, async (circle) => {
+          circle.users = await UserModel.findMinimumUsersInCircle(circle, driver);
+          return circle;
+        }));
+      });
+    return {
+      token: await tokenPromise,
+      user: self,
+      circles: await circlesPromise
+    };
   }
 
   async isBlockByUser(userId: number, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidId(userId);
     const [rows] = await driver.query('SELECT id FROM UserBlockUser WHERE blockeeId = :myId AND blockerId = :userId LIMIT 1', {
-      myId: this.id,
+      myId: this[$id],
       userId
     });
     return !_.isEmpty(rows);
-  }
-
-  async isCircledByUser(userId: number, driver: DatabaseDriver = db): Promise<boolean> {
-    const [rows] = await driver.query('SELECT circleId FROM CircleUser WHERE userId = 1 AND circleId IN (SELECT id FROM Circles WHERE ownerId = 1) LIMIT 1', {
-      myId: this.id,
-      userId
-    });
-    return !_.isEmpty(rows);
-  }
-
-  async changePassword(password: string, driver: DatabaseDriver = db) {
-    this.password = password;
-    await this.hashPassword();
-    await driver.execute(`UPDATE Users SET salt = :salt, hash = :hash WHERE id = :id`, this);
-  }
-
-  getJwtPayload(): Object {
-    const self = this;
-    self.obfuscate();
-    return cloneByFieldMaps(self, JWT_PAYLOAD_FIELD_MAPS);
-  }
-
-  async getSubscriberIds(driver: DatabaseDriver = db) {
-    console.assert(isNumericId(this.id));
-    const [rows] = await driver.query(`SELECT subscriberId FROM Subscriptions WHERE subscribeeId = :id`, this);
-    return map(rows as any[], e => e.subscriberId);
-  }
-
-  async getCirclerIds(driver: DatabaseDriver = db) {
-    console.assert(isNumericId(this.id));
-    const [rows] = await driver.query(`SELECT DISTINCT(CircleUser.userId) FROM Circles LEFT JOIN CircleUser ON (Circles.id = CircleUser.circleId) WHERE Circles.ownerId = :id`, this);
-    return map(rows as any[], e => e.userId);
   }
 
   async saveSettings(data: ChangeSettingsRequest, driver: DatabaseDriver = db) {
     const self = this;
     const sql = createSaveSettingsSql(data);
-    (data as any).id = self.id;
+    (data as any).id = self[$id];
     await driver.query(sql, data);
     if (data.password) {
       await self.changePassword(data.password, driver);
     }
   }
 
-  async getLoginData(expire?: string | number) {
-    const self = this;
-    const token = await authService.sign(self, expire);
-    const circles = await CircleModel.getAllCircleForUser(self.id as number);
+  async getSubscriberIds(driver: DatabaseDriver = db): Promise<number[]> {
+    assertValidId(this[$id]);
+    const [rows] = await driver.query(`SELECT subscriberId FROM Subscriptions WHERE subscribeeId = :id`, {
+      id: this[$id]
+    });
+    return _.map(rows as any[], e => e.subscriberId);
+  }
+}
 
-    return new OutboundDataHolder({
-      token,
-      user: self.getOutboundData(),
-      circles: circles.getOutboundData(),
+const {
+  unObfuscateCloneFrom, obfuscateCloneTo, hideCloneFrom
+} = obfuscatorFuns(USER_OBFUSCATE_MAPS);
+
+UserRecord.prototype.obfuscateCloneTo = obfuscateCloneTo;
+UserRecord.prototype.unObfuscateCloneFrom = unObfuscateCloneFrom;
+UserRecord.prototype.hideCloneFrom = function(this: any, from: any) {
+  const self = this;
+  hideCloneFrom.call(this, from);
+  self[$username] = from.username;
+  self[$email] = from.email;
+  self[$salt] = from.salt;
+  self[$hash] = from.hash;
+};
+
+interface ChangePasswordParams {
+  userId: number;
+  salt: Buffer;
+  hash: Buffer;
+}
+
+const assertValidSaltHash = devOnly(function(data: any) {
+  console.assert(data.salt && data.salt.length === 32, `invalid salt`);
+  console.assert(data.hash && data.hash.length === 64, `invalid hash`);
+});
+
+const assertValidChangePasswordParams = devOnly(function(data: any) {
+  console.assert(isNumericId(data.userId), `invalid userId ${data.userId}`);
+  assertValidSaltHash(data);
+});
+
+export interface RawUser {
+  username: string;
+  nickname: string;
+  password: string;
+  email?: string;
+  role?: number;
+  hash?: Buffer;
+  salt?: Buffer;
+}
+
+const enum SQLs {
+  INSERT = 'INSERT INTO Users (username, nickname, email, role, salt, hash) VALUES(:username, :nickname, :email, :role, :salt, :hash)',
+  CHANGE_PASSWORD = 'UPDATE Users SET salt = :salt, hash = :hash WHERE id = :userId'
+}
+
+
+const assertValidRawUser = devOnly(function(data: any) {
+  console.assert(isValidUsername(data.username), `invalid username ${data.username}`);
+  console.assert(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
+  console.assert(isValidPassword(data.password), `invalid password ${data.password}`);
+  console.assert(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
+  assertValidSaltHash(data);
+});
+
+const assertValidPassword = devOnly(function(password: any) {
+  console.assert(isValidPassword(password), `invalid password ${password}`);
+});
+
+const assertValidUsername = devOnly(function(username: any) {
+  console.assert(isValidUsername(username), `invalid username ${username}`);
+});
+
+const assertValidEmail = devOnly(function(email: any) {
+  console.assert(isEmail(email), `invalid email ${email}`);
+});
+
+async function generateSaltHashForPassword(password: string): Promise<[Buffer, Buffer]> {
+  assertValidPassword(password);
+  const salt = await passwordService.generateSalt();
+  const hash = await passwordService.passwordHash(salt, password);
+  return [salt, hash];
+}
+
+
+export class UserModel {
+  static async insert(raw: RawUser, drive: DatabaseDriver = db): Promise<number> {
+    [raw.salt, raw.hash] = await generateSaltHashForPassword(raw.password);
+    assertValidRawUser(raw);
+    return insertReturnId(SQLs.INSERT as string, raw, drive);
+  }
+
+  static async create(raw: RawUser, drive: DatabaseDriver = db): Promise<UserRecord> {
+    const id = await this.insert(raw, drive);
+    const row = Object.create(raw);
+    row.id = id;
+    return fromDatabaseRow(row, UserRecord);
+  }
+
+  static async changePassword(params: ChangePasswordParams, driver: DatabaseDriver = db) {
+    assertValidChangePasswordParams(params);
+    await driver.execute(SQLs.CHANGE_PASSWORD as string, params);
+  }
+
+  static async emailExistsInDatabase(email: string, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidEmail(email);
+    const [rows] = await driver.query('SELECT id FROM Users WHERE email = :email LIMIT 1', {email});
+    return !!rows && !!(rows as any).length;
+  }
+
+  static async usernameExistsInDatabase(username: string, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidUsername(username);
+    const [rows] = await driver.query('SELECT id FROM Users WHERE username = :username LIMIT 1', {username});
+    return !!rows && !!(rows as any).length;
+  }
+
+  static async findUserByUsername(username: string, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
+    assertValidUsername(username);
+    const [rows] = await driver.query(`SELECT id, username, nickname, avatarUrl, bannerUrl, role, salt, hash FROM Users WHERE userName = :username LIMIT 1`, {username});
+    if (!_.isEmpty(rows)) {
+      return fromDatabaseRow(rows[0], UserRecord);
+    }
+  }
+
+  static async authenticate(username: string, password: string): Promise<UserRecord | undefined> {
+    if (!isValidUsername(username) || !isValidPassword(password)) {
+      return;
+    }
+    const user = await this.findUserByUsername(username);
+    if (user && await user.verifyPassword(password)) {
+      return user;
+    }
+  }
+
+  static async findUserByObservation(observation: Observation, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
+    assertValidObservation(observation);
+    const [rows] = await driver.query('SELECT nickname, avatarUrl, bannerUrl, circlerCount, UserBlockUser.id IS NOT NULL AS blockedByMe FROM Users LEFT JOIN (SELECT id, blockeeId FROM UserBlockUser WHERE blockeeId = :userId AND blockerId = :observerId ) UserBlockUser ON (Users.id = UserBlockUser.blockeeId) WHERE Users.id = :targetId LIMIT 1', observation);
+    if (!_.isEmpty(rows)) {
+      return fromDatabaseRow(rows[0], UserRecord);
+    }
+  }
+
+  static async findMinimumUsersInCircle(circle: CircleRecord, driver: DatabaseDriver = db): Promise<MinimumUser[]> {
+    const [userRows] = await driver.query('SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :circleId)', {
+      circleId: circle[$id]
+    });
+    return _.map(userRows, ({id, nickname, avatarUrl}) => {
+      return {
+        id: userObfuscator.obfuscate(id),
+        nickname, avatarUrl
+      };
     });
   }
 }
 
-({
-  unObfuscateFrom: UserModel.unObfuscateFrom,
-  obfuscate: UserModel.prototype.obfuscate
-} = obfuscatorFuns(USER_OBFUSCATE_MAPS, UserModel));
 
-
+// static async getAllCircleForUser(ownerId: number, driver: DatabaseDriver = db) {
+//   const [circleRows] = await driver.query('SELECT id, name, userCount FROM Circles WHERE ownerId = :ownerId', {ownerId});
+//   const data = await Promise.all(_.map((circleRows || []) as any[], async (circle) => {
+//     const [userRows] = await driver.query('SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :id)', circle);
+//     circle.users = userRows;
+//     disableStringify(circle);
+//     disableStringify(circle.users);
+//     return circle as CircleUsers;
+//   }));
+//   disableStringify(data);
+//   const pack = new CirclePacker();
+//   pack.circles = data;
+//   return pack;
+// }

@@ -1,9 +1,9 @@
 import {assert} from 'chai';
-import {UserModel} from "./user.model";
+import {$email, $hash, $salt, $username, UserModel, UserRecord} from "./user.model";
 import {MAX_USERNAME_LENGTH} from "../../shared/constants";
-import {isValidStringId} from "../../shared/utils";
+import {isValidPassword, isValidStringId, isValidUsername} from "../../shared/utils";
 import {authService} from "../service/auth.service";
-import {isValidPassword, isValidUsername} from "../../shared/utils";
+import {$id} from "../service/obfuscator.service";
 
 const randomPassword = (function() {
   function gen() {
@@ -52,67 +52,94 @@ describe('user', () => {
 
 
   describe('UserModel', () => {
-    let user;
+    let user: UserRecord;
     beforeEach(() => {
-      user = new UserModel();
-      user.id = 10;
-      user.username = 'username';
-      user.password = 'password';
-      user.email = 'abc@123.com';
-      user.role = 'admin';
+      user = Object.create(UserRecord.prototype);
+      user[$id] = 10;
+      user[$username] = 'username';
+      user[$email] = 'abc@123.com';
+      user.role = 1;
       return user;
     });
 
 
-    it('should throw if user have no salt or hash', async () => {
-      user.password = randomPassword();
-      assert.throw(() => {
-        user.verify(randomPassword());
-      });
+    it('should throw if user have no salt and hash', async () => {
+      let err;
+      try {
+        await user.verifyPassword(randomPassword());
+      } catch (e) {
+        err = e;
+      }
+      assert.isDefined(err);
+    });
 
-      await user.hashPassword();
-      assert.throw(() => {
-        user.salt = undefined;
-        user.verify(randomPassword());
-      });
+    it('should throw if user have no salt', async () => {
+      let err;
+      try {
+        await user.hashPassword(randomPassword());
+      } catch (e) {
+        err = e;
+      }
+      assert.isUndefined(err);
 
-      await user.hashPassword();
-      assert.throw(() => {
-        user.hash = undefined;
-        user.verify(randomPassword());
-      });
+      try {
+        user[$salt] = undefined;
+        await user.verifyPassword(randomPassword());
+      } catch (e) {
+        err = e;
+      }
+      assert.isDefined(err);
+    });
+
+    it('should throw if user have no hash', async () => {
+      let err;
+      try {
+        await user.hashPassword(randomPassword());
+      } catch (e) {
+        err = e;
+      }
+      assert.isUndefined(err);
+
+      try {
+        user[$hash] = undefined;
+        await user.verifyPassword(randomPassword());
+      } catch (e) {
+        err = e;
+      }
+      assert.isDefined(err);
     });
 
     it('should return true for correct password', async () => {
       for (let i = 0; i < 10; ++i) {
-        const password = user.password = randomPassword();
-        await user.hashPassword();
+        const password = randomPassword();
+        await user.hashPassword(password);
         assert.isTrue(await user.verifyPassword(password), password);
       }
     });
 
     it('should return false for incorrect password', async () => {
       for (let i = 0; i < 10; ++i) {
-        const password = user.password = randomPassword();
+        const password = randomPassword();
         const password2 = randomPassword();
-        await user.hashPassword();
+        await user.hashPassword(password);
         assert.isFalse(await user.verifyPassword(password2), `${password}:${password2}`);
       }
     });
 
     it('should obfuscate id ', () => {
-      const data = user.getOutboundData();
+      const data = JSON.parse(JSON.stringify(user));
       assert.isObject(data, typeof data);
       assert.isDefined(data.id);
       assert.isTrue(isValidStringId(data.id), data);
     });
 
     it('should not output sensitive info when JSON.stringify', async () => {
-      await user.hashPassword();
-      assert.isDefined(user.password);
-      assert.isDefined(user.salt);
-      assert.isDefined(user.hash);
-      const data = user.getOutboundData();
+      await user.hashPassword(randomPassword());
+      assert.isDefined(user[$salt]);
+      assert.isDefined(user[$hash]);
+      const data = JSON.parse(JSON.stringify(user));
+      assert.isUndefined(data[$salt]);
+      assert.isUndefined(data[$hash]);
       assert.isUndefined(data.password);
       assert.isUndefined(data.salt);
       assert.isUndefined(data.hash);
@@ -122,24 +149,28 @@ describe('user', () => {
       const token = await authService.sign(user);
       assert.isString(token, typeof token);
       const payload = await authService.verify(token);
-      assert.notEqual(user.id, payload.id);
+      console.log(typeof payload);
+      assert.notEqual(user[$id], payload.id as any);
       assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
-      const data = UserModel.unObfuscateFrom(payload);
+      const data = Object.create(UserRecord.prototype);
+      data.unObfuscateAssign(payload);
       assert.isDefined(data);
-      assert.strictEqual(user.id, data!.id);
+      assert.isDefined(data[$id]);
+      assert.strictEqual(user[$id], data[$id]);
     });
 
     it('should not create a user from invalid object literal', async () => {
       const token = await authService.sign(user);
       assert.isString(token, typeof token);
       const payload = await authService.verify(token);
-      assert.notEqual(user.id, payload.id);
+      assert.notEqual(user[$id], payload.id as any);
       assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
       payload.id = '554d8f9e22022b23994ecff49b5033d1';
-      const data = UserModel.unObfuscateFrom(payload);
-      assert.isUndefined(data);
+      const data = Object.create(UserRecord.prototype);
+      data.unObfuscateAssign(payload);
+      assert.isUndefined(data[$id]);
     });
   });
 });

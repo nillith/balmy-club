@@ -86,3 +86,26 @@ export interface PublishCommentRequest {
   postId: string;
   content: string;
 }
+
+
+export interface TextContentResponse {
+  id: string;
+  authorId: string;
+  content: string;
+  plusCount: number;
+  createdAt: number;
+  authorNickname: string;
+  authorAvatarUrl: string;
+  plusedByMe?: boolean;
+}
+
+export interface CommentResponse extends TextContentResponse {
+  postId: string;
+}
+
+export interface PostResponse extends TextContentResponse {
+  reShareFromPostId: string;
+  visibility: PostVisibilities;
+  reShareCount: number;
+  comments: CommentResponse[];
+}

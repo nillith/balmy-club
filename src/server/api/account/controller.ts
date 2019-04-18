@@ -3,13 +3,11 @@ import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer.service";
 import validator from 'validator';
 import {SignUpPayload, signUpService} from "../../service/auth.service";
-import {UserCreateInfo, UserModel} from "../../models/user.model";
+import {RawUser, UserModel} from "../../models/user.model";
 import {isString} from "util";
 import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
 import _ from "lodash";
-import {respondWithJson} from "../../init";
-import {SignUpTypes} from "../../../shared/contracts";
-import {SignUpRequest} from "../../../shared/contracts";
+import {SignUpRequest, SignUpTypes} from "../../../shared/contracts";
 
 const SignUpErrorMessages = {
   invalidEmail: 'Invalid Email!',
@@ -23,7 +21,7 @@ const SignUpErrorMessages = {
 };
 
 
-const getSignUpInfo = async function(body: SignUpRequest): Promise<UserCreateInfo | string> {
+const getSignUpInfo = async function(body: SignUpRequest): Promise<RawUser | string> {
   let {email, username, password, nickname} = body as any;
   email = _.trim(email);
   username = _.trim(username);
@@ -83,7 +81,7 @@ const getSignUpInfo = async function(body: SignUpRequest): Promise<UserCreateInf
 
 export const signUp = async function(req: Request, res: Response, next: NextFunction) {
   const body: SignUpRequest = req.body;
-  const signUpInfo = await getSignUpInfo(body) as UserCreateInfo;
+  const signUpInfo = await getSignUpInfo(body) as RawUser;
   if (isString(signUpInfo)) {
     return respondWith(res, 400, signUpInfo);
   }
@@ -95,7 +93,7 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
     case SignUpTypes.Direct:
       const user = await UserModel.create(signUpInfo);
       if (user) {
-        return respondWithJson(res, await user.getLoginData());
+        return res.json(await user.getLoginData());
       }
       break;
     default:
