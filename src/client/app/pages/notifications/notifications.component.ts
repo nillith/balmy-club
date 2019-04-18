@@ -8,14 +8,11 @@ import {NotificationData, NotificationsApiService} from "../../api/notifications
 })
 export class NotificationsComponent implements OnInit {
 
-  notifications: NotificationData[] = [];
 
-  constructor(private notificationsApi: NotificationsApiService) {
+  constructor(public notificationsApi: NotificationsApiService) {
   }
 
   async ngOnInit() {
-    const self = this;
-    await this.notificationsApi.getUnreadCount();
-    self.notifications = await this.notificationsApi.getNotifications();
+    this.notificationsApi.fetchNotification();
   }
 }

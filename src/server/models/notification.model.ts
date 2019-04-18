@@ -133,6 +133,17 @@ const enum SQLs {
   USER_NOTIFICATIONS = 'SELECT Notifications.id, Activities.subjectId, Users.nickname AS subjectNickname, Users.avatarUrl AS subjectAvatarUrl, Activities.objectId, Activities.contextId, Activities.objectType, Activities.actionType, Activities.contextType FROM Notifications LEFT JOIN Activities ON (Notifications.activityId = Activities.id) LEFT JOIN Users ON (Activities.subjectId = Users.id) WHERE recipientId = :userId AND NOT isRead AND Activities.id IS NOT NULL ORDER BY Notifications.timestamp DESC LIMIT 100;'
 }
 
+export interface NotificationObserver {
+  notificationId: number;
+  userId: number;
+  isRead: boolean;
+}
+
+const assertValidNotificationObserver = devOnly(function(data: any) {
+  console.assert(isNumericId(data.notificationId), `invalid notification id ${data.notificationId}`);
+  console.assert(isNumericId(data.userId), `invalid notification id ${data.userId}`);
+});
+
 export class NotificationModel {
 
   static async insert(raw: RawNotification, driver: DatabaseDriver = db): Promise<number> {
@@ -176,5 +187,11 @@ export class NotificationModel {
       });
     }
     return results;
+  }
+
+  static async updateNotificationRead(params: NotificationObserver, driver: DatabaseDriver = db) {
+    assertValidNotificationObserver(params);
+    const [result] = await driver.query(`UPDATE Notifications SET isRead = :isRead WHERE recipientId = :userId AND id = :notificationId`, params);
+    return (result as any).affectedRows === 1;
   }
 }

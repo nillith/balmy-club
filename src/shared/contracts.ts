@@ -123,4 +123,5 @@ export interface NotificationResponse {
   subjectId: string;
   objectId: string;
   contextExtraId?: string;
+  isRead?: boolean;
 }

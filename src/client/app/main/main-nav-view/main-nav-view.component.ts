@@ -5,6 +5,7 @@ import {SettingService} from "../avatar-setting-dialog/setting.service";
 import {IService} from "../../services/i.service";
 import {NavEntry} from "../../../constants";
 import {NotificationsApiService} from "../../api/notifications-api.service";
+import {NotificationDialogService} from "../../modules/notification/notification-dialog/notification-dialog.service";
 
 @Component({
   selector: 'app-main-nav-view',
@@ -18,7 +19,8 @@ export class MainNavViewComponent implements OnInit {
               public loginWallService: LoginWallService,
               public settingService: SettingService,
               public iService: IService,
-              public notificationsApi: NotificationsApiService) {
+              public notificationsApi: NotificationsApiService,
+              public notificationsDialog: NotificationDialogService) {
   }
 
   ngOnInit(): void {

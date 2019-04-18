@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {NotificationData} from "../../../api/notifications-api.service";
+import {NotificationData, NotificationsApiService} from "../../../api/notifications-api.service";
 import {Activity} from "../../../../../shared/interf";
+
 @Component({
   selector: 'app-notification-list-view',
   templateUrl: './notification-list-view.component.html',
@@ -11,9 +12,17 @@ export class NotificationListViewComponent implements OnInit {
 
   Activity = Activity;
 
-  constructor() {
+  constructor(private notificationsApi: NotificationsApiService) {
   }
 
   ngOnInit() {
+  }
+
+  async onNotificationClick(n: NotificationData) {
+    if (n.isRead) {
+      return;
+    }
+    n.isRead = true;
+    await this.notificationsApi.markNotificationAsReadById(n.id);
   }
 }

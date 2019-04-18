@@ -23,7 +23,8 @@
         <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
       </button>
       <span class="app-fill-space"></span>
-      <button mat-icon-button color="warn">
+      <span #notificationAnchor></span>
+      <button mat-icon-button color="warn" (click)="notificationsDialog.popup(notificationAnchor)">
         <mat-icon matBadge="{{notificationsApi.unreadCount > 0 ?notificationsApi.unreadCount:null}}"
                   matBadgeColor="warn" matBadgeSize="small"
                   matBadgeOverlap="true" role="img">

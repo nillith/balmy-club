@@ -1,7 +1,10 @@
 <div *ngIf="notifications">
-  <mat-card *ngFor="let n of notifications" fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="10px" >
+  <mat-card *ngFor="let n of notifications"
+            [class.read-notification]="n.isRead"
+            (click)="onNotificationClick(n)"
+            fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="10px">
     <app-avatar [user]="n.subject"></app-avatar>
-    <a href="u/{{n.subjectId}}">{{n.subjectNickname}}</a>
+    <a href="u/{{n.subjectId}}" target="_blank">{{n.subjectNickname}}</a>
     <div [ngSwitch]="n.objectType">
       <div *ngSwitchCase="Activity.ObjectTypes.Comment">
         <app-comment-action-view [notification]="n"></app-comment-action-view>
