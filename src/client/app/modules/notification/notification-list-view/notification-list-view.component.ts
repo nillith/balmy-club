@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NotificationData, NotificationsApiService} from "../../../api/notifications-api.service";
 import {Activity} from "../../../../../shared/interf";
+import {StringIds} from "../../i18n/translations/string-ids";
 
 @Component({
   selector: 'app-notification-list-view',
@@ -11,6 +12,7 @@ export class NotificationListViewComponent implements OnInit {
   @Input() notifications: NotificationData[];
 
   Activity = Activity;
+  StringIds = StringIds;
 
   constructor(private notificationsApi: NotificationsApiService) {
   }

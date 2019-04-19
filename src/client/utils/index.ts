@@ -49,15 +49,3 @@ export class DataStorage {
     localStorage.clear();
   }
 }
-
-export function elementInViewport(elem: HTMLElement) {
-  const rect = elem.getBoundingClientRect();
-  console.log(rect);
-  console.log(`${window.innerWidth || document.documentElement.clientWidth}:${window.innerHeight || document.documentElement.clientHeight}`)
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
-}

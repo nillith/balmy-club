@@ -2,6 +2,7 @@ import {Component, ElementRef, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {NotificationsApiService} from "../../../api/notifications-api.service";
 import {makeBackdropTransparent} from "../../../../utils/index";
+import {StringIds} from "../../i18n/translations/string-ids";
 
 @Component({
   selector: 'app-notification-dialog',
@@ -10,6 +11,8 @@ import {makeBackdropTransparent} from "../../../../utils/index";
 })
 export class NotificationDialogComponent implements OnInit {
   anchor: HTMLElement;
+  StringIds = StringIds;
+
   constructor(public hostElement: ElementRef,
               public dialogRef: MatDialogRef<NotificationDialogComponent>,
               @Inject(MAT_DIALOG_DATA) data: { anchor: HTMLElement },
@@ -23,9 +26,7 @@ export class NotificationDialogComponent implements OnInit {
 
       self.notificationsApi.fetchNotification();
       const {nativeElement} = self.hostElement;
-      console.log(nativeElement);
       const {width, height} = nativeElement.getBoundingClientRect();
-      console.log(`${width}:${height}`);
       const {anchor, dialogRef} = self;
       const rect = anchor.getBoundingClientRect();
       const top = Math.floor(rect.bottom + 10);

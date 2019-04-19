@@ -9,6 +9,7 @@ import {DataStorage} from "../../utils/index";
 import {ChangeSettingsRequest, LoginResponse, MinimumUser, UserResponse} from "../../../shared/contracts";
 import _ from 'lodash';
 import {CommentModel} from "../models/comment.model";
+import {NotificationsApiService} from "../api/notifications-api.service";
 
 const STORAGE_KEYS = {
   USER: 'user',
@@ -28,7 +29,7 @@ export class IService {
   public allUsers: MinimumUser[] = [];
 
 
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService, private notificationsApi: NotificationsApiService) {
     const self = this;
     self.unpackToken(getAccessToken());
     if (self.isLoggedIn()) {
@@ -151,7 +152,6 @@ export class IService {
 
   getCirclesIdsContainsUser(userId: string) {
     const self = this;
-    console.log(self);
     return self.circles.map((c) => {
       if (c.isInCircle(userId)) {
         return c.id;

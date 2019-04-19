@@ -1,6 +1,6 @@
 {
   "name": "circle-plus",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "client:start": "ng serve -o",
     "server:start": "npx nodemon --exec npx ts-node --project src/server/tsconfig.json ./src/server/index.ts",
@@ -76,7 +76,6 @@
     "@types/ejs": "^2.6.3",
     "@types/express": "^4.16.1",
     "@types/express-session": "^1.15.12",
-    "@types/express-validator": "^3.0.0",
     "@types/hammerjs": "^2.0.36",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",

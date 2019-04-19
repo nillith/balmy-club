@@ -3,10 +3,15 @@ mat-card {
   margin: 10px;
 }
 
-a{
+a {
   text-decoration: none;
 }
 
-.read-notification{
+.read-notification {
   background-color: aliceblue;
+}
+
+.notification-list {
+  max-height: 65vh;
+  overflow-y: auto;
 }

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NotificationData} from "../../../api/notifications-api.service";
 import {Activity} from "../../../../../shared/interf";
+import {StringIds} from "../../i18n/translations/string-ids";
 
 @Component({
   selector: 'app-user-action-view',
@@ -9,6 +10,7 @@ import {Activity} from "../../../../../shared/interf";
 })
 export class UserActionViewComponent implements OnInit {
   Activity = Activity;
+  StringIds = StringIds;
   @Input() notification: NotificationData;
 
   constructor() {

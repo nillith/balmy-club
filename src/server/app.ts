@@ -53,26 +53,26 @@ app.use((req, res, next) => {
 
 app.use(express.static(config.publicRoot, {maxAge: 31557600000}));
 
-if (env !== 'test' && env !== 'development') {
-  app.use(lusca({
-    csrf: true,
-    xframe: 'SAMEORIGIN',
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-      preload: true
-    },
-    xssProtection: true
-  }));
-}
+app.use(lusca({
+  csrf: {
+    angular: true
+  },
+  xframe: 'SAMEORIGIN',
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  xssProtection: true
+}));
 
 if (env === 'development' || env === 'test') {
   app.use((err, req, res, next) => {
-    return res.status(err[$status]).send(err.getStacktrace());
+    console.log(err);
+    return res.status(err[$status]).send(err.message);
   });
 } else {
   app.use((err, req, res, next) => {
-    console.assert(err);
     let status = err[$status];
     let msg = err[$msg] || STATUS_CODES[status];
     if (!status || !msg) {

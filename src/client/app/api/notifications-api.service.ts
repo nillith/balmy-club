@@ -64,7 +64,7 @@ export class NotificationsApiService {
 
   async markNotificationAsReadById(notificationId: string) {
     const self = this;
-    await self.http.post(`${API_URLS.NOTIFICATIONS}/${notificationId}/read`, {responseType: 'text'}).toPromise();
+    await self.http.post(`${API_URLS.NOTIFICATIONS}/${notificationId}/read`, undefined, {responseType: 'text'}).toPromise();
     --self.unreadCount;
   }
 }

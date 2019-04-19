@@ -43,7 +43,7 @@ export class DatabaseRecordBase {
     throw Error('Not Implemented!');
   }
 
-  toJSON() {
+  toJSON(): any {
     const self = this;
     const result: any = {};
     cloneFields(self, self.constructor[$outboundCloneFields], result);
