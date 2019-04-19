@@ -19,12 +19,14 @@ export class SwitchDebouncer {
       if (delta < deviation) {
         try {
           if (Boolean(self.isOn) !== Boolean(self.snapshotState)) {
+            const targetResult = self.isOn;
             if (self.isOn) {
               await self.onAction();
             } else {
               await self.offAction();
             }
-            self.snapshotState = self.isOn;
+            self.snapshotState = targetResult;
+            self.isOn = targetResult;
           }
         } catch (e) {
           console.log(e);
