@@ -23,6 +23,7 @@ import {
 import _ from 'lodash';
 import {CircleModel, CircleRecord} from "./circle.model";
 import {ChangeSettingsRequest, MinimumUser} from "../../shared/contracts";
+import {isNull, isUndefined} from "util";
 
 
 const createSaveSettingsSql = (function() {
@@ -207,6 +208,9 @@ const assertValidRawUser = devOnly(function(data: any) {
   console.assert(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
   console.assert(isValidPassword(data.password), `invalid password ${data.password}`);
   console.assert(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
+  if(!data.email){
+    console.assert(isUndefined(data.email) || isNull(data.email), `empty string email`);
+  }
   assertValidSaltHash(data);
 });
 

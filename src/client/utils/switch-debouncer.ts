@@ -18,7 +18,7 @@ export class SwitchDebouncer {
       const delta = self.delay - elapsed;
       if (delta < deviation) {
         try {
-          if (self.isOn !== self.snapshotState) {
+          if (Boolean(self.isOn) !== Boolean(self.snapshotState)) {
             if (self.isOn) {
               await self.onAction();
             } else {

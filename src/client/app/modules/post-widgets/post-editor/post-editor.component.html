@@ -1,7 +1,7 @@
 <mat-card>
   <mat-card-header fxLayout="row" fxLayoutAlign="left center">
     <app-avatar [user]="post.author"></app-avatar>
-    <div>{{post.author.nickname}}</div>
+    <a href="{{ post.author | userLink}}" class="app-nickname-link" target="_blank">{{post.author.nickname}}</a>
     <mat-icon>navigate_next</mat-icon>
     <div>Public</div>
     <div class="app-fill-space"></div>
@@ -19,7 +19,8 @@
   <mat-card-content fxLayout="column">
     <div *ngIf="editMode">
       <div class="markdown-editor-container">
-        <app-markdown-editor #markdownEditor [content]="post.content" [contextUsers]="post.contextUsers"></app-markdown-editor>
+        <app-markdown-editor #markdownEditor [content]="post.content"
+                             [contextUsers]="post.contextUsers"></app-markdown-editor>
         <mat-divider></mat-divider>
         <mat-card-actions align="end" class="post-editor-content-section">
           <button mat-raised-button (click)="cancelEdit()">{{StringIds.Cancel | i18n}}</button>
@@ -31,8 +32,10 @@
                          class="post-editor-content-section"></app-markdown-viewer>
   </mat-card-content>
   <mat-card-actions align="end" style="padding:1em;">
-    <app-plus-one-button [initialOn]="post.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
-    <button mat-icon-button class="off-icon" (click)="onShareClick()">
+    <app-plus-one-button [initialOn]="post.plusedByMe" [onAction]="plusAction"
+                         [offAction]="unPlusAction"></app-plus-one-button>
+    <button mat-icon-button *ngIf="post.plusCount > 0">{{post.plusCount}}</button>
+    <button *ngIf="false" mat-icon-button class="off-icon" (click)="onShareClick()">
       <mat-icon>share</mat-icon>
     </button>
   </mat-card-actions>
@@ -48,7 +51,8 @@
       <div [ngClass]="{'limit-comment-height':limitCommentHeight}">
         <div *ngFor="let comment of post.comments; let i = index">
           <hr class="comment-hr">
-          <app-comment-editor id="{{comment.id}}" [comment]="comment" [post]="post" [contextUsers]="contextUsers"></app-comment-editor>
+          <app-comment-editor id="{{comment.id}}" [comment]="comment" [post]="post"
+                              [contextUsers]="contextUsers"></app-comment-editor>
         </div>
       </div>
     </mat-expansion-panel>

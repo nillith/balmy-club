@@ -34,6 +34,13 @@
               "src/client/styles.scss"
             ],
             "scripts": [
+              "node_modules/jquery/dist/jquery.slim.js",
+              "node_modules/to-mark/dist/to-mark.js",
+              "node_modules/highlight.js/lib/highlight.js",
+              "node_modules/squire-rte/build/squire.js",
+              "node_modules/markdown-it/dist/markdown-it.js",
+              "node_modules/tui-code-snippet/dist/tui-code-snippet.js",
+              "node_modules/codemirror/lib/codemirror.js",
               "node_modules/tui-editor/dist/tui-editor-Editor.js",
               "node_modules/masonry-layout/dist/masonry.pkgd.min.js"
             ],

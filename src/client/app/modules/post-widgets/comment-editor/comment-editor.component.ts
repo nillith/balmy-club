@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {CommentData} from "../../../../../shared/interf";
 import {PostEditorComponent} from "../post-editor/post-editor.component";
 import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-editor.component";
 import {StringIds} from '../../i18n/translations/string-ids';
@@ -43,11 +42,13 @@ export class CommentEditorComponent implements OnInit {
     self.plusAction = async () => {
       await self.commentsApi.plusOne(self.comment.id);
       self.comment.plusedByMe = true;
+      ++self.comment.plusCount;
     };
 
     self.unPlusAction = async () => {
       await self.commentsApi.unPlusOne(self.comment.id);
       self.comment.plusedByMe = false;
+      --self.comment.plusCount;
     };
   }
 
@@ -70,38 +71,51 @@ export class CommentEditorComponent implements OnInit {
   }
 
   createComment() {
+    const self = this;
     this.comment = {
+      author: {
+        id: self.iService.me.id,
+        avatarUrl: self.iService.me.avatarUrl,
+        nickname: self.iService.me.nickname,
+      },
       content: ''
     } as CommentResponse;
     this.toggleEditMode();
   }
 
   cancelEdit() {
-    if (!this.comment.id) {
-      this.comment = undefined;
+    const self = this;
+    if (!self.comment.id) {
+      self.comment = undefined;
     }
 
-    this.toggleEditMode();
+    self.toggleEditMode();
   }
 
   async saveEdit() {
     const self = this;
     self.loading = true;
+    const isNew = !self.comment.id;
     try {
       self.comment.content = self.editor.markdown;
       this.toggleEditMode();
       const comment = self.iService.createComment(self.post.id);
       comment.content = self.comment.content;
       await comment.save();
-      if (!self.post.comments) {
-        self.post.comments = [comment];
-      } else {
-        self.post.comments.push(comment);
+      if (isNew) {
+        if (!self.post.comments) {
+          self.post.comments = [comment];
+        } else {
+          self.post.comments.push(comment);
+        }
       }
     } catch (e) {
       self.toast.showToast(e.error || e.mentionIds);
     } finally {
       self.loading = false;
+      if (isNew) {
+        self.comment = undefined;
+      }
     }
   }
 

@@ -147,6 +147,7 @@ interface TimelineSqlCreateOptions {
   withUser?: boolean;
   withPrivatePost?: boolean;
   singleUser?: boolean;
+  circledOnly?: boolean;
 }
 
 const POST_PUBLIC_SQL_COLUMNS = [
@@ -210,6 +211,8 @@ const createTimelineSql = function(options: TimelineSqlCreateOptions) {
 
   if (options.singleUser) {
     ands.push('Posts.authorId = :userId');
+  } else if (options.circledOnly) {
+    ands.push('(Posts.authorId = :observerId OR Posts.authorId IN (SELECT userId FROM CircleUser WHERE circleId IN (SELECT id FROM Circles WHERE ownerId = :observerId)))');
   }
   processVisibilityOption(options, ands, leftJoins);
   return `SELECT ${cols.join(', ')} FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} ORDER BY Posts.createdAt DESC LIMIT :offset, ${POSTS_GROUP_SIZE}`;
@@ -250,7 +253,8 @@ const USER_TIMELINE_POSTS_SQL = createTimelineSql({
 
 const HOME_STREAM_POSTS_SQL = createTimelineSql({
   withUser: true,
-  withPrivatePost: true
+  withPrivatePost: true,
+  circledOnly: true,
 });
 
 export class PostModel {

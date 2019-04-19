@@ -91,13 +91,25 @@ body {
   margin-bottom: 2px;
 }
 
+.app-nickname-link {
+  font-size: mat-font-size($app-font-config, body-2);
+  font-family: mat-font-family($app-font-config);
+  text-decoration: none;
+  font-weight: bold;
+  color: #222222;
+  &:active {
+    color: red;
+    text-decoration: none;
+  }
+}
+
 .tui-editor-contents {
   font-size: mat-font-size($app-font-config, body-2);
   font-family: mat-font-family($app-font-config);
 
   margin: 0;
   padding: 0;
-  .app-mention-user {
+  .app-nickname-link {
     text-decoration: none;
     margin-left: 0.1em;
     margin-right: 0.1em;

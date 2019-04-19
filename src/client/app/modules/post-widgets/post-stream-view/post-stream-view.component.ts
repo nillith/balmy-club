@@ -4,12 +4,15 @@ import {HttpClient} from "@angular/common/http";
 import {utcTimestamp} from "../../../../../shared/utils";
 import {POSTS_GROUP_SIZE} from "../../../../../shared/constants";
 import {IService} from "../../../services/i.service";
+import {StringIds} from "../../i18n/translations/string-ids";
 
 
 export interface StreamFetcher {
   start(container: PostGroup[]);
 
   loadMore();
+
+  isEnd(): boolean;
 }
 
 export class DefaultStreamFetcher {
@@ -80,16 +83,19 @@ export class DefaultStreamFetcher {
     }).toPromise();
 
     try {
-      const result = JSON.parse(data);
+      if (data.startsWith('[')) {
+        const result = JSON.parse(data);
 
-      if (!result || result.length < POSTS_GROUP_SIZE) {
+        if (!result || result.length < POSTS_GROUP_SIZE) {
+          self.end = true;
+        }
+        if (result && result.length) {
+          self.container.push(self.preprocess(result));
+          ++self.groupIndex;
+        }
+      } else {
         self.end = true;
       }
-      if (result && result.length) {
-        self.container.push(self.preprocess(result));
-        ++self.groupIndex;
-      }
-
     } catch (e) {
       self.end = true;
       console.log(e);
@@ -115,10 +121,11 @@ export class PostStreamViewComponent implements OnInit, OnDestroy {
 
   @Input() streamFetcher: StreamFetcher;
   @ViewChild('loadmore') loadMoreDetector: ElementRef;
-
+  StringIds = StringIds;
   groups: PostGroup[] = [];
 
   scrollListener: any;
+  @Input() showDiscoverLinkIfEmpty = false;
 
   constructor() {
     this.scrollListener = this.onScroll.bind(this);

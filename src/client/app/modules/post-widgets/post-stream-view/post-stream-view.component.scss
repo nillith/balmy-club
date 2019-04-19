@@ -1,5 +1,7 @@
-.post-stream-view-container{
-  width:100%;
+@import "../../../../styles/mixin";
+
+.post-stream-view-container {
+  width: 100%;
   box-sizing: border-box;
   margin: 0;
   padding-top: 5em;
@@ -11,5 +13,11 @@ app-post-group-view {
 
 .post-stream-load-more-detector {
   height: 20px;
-  width:100%;
+  width: 100%;
+}
+
+.discover-link {
+  font-size: mat-font-size($app-font-config, title);
+  font-family: mat-font-family($app-font-config);
+  text-decoration: none;
 }

@@ -49,5 +49,9 @@ export const values = {
   [StringIds.Publish]: 'Publish',
   [StringIds.PlusOnePost]: '+1 Your Post',
   [StringIds.PublishedPost]: 'Published One Post',
+  [StringIds.PlusOneComment]: '+1 Your Comment',
+  [StringIds.PublishedComment]: 'Published Comment',
+  [StringIds.MentionedYou]: 'Mentioned You',
+  [StringIds.CircledYou]: 'Circled You',
 };
 

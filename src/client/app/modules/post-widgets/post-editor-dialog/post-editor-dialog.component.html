@@ -13,7 +13,7 @@
     <button class="visibility-setting" (click)="showVisibilitySelector()">{{visibilityName | i18n}}</button>
     <div *ngIf="isPrivate()" style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
       <mat-select #circleSelector style="width:150px;" (selectionChange)="onCircleChange($event)">
-        <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name | i18n}}</mat-option>
+        <mat-option *ngFor="let opt of []" [value]="opt.id">{{opt.name | i18n}}</mat-option>
       </mat-select>
     </div>
     <button *ngIf="isPrivate()" mat-icon-button (click)="showCircleSelection()">

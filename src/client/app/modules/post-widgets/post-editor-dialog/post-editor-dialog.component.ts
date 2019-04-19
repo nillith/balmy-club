@@ -88,6 +88,10 @@ export class PostEditorDialogComponent implements OnInit {
     self.dialogRef.close();
   }
 
+  onCircleChange() {
+
+  }
+
   async publishPost() {
     const self = this;
     self.loading = true;

@@ -44,11 +44,13 @@ export class PostEditorComponent implements OnInit {
     self.plusAction = async () => {
       await self.postApi.plusOne(self.post.id);
       self.post.plusedByMe = true;
+      ++self.post.plusCount;
     };
 
     self.unPlusAction = async () => {
       await self.postApi.unPlusOne(self.post.id);
       self.post.plusedByMe = false;
+      --self.post.plusCount;
     };
   }
 
@@ -84,7 +86,6 @@ export class PostEditorComponent implements OnInit {
   }
 
   async onShareClick() {
-    const self = this;
-    await self.postApi.unPlusOne(self.post.id);
+
   }
 }

@@ -23,7 +23,7 @@ const SignUpErrorMessages = {
 
 const getSignUpInfo = async function(body: SignUpRequest): Promise<RawUser | string> {
   let {email, username, password, nickname} = body as any;
-  email = _.trim(email);
+  email = _.trim(email) || undefined;
   username = _.trim(username);
   password = _.trim(password);
   nickname = _.trim(nickname);

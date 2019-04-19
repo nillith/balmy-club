@@ -47,4 +47,10 @@ export const values = {
   [StringIds.Share]: '分享',
   [StringIds.Menu]: '菜单',
   [StringIds.Publish]: '发布',
+  [StringIds.PlusOnePost]: '+1 你的信息',
+  [StringIds.PublishedPost]: '发布了信息',
+  [StringIds.PlusOneComment]: '+1 你的评论',
+  [StringIds.PublishedComment]: '发表了评论',
+  [StringIds.MentionedYou]: '提及你',
+  [StringIds.CircledYou]: '圈了你',
 };

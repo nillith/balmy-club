@@ -1,6 +1,13 @@
 <div fxLayout="row" fxLayoutAlign="left up">
-  <div class="comment-editor-avatar">
-    <img src="{{iService.me | avatarUrl}}">
+  <div class="comment-author">
+    <div *ngIf="!comment || !comment.author" class="comment-editor-avatar">
+      <img src="{{iService.me | avatarUrl}}">
+    </div>
+
+    <div *ngIf="comment && comment.author">
+      <app-avatar [user]="comment.author" [size]="'48px'"></app-avatar>
+      <a href="{{ comment.author | userLink}}" class="app-nickname-link" target="_blank">{{comment.author.nickname}}</a>
+    </div>
   </div>
   <div class="app-fill-space">
     <div *ngIf="editMode && comment">
@@ -20,7 +27,7 @@
     <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
       <div class="app-fill-space"></div>
       <app-plus-one-button [initialOn]="comment.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
-      <span>{{comment.plusCount}}</span>
+      <button mat-icon-button *ngIf="comment.plusCount > 0">{{comment.plusCount}}</button>
       <button [disabled]="menuBusy" mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>
