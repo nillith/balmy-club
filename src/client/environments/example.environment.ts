@@ -7,7 +7,8 @@ export const environment = {
   jwtModule: {
     whitelistedDomains: [],
     blacklistedRoutes: []
-  }
+  },
+  wsUrl: 'ws://localhost:8081'
 };
 
 /*

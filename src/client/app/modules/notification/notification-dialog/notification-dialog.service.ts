@@ -13,7 +13,7 @@ export class NotificationDialogService {
 
   async popup(anchor: HTMLElement) {
     const self = this;
-    const count = await self.notificationsApi.getUnreadCount();
+    const count = self.notificationsApi.unreadCount
     if (count > 0) {
       setTimeout(() => {
         self.dialog.open(NotificationDialogComponent, {

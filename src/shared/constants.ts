@@ -26,4 +26,20 @@ export const UserRanks = {
   [Roles.User]: 1,
   [Roles.Admin]: 2,
 };
+export const PING = 'PING';
+export const PONG = 'PONG';
+export const AUTH = 'AUTH';
+
+
+export const IPCMessageTypes = {
+  // client side only start
+  Token: 1,
+  Read: 2,
+  Logout: 3,
+  // client side only end
+
+
+  Sync: 100,
+  Notification: 101,
+};
 

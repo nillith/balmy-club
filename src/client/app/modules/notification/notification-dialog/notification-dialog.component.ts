@@ -24,7 +24,7 @@ export class NotificationDialogComponent implements OnInit {
     const self = this;
     setTimeout(function() {
 
-      self.notificationsApi.fetchNotification();
+      // self.notificationsApi.fetchNotification();
       const {nativeElement} = self.hostElement;
       const {width, height} = nativeElement.getBoundingClientRect();
       const {anchor, dialogRef} = self;

@@ -52,6 +52,8 @@ export const API_URLS = {
   ACCOUNT: 'api/account'
 };
 
+export const SHARED_WORKER_URL = '/workers/message-relay.js';
+
 
 export enum MenuActions {
   Edit = 1,

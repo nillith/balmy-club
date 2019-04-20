@@ -35,6 +35,7 @@ export class IService {
     if (self.isLoggedIn()) {
       self.loadUserFromStorage();
       self.loadCirclesFromStorage();
+      self.notificationsApi.onLogin();
     }
     if (!self.me || !self.me.id) {
       self.logout();
@@ -111,6 +112,7 @@ export class IService {
     self.unpackCircleData(data.circles);
     self.storage.saveObject(STORAGE_KEYS.USER, data.user);
     self.storage.saveObject(STORAGE_KEYS.CIRCLES, data.circles);
+    self.notificationsApi.onLogin();
   }
 
   updateUserData(data: UserData) {
@@ -143,6 +145,7 @@ export class IService {
     self.token = self.tokenContent = undefined;
     removeAccessToken();
     localStorage.clear();
+    self.notificationsApi.onLogout();
   }
 
   isLoggedIn() {

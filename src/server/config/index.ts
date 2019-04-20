@@ -13,6 +13,7 @@ export const config = {
   env: env.NODE_ENV || 'development',
   isProd: 'production' === env.NODE_ENV,
   port: toNumber('SERVER_PORT') || 9000,
+  webSocketPort: toNumber('WEB_SOCKET_PORT') | 8081,
   ip: env.SERVER_IP || '127.0.0.1',
   host: env.SERVER_HOST,
   isBehindTrustProxy: 'true' === env.IS_BEHIND_TRUST_PROXY,

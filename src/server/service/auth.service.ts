@@ -6,6 +6,8 @@ import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status} from "../constants/symbols";
 import {ACCESS_TOKEN_COOKIE_KEY, ACCESS_TOKEN_KEY, Roles, UserRanks} from "../../shared/constants";
 import {AccessTokenData} from "../../shared/interf";
+import {isString} from "util";
+import {INVALID_NUMERIC_ID, userObfuscator} from "./obfuscator.service";
 
 const $requestUser = Symbol('request user');
 
@@ -71,6 +73,18 @@ export class AuthService extends JwtHelper<UserRecord, AccessTokenData> {
     const user = Object.create(UserRecord.prototype);
     user.unObfuscateAssign(payload);
     return user;
+  }
+
+  async decodeUserIdFromToken(token: any) {
+    if (token && isString(token)) {
+      try {
+        const payload = await this.verify(token);
+        return userObfuscator.unObfuscate(payload.id);
+      } catch (e) {
+        // swallow
+      }
+    }
+    return INVALID_NUMERIC_ID;
   }
 
   requireRole(requiredRole: string): RequestHandler {

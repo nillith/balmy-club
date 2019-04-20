@@ -1,4 +1,4 @@
-<div *ngIf="notifications" class="notification-list">
+<div *ngIf="notifications">
   <mat-card *ngFor="let n of notifications"
             [class.read-notification]="n.isRead"
             (click)="onNotificationClick(n)"
