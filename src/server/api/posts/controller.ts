@@ -128,8 +128,6 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
         timestamp
       };
 
-      console.log(rawMentionNotifications);
-
       rawMentionAlikes = {
         notificationIds: bulkInsertIds(await NotificationModel.insertBulkNotifications(rawMentionNotifications, connection)),
         recipientIds: mentionIds,
@@ -155,7 +153,6 @@ export const getPublicStreamPosts = async function(req: Request, res: Response, 
   const group = Math.floor(parseFloat(query.g));
 
   if (!isValidTimestamp(timestamp) || group < 0) {
-    console.log(`${isValidTimestamp(timestamp)}:${group}`);
     return respondWith(res, 404);
   }
 
@@ -192,7 +189,6 @@ export const getPostById = async function(req: Request, res: Response, next: Nex
     };
     const post = await PostModel.getPostById(postViewer);
     if (post) {
-      console.log(JSON.stringify(post));
       post.comments = await CommentModel.getCommentsForPost(postViewer);
       return res.json(post);
     }

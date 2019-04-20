@@ -149,7 +149,6 @@ describe('user', () => {
       const token = await authService.sign(user);
       assert.isString(token, typeof token);
       const payload = await authService.verify(token);
-      console.log(typeof payload);
       assert.notEqual(user[$id], payload.id as any);
       assert.isTrue(isValidStringId(payload.id));
       assert.isObject(payload, typeof payload);
