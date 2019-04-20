@@ -20,10 +20,10 @@ export class MarkdownViewerComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
-    self.viewer = self.markdownService.createViewer({
+    const _this = this;
+    _this.viewer = _this.markdownService.createViewer({
       el: this.hostElement.nativeElement,
-      initialValue: self.content
+      initialValue: _this.content
     });
   }
 

@@ -33,14 +33,14 @@ export class DefaultStreamFetcher {
   }
 
   loadMore() {
-    const self = this;
-    if (self.end) {
+    const _this = this;
+    if (_this.end) {
       return;
     }
-    if (self.loading) {
-      self.goOn = true;
+    if (_this.loading) {
+      _this.goOn = true;
     } else {
-      self.nextGroup();
+      _this.nextGroup();
     }
   }
 
@@ -74,11 +74,11 @@ export class DefaultStreamFetcher {
   }
 
   async nextGroup() {
-    const self = this;
-    self.loading = true;
-    self.goOn = false;
+    const _this = this;
+    _this.loading = true;
+    _this.goOn = false;
 
-    const data = await self.http.get(`${self.apiUrl}?t=${self.timestamp}&g=${self.groupIndex}`, {
+    const data = await _this.http.get(`${_this.apiUrl}?t=${_this.timestamp}&g=${_this.groupIndex}`, {
       responseType: 'text'
     }).toPromise();
 
@@ -87,25 +87,25 @@ export class DefaultStreamFetcher {
         const result = JSON.parse(data);
 
         if (!result || result.length < POSTS_GROUP_SIZE) {
-          self.end = true;
+          _this.end = true;
         }
         if (result && result.length) {
-          self.container.push(self.preprocess(result));
-          ++self.groupIndex;
+          _this.container.push(_this.preprocess(result));
+          ++_this.groupIndex;
         }
       } else {
-        self.end = true;
+        _this.end = true;
       }
     } catch (e) {
-      self.end = true;
+      _this.end = true;
       console.log(e);
     } finally {
-      if (self.goOn) {
+      if (_this.goOn) {
         setTimeout(() => {
-          self.nextGroup();
+          _this.nextGroup();
         });
       } else {
-        self.loading = false;
+        _this.loading = false;
       }
     }
   }
@@ -132,8 +132,8 @@ export class PostStreamViewComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    const self = this;
-    self.streamFetcher.start(self.groups);
+    const _this = this;
+    _this.streamFetcher.start(_this.groups);
     window.addEventListener('scroll', this.scrollListener, true);
   }
 
@@ -143,12 +143,12 @@ export class PostStreamViewComponent implements OnInit, OnDestroy {
   }
 
   onScroll(e: Event) {
-    const self = this;
-    const {nativeElement} = self.loadMoreDetector;
+    const _this = this;
+    const {nativeElement} = _this.loadMoreDetector;
     const rect = nativeElement.getBoundingClientRect();
     const totalHeight = window.innerHeight || document.documentElement.clientHeight;
     if (rect.top < totalHeight) {
-      self.streamFetcher.loadMore();
+      _this.streamFetcher.loadMore();
     }
   }
 }

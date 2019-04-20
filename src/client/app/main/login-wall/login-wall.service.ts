@@ -15,22 +15,22 @@ export class LoginWallService {
   }
 
   isLoggedIn() {
-    const self = this;
-    if (self.guarding) {
+    const _this = this;
+    if (_this.guarding) {
       return false;
     }
-    const loggedIn = self.iService.isLoggedIn();
+    const loggedIn = _this.iService.isLoggedIn();
     if (!loggedIn) {
-      self.guarding = true;
+      _this.guarding = true;
       setTimeout(() => {
-        self.loginDialog = self.dialog.open(LoginDialogComponent, {
+        _this.loginDialog = _this.dialog.open(LoginDialogComponent, {
           disableClose: true
         });
 
-        self.loginDialog.afterClosed().subscribe(() => {
+        _this.loginDialog.afterClosed().subscribe(() => {
           setTimeout(() => {
-            self.loginDialog = null;
-            self.guarding = false;
+            _this.loginDialog = null;
+            _this.guarding = false;
           }, 300);
         });
       });

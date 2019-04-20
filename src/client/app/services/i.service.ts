@@ -30,15 +30,15 @@ export class IService {
 
 
   constructor(private http: HttpClient, private jwtHelper: JwtHelperService, private notificationsApi: NotificationsApiService) {
-    const self = this;
-    self.unpackToken(getAccessToken());
-    if (self.isLoggedIn()) {
-      self.loadUserFromStorage();
-      self.loadCirclesFromStorage();
-      self.notificationsApi.onLogin();
+    const _this = this;
+    _this.unpackToken(getAccessToken());
+    if (_this.isLoggedIn()) {
+      _this.loadUserFromStorage();
+      _this.loadCirclesFromStorage();
+      _this.notificationsApi.onLogin();
     }
-    if (!self.me || !self.me.id) {
-      self.logout();
+    if (!_this.me || !_this.me.id) {
+      _this.logout();
     }
   }
 
@@ -46,88 +46,88 @@ export class IService {
     if (!data) {
       return;
     }
-    const self = this;
-    self.me = data;
-    self.me.isMe = true;
+    const _this = this;
+    _this.me = data;
+    _this.me.isMe = true;
   }
 
   private unpackCircleData(circleData: any) {
     if (!circleData) {
       return;
     }
-    const self = this;
-    self.circles = [];
+    const _this = this;
+    _this.circles = [];
     for (const c of circleData) {
-      const circle = self.buildCircle();
+      const circle = _this.buildCircle();
       circle.assign(c);
-      self.circles.push(circle);
+      _this.circles.push(circle);
     }
 
-    for (const c of self.circles) {
+    for (const c of _this.circles) {
       c.buildLookTable();
     }
 
     const users: any = {};
-    for (const c of self.circles) {
+    for (const c of _this.circles) {
       if (c.users) {
         for (const u of c.users) {
           users[u.id] = u;
         }
       }
     }
-    self.allUsers = Object.values(users) as MinimumUser[];
+    _this.allUsers = Object.values(users) as MinimumUser[];
   }
 
   private unpackToken(token: string) {
-    const self = this;
-    self.token = token;
-    self.tokenContent = undefined;
+    const _this = this;
+    _this.token = token;
+    _this.tokenContent = undefined;
     if (!token) {
       return;
     }
-    const {jwtHelper} = self;
+    const {jwtHelper} = _this;
     if (jwtHelper.isTokenExpired(token)) {
       removeAccessToken();
     } else {
-      self.tokenContent = jwtHelper.decodeToken(token);
-      self.storage = new DataStorage(self.tokenContent.id);
+      _this.tokenContent = jwtHelper.decodeToken(token);
+      _this.storage = new DataStorage(_this.tokenContent.id);
       setAccessToken(token);
     }
   }
 
   private loadUserFromStorage() {
-    const self = this;
-    self.unpackUserData(self.storage.loadObject(STORAGE_KEYS.USER));
+    const _this = this;
+    _this.unpackUserData(_this.storage.loadObject(STORAGE_KEYS.USER));
   }
 
   private loadCirclesFromStorage() {
-    const self = this;
-    self.unpackCircleData(self.storage.loadObject(STORAGE_KEYS.CIRCLES));
+    const _this = this;
+    _this.unpackCircleData(_this.storage.loadObject(STORAGE_KEYS.CIRCLES));
   }
 
   onLogin(data: LoginResponse) {
-    const self = this;
-    self.unpackToken(data.token);
-    self.unpackUserData(data.user);
-    self.unpackCircleData(data.circles);
-    self.storage.saveObject(STORAGE_KEYS.USER, data.user);
-    self.storage.saveObject(STORAGE_KEYS.CIRCLES, data.circles);
-    self.notificationsApi.onLogin();
+    const _this = this;
+    _this.unpackToken(data.token);
+    _this.unpackUserData(data.user);
+    _this.unpackCircleData(data.circles);
+    _this.storage.saveObject(STORAGE_KEYS.USER, data.user);
+    _this.storage.saveObject(STORAGE_KEYS.CIRCLES, data.circles);
+    _this.notificationsApi.onLogin();
   }
 
   updateUserData(data: UserData) {
-    const self = this;
-    self.me = data;
-    self.storage.saveObject(self.tokenContent.id, data);
+    const _this = this;
+    _this.me = data;
+    _this.storage.saveObject(_this.tokenContent.id, data);
   }
 
   onCircleCreated(circle: CircleModel) {
     if (!circle || !circle.id) {
       return;
     }
-    const self = this;
-    self.circles.push(circle);
-    const circlesData = self.storage.loadObject(STORAGE_KEYS.CIRCLES);
+    const _this = this;
+    _this.circles.push(circle);
+    const circlesData = _this.storage.loadObject(STORAGE_KEYS.CIRCLES);
     const c = circle.assignOut();
     // if (c.users) {
     //   c.users = c.users.map((u) => {
@@ -137,15 +137,15 @@ export class IService {
     //   });
     // }
     circlesData.push(c);
-    self.storage.saveObject(STORAGE_KEYS.CIRCLES, circlesData);
+    _this.storage.saveObject(STORAGE_KEYS.CIRCLES, circlesData);
   }
 
   logout() {
-    const self = this;
-    self.token = self.tokenContent = undefined;
+    const _this = this;
+    _this.token = _this.tokenContent = undefined;
     removeAccessToken();
     localStorage.clear();
-    self.notificationsApi.onLogout();
+    _this.notificationsApi.onLogout();
   }
 
   isLoggedIn() {
@@ -154,8 +154,8 @@ export class IService {
   }
 
   getCirclesIdsContainsUser(userId: string) {
-    const self = this;
-    return self.circles.map((c) => {
+    const _this = this;
+    return _this.circles.map((c) => {
       if (c.isInCircle(userId)) {
         return c.id;
       }
@@ -163,8 +163,8 @@ export class IService {
   }
 
   buildCircle() {
-    const self = this;
-    return new CircleModel(self.http, self.me.id, self);
+    const _this = this;
+    return new CircleModel(_this.http, _this.me.id, _this);
   }
 
   isMyId(id: string): boolean {
@@ -172,20 +172,20 @@ export class IService {
   }
 
   async saveSettings(data: ChangeSettingsRequest) {
-    const self = this;
-    await self.http.patch(API_URLS.SETTINGS, data, {
+    const _this = this;
+    await _this.http.patch(API_URLS.SETTINGS, data, {
       responseType: 'text'
     }).toPromise();
-    self.updateUserData(data as UserData);
+    _this.updateUserData(data as UserData);
   }
 
 
   async viewUserById(id: string): Promise<UserResponse> {
-    const self = this;
-    if (self.me.id === id) {
-      return self.me;
+    const _this = this;
+    if (_this.me.id === id) {
+      return _this.me;
     }
-    const data = await self.http.get(`${API_URLS.USERS}/${id}`).toPromise();
+    const data = await _this.http.get(`${API_URLS.USERS}/${id}`).toPromise();
     return data as UserResponse;
   }
 
@@ -205,8 +205,8 @@ export class IService {
     if (!addCircleIds && !removeCircleIds) {
       return;
     }
-    const self = this;
-    await self.http.patch(`${API_URLS.CIRCLES}/user`, {
+    const _this = this;
+    await _this.http.patch(`${API_URLS.CIRCLES}/user`, {
       userId: user.id,
       addCircleIds,
       removeCircleIds
@@ -214,7 +214,7 @@ export class IService {
 
     if (addCircleIds) {
       for (const addId of addCircleIds) {
-        const circle = _.find(self.circles, c => c.id === addId);
+        const circle = _.find(_this.circles, c => c.id === addId);
         circle.users.push(user);
         circle.userIdMap[user.id] = user;
       }
@@ -222,14 +222,14 @@ export class IService {
 
     if (removeCircleIds) {
       for (const removeId of removeCircleIds) {
-        const circle = _.find(self.circles, c => c.id === removeId);
+        const circle = _.find(_this.circles, c => c.id === removeId);
         _.remove(circle.users, (u) => {
           return u.id === user.id;
         });
         circle.userIdMap[user.id] = undefined;
       }
     }
-    self.storage.saveObject(STORAGE_KEYS.CIRCLES, self.circles.map((c) => {
+    _this.storage.saveObject(STORAGE_KEYS.CIRCLES, _this.circles.map((c) => {
       return c.assignOut();
     }));
   }

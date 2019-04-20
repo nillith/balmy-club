@@ -11,42 +11,42 @@ export class SwitchDebouncer {
   }
 
   private startPendingTask(de: number) {
-    const self = this;
-    self.pending = true;
+    const _this = this;
+    _this.pending = true;
     setTimeout(async () => {
-      const elapsed = Date.now() - self.checkpoint;
-      const delta = self.delay - elapsed;
+      const elapsed = Date.now() - _this.checkpoint;
+      const delta = _this.delay - elapsed;
       if (delta < deviation) {
         try {
-          if (Boolean(self.isOn) !== Boolean(self.snapshotState)) {
-            const targetResult = self.isOn;
-            if (self.isOn) {
-              await self.onAction();
+          if (Boolean(_this.isOn) !== Boolean(_this.snapshotState)) {
+            const targetResult = _this.isOn;
+            if (_this.isOn) {
+              await _this.onAction();
             } else {
-              await self.offAction();
+              await _this.offAction();
             }
-            self.snapshotState = targetResult;
-            self.isOn = targetResult;
+            _this.snapshotState = targetResult;
+            _this.isOn = targetResult;
           }
         } catch (e) {
           console.log(e);
-          self.isOn = self.snapshotState;
+          _this.isOn = _this.snapshotState;
         } finally {
-          self.pending = false;
+          _this.pending = false;
         }
       } else {
-        self.startPendingTask(delta);
+        _this.startPendingTask(delta);
       }
     }, de);
   }
 
   switch() {
-    const self = this;
-    self.checkpoint = Date.now();
-    self.isOn = !self.isOn;
-    if (self.pending) {
+    const _this = this;
+    _this.checkpoint = Date.now();
+    _this.isOn = !_this.isOn;
+    if (_this.pending) {
       return;
     }
-    self.startPendingTask(self.delay);
+    _this.startPendingTask(_this.delay);
   }
 }

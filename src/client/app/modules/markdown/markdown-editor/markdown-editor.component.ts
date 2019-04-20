@@ -32,11 +32,11 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
   }
 
   disableEditor() {
-    const self = this;
-    if (self.__disabled) {
+    const _this = this;
+    if (_this.__disabled) {
       return;
     }
-    const {nativeElement} = self.hostElement;
+    const {nativeElement} = _this.hostElement;
     if (!nativeElement) {
       return;
     }
@@ -48,16 +48,16 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
         buttons[1].click();
       }
       toolbar.style.display = 'none';
-      self.__disabled = true;
+      _this.__disabled = true;
     }
   }
 
   enableEditor() {
-    const self = this;
-    if (!self.__disabled) {
+    const _this = this;
+    if (!_this.__disabled) {
       return;
     }
-    const {nativeElement} = self.hostElement;
+    const {nativeElement} = _this.hostElement;
     if (!nativeElement) {
       return;
     }
@@ -69,7 +69,7 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
         buttons[0].click();
       }
       toolbar.style.display = 'block';
-      self.__disabled = false;
+      _this.__disabled = false;
     }
   }
 
@@ -85,22 +85,22 @@ export class MarkdownEditorComponent implements OnInit, MentionSelectionListener
   }
 
   ngOnInit() {
-    const self = this;
-    const {nativeElement} = self.hostElement;
-    (window as any).MD = self.editor = self.mk.createEditor({
+    const _this = this;
+    const {nativeElement} = _this.hostElement;
+    (window as any).MD = _this.editor = _this.mk.createEditor({
       el: nativeElement,
-      events: self.mentionSelectionDialogService.createEditorListener(nativeElement, self),
-      initialValue: self.content,
-      toolbarItems: self.noToolbar ? [] : undefined,
-      placeholder: self.placeholder,
+      events: _this.mentionSelectionDialogService.createEditorListener(nativeElement, _this),
+      initialValue: _this.content,
+      toolbarItems: _this.noToolbar ? [] : undefined,
+      placeholder: _this.placeholder,
       maxHeight: '300px',
     });
 
     const sizer = nativeElement.querySelector('.CodeMirror-sizer');
     sizer.style.minHeight = '1em';
 
-    if (self.initialFocus) {
-      self.editor.focus();
+    if (_this.initialFocus) {
+      _this.editor.focus();
     }
   }
 

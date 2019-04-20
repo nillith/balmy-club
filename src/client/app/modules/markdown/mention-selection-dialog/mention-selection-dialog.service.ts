@@ -29,28 +29,28 @@ class MentionTriggerResolver {
     if (!isMentionTrigger(e)) {
       return;
     }
-    const self = this;
-    self.pressing = false;
-    if (self.longPress) {
+    const _this = this;
+    _this.pressing = false;
+    if (_this.longPress) {
       return;
     }
-    self.triggerListener.onTrigger();
+    _this.triggerListener.onTrigger();
   }
 
   private onKeyDown(e: MarkdownKeyboardEvent) {
     if (!isMentionTrigger(e)) {
       return;
     }
-    const self = this;
-    self.longPress = self.pressing;
-    self.pressing = true;
+    const _this = this;
+    _this.longPress = _this.pressing;
+    _this.pressing = true;
   }
 
   get editorListener() {
-    const self = this;
+    const _this = this;
     return {
-      keyup: self.onKeyUp.bind(self),
-      keydown: self.onKeyDown.bind(self),
+      keyup: _this.onKeyUp.bind(_this),
+      keydown: _this.onKeyDown.bind(_this),
     };
   }
 }
@@ -66,41 +66,41 @@ abstract class MentionTriggerThrottle implements MentionTriggerListener {
   protected abstract showDialog(): void;
 
   constructor(private delay: number, deviation: number) {
-    const self = this;
-    self.onDialogClose = () => {
-      self.showing = false;
+    const _this = this;
+    _this.onDialogClose = () => {
+      _this.showing = false;
     };
 
-    self.timeoutTask = function() {
-      const elapsed = Date.now() - self.startTimestamp;
+    _this.timeoutTask = function() {
+      const elapsed = Date.now() - _this.startTimestamp;
       const remainingTime = delay - elapsed;
       if (remainingTime > deviation) {
-        return setTimeout(self.timeoutTask, remainingTime);
+        return setTimeout(_this.timeoutTask, remainingTime);
       }
-      if (self.canceling) {
-        self.pending = false;
-        self.canceling = false;
+      if (_this.canceling) {
+        _this.pending = false;
+        _this.canceling = false;
         return;
       }
-      self.showDialog();
-      self.pending = false;
+      _this.showDialog();
+      _this.pending = false;
     };
   }
 
   onTrigger() {
-    const self = this;
-    if (self.showing) {
+    const _this = this;
+    if (_this.showing) {
       return;
     }
 
-    if (self.pending) {
-      self.canceling = true;
+    if (_this.pending) {
+      _this.canceling = true;
       return;
     }
 
-    self.startTimestamp = Date.now();
-    self.pending = true;
-    setTimeout(self.timeoutTask, self.delay);
+    _this.startTimestamp = Date.now();
+    _this.pending = true;
+    setTimeout(_this.timeoutTask, _this.delay);
   }
 }
 
@@ -110,16 +110,16 @@ export class MentionSelectionDialogPopper extends MentionTriggerThrottle {
   }
 
   protected showDialog(): void {
-    const self = this;
-    const {matDialog} = self;
+    const _this = this;
+    const {matDialog} = _this;
     const userSelectionDialog = matDialog.open(MentionSelectionDialogComponent, {
       data: {
-        anchor: self.sourceElement.querySelector('.CodeMirror-cursor'),
-        contextUsers: self.selectionListener.contextUsers
+        anchor: _this.sourceElement.querySelector('.CodeMirror-cursor'),
+        contextUsers: _this.selectionListener.contextUsers
       },
     });
-    userSelectionDialog.componentInstance.selectionListener = self.selectionListener;
-    userSelectionDialog.afterClosed().subscribe(self.onDialogClose);
+    userSelectionDialog.componentInstance.selectionListener = _this.selectionListener;
+    userSelectionDialog.afterClosed().subscribe(_this.onDialogClose);
   }
 }
 

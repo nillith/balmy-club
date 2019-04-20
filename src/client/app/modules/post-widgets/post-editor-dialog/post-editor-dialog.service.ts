@@ -18,10 +18,10 @@ export class PostEditorDialogService {
   }
 
   popup(post?: PostModel) {
-    const self = this;
+    const _this = this;
     if (!post) {
-      post = self.modelFactor.buildPost();
-      self.dialog.open(PostEditorDialogComponent, {
+      post = _this.modelFactor.buildPost();
+      _this.dialog.open(PostEditorDialogComponent, {
         data: {
           post
         },

@@ -34,17 +34,17 @@ export class CommentBuilder extends TextContentBuilder {
   }
 
   async build(): Promise<[Mentions, RawComment]> {
-    const self = this;
-    let mentions = self.extractMentionsFromContent();
+    const _this = this;
+    let mentions = _this.extractMentionsFromContent();
     if (!_.isEmpty(mentions)) {
-      mentions = await self.sanitizeContentMentions(mentions);
+      mentions = await _this.sanitizeContentMentions(mentions);
     }
     const mentionIds = JSON.stringify(mentions.map((m) => m.id));
     const raw: RawComment = {
-      authorId: self[$authorId],
-      postId: self[$postId],
-      content: self.content,
-      createdAt: self.createdAt,
+      authorId: _this[$authorId],
+      postId: _this[$postId],
+      content: _this.content,
+      createdAt: _this.createdAt,
       mentionIds
     };
     return [mentions, raw];

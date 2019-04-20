@@ -45,25 +45,25 @@ export class NotificationsApiService {
   messagePort?: MessagePort;
 
   constructor(private http: HttpClient, private toast: ToastService, private appRef: ApplicationRef) {
-    const self = this;
-    self.fetchTask = _.throttle(async () => {
-      if (self.loading) {
+    const _this = this;
+    _this.fetchTask = _.throttle(async () => {
+      if (_this.loading) {
         return;
       }
       try {
-        self.loading = true;
-        await self.getUnreadCount();
-        if (self.unreadCount) {
-          self.notifications = await self.getNotifications();
+        _this.loading = true;
+        await _this.getUnreadCount();
+        if (_this.unreadCount) {
+          _this.notifications = await _this.getNotifications();
         }
       } catch (e) {
-        self.toast.showToast(e.error || e.message);
+        _this.toast.showToast(e.error || e.message);
       } finally {
-        self.loading = false;
+        _this.loading = false;
       }
     }, 1000);
 
-    window.addEventListener('beforeunload', self.beforeUnload.bind(self));
+    window.addEventListener('beforeunload', _this.beforeUnload.bind(_this));
 
   }
 
@@ -166,16 +166,16 @@ export class NotificationsApiService {
   }
 
   async getUnreadCount() {
-    const self = this;
-    const data = await self.http.get(`${API_URLS.NOTIFICATIONS}/unread-count`, {responseType: 'text'}).toPromise();
-    return self.unreadCount = parseFloat(data);
+    const _this = this;
+    const data = await _this.http.get(`${API_URLS.NOTIFICATIONS}/unread-count`, {responseType: 'text'}).toPromise();
+    return _this.unreadCount = parseFloat(data);
   }
 
   async markNotificationAsReadById(notificationId: string) {
-    const self = this;
-    await self.http.post(`${API_URLS.NOTIFICATIONS}/${notificationId}/read`, undefined, {responseType: 'text'}).toPromise();
-    --self.unreadCount;
-    self.messagePort.postMessage(JSON.stringify({
+    const _this = this;
+    await _this.http.post(`${API_URLS.NOTIFICATIONS}/${notificationId}/read`, undefined, {responseType: 'text'}).toPromise();
+    --_this.unreadCount;
+    _this.messagePort.postMessage(JSON.stringify({
       type: IPCMessageTypes.Read,
       data: notificationId
     }));

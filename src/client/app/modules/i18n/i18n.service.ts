@@ -15,8 +15,8 @@ export class I18nService {
   public name: string;
 
   constructor() {
-    const self = this;
-    self.changeLanguageByCode(self.language);
+    const _this = this;
+    _this.changeLanguageByCode(_this.language);
   }
 
   private setTranslation(trans) {
@@ -31,10 +31,10 @@ export class I18nService {
   }
 
   changeLanguageByCode(v: string) {
-    const self = this;
+    const _this = this;
     localStorage.setItem(LANGUAGE_OPTION_KEY, v);
 
     const trans = TRANSLATIONS[v] || TRANSLATIONS[DEFAULT_LANGUAGE_CODE];
-    self.setTranslation(trans);
+    _this.setTranslation(trans);
   }
 }

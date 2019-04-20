@@ -19,11 +19,11 @@ export abstract class ModelBase {
   protected abstract async update(): Promise<void>;
 
   async save(): Promise<void> {
-    const self = this;
-    if (self.isNew()) {
-      return self.create();
+    const _this = this;
+    if (_this.isNew()) {
+      return _this.create();
     } else {
-      return self.update();
+      return _this.update();
     }
   }
 
@@ -32,12 +32,12 @@ export abstract class ModelBase {
   }
 
   assign(obj: any) {
-    const self = this;
-    cloneFields(obj, (self.constructor as any).ASSIGN_FIELDS, self);
+    const _this = this;
+    cloneFields(obj, (_this.constructor as any).ASSIGN_FIELDS, _this);
   }
 
   assignOut(target: any = {}) {
-    const self = this;
-    return cloneFields(self, (self.constructor as any).ASSIGN_FIELDS, target);
+    const _this = this;
+    return cloneFields(_this, (_this.constructor as any).ASSIGN_FIELDS, target);
   }
 }

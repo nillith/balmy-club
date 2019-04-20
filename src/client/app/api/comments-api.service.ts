@@ -10,17 +10,17 @@ export class CommentsApiService {
   }
 
   async plusOne(commentId: string) {
-    const self = this;
-    const data = await self.http.post(`${API_URLS.COMMENTS}/${commentId}/plus`, undefined, {responseType: 'text'}).toPromise();
+    const _this = this;
+    const data = await _this.http.post(`${API_URLS.COMMENTS}/${commentId}/plus`, undefined, {responseType: 'text'}).toPromise();
   }
 
   async unPlusOne(commentId: string) {
-    const self = this;
-    const data = await self.http.delete(`${API_URLS.COMMENTS}/${commentId}/plus`, {responseType: 'text'}).toPromise();
+    const _this = this;
+    const data = await _this.http.delete(`${API_URLS.COMMENTS}/${commentId}/plus`, {responseType: 'text'}).toPromise();
   }
 
   async deleteCommentById(commentId: string) {
-    const self = this;
-    const data = await self.http.delete(`${API_URLS.MY_COMMENTS}/${commentId}`, {responseType: 'text'}).toPromise();
+    const _this = this;
+    const data = await _this.http.delete(`${API_URLS.MY_COMMENTS}/${commentId}`, {responseType: 'text'}).toPromise();
   }
 }

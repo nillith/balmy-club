@@ -63,8 +63,8 @@ export class PostEditorDialogComponent implements OnInit {
   }
 
   get visibilityName() {
-    const self = this;
-    return VisibilityText[self.post.visibility];
+    const _this = this;
+    return VisibilityText[_this.post.visibility];
   }
 
   isPrivate() {
@@ -84,8 +84,8 @@ export class PostEditorDialogComponent implements OnInit {
 
 
   cancelPost() {
-    const self = this;
-    self.dialogRef.close();
+    const _this = this;
+    _this.dialogRef.close();
   }
 
   onCircleChange() {
@@ -93,32 +93,32 @@ export class PostEditorDialogComponent implements OnInit {
   }
 
   async publishPost() {
-    const self = this;
-    self.loading = true;
+    const _this = this;
+    _this.loading = true;
     try {
-      let content = self.editor.markdown;
+      let content = _this.editor.markdown;
       if (content) {
         content = content.trim();
       }
       if (!content) {
-        self.toastService.showToast('Empty post is not allowed!');
+        _this.toastService.showToast('Empty post is not allowed!');
         return;
       }
 
       if (content.length > MAX_POST_LENGTH) {
-        self.toastService.showToast(`Post exceeded max length: ${MAX_POST_LENGTH}!`);
+        _this.toastService.showToast(`Post exceeded max length: ${MAX_POST_LENGTH}!`);
       }
-      const {post} = self;
+      const {post} = _this;
       post.content = content;
-      self.editor.disableEditor();
+      _this.editor.disableEditor();
       await post.save();
-      self.dialogRef.close();
-      self.toastService.showToast(`Post Succeed!`);
+      _this.dialogRef.close();
+      _this.toastService.showToast(`Post Succeed!`);
     } catch (e) {
-      self.toastService.showToast(e.error || e.message);
-      self.editor.enableEditor();
+      _this.toastService.showToast(e.error || e.message);
+      _this.editor.enableEditor();
     } finally {
-      self.loading = false;
+      _this.loading = false;
     }
   }
 }

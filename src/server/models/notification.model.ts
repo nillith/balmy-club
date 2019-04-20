@@ -76,25 +76,25 @@ export class Notification extends DatabaseRecordBase {
   }
 
   obfuscateCloneTo(obj: any): void {
-    const self = this;
-    obj.id = notificationObfuscator.obfuscate(self[$id]);
-    obj.subjectId = userObfuscator.obfuscate(self[$subjectId]);
-    obj.objectId = ObjectIdObfuscator[obj.objectType].obfuscate(self[$objectId]);
+    const _this = this;
+    obj.id = notificationObfuscator.obfuscate(_this[$id]);
+    obj.subjectId = userObfuscator.obfuscate(_this[$subjectId]);
+    obj.objectId = ObjectIdObfuscator[obj.objectType].obfuscate(_this[$objectId]);
     if (obj[$contextId]) {
-      obj.contextId = ContextIdObfuscator[obj.contextType].obfuscate(self[$contextId]);
-      if (Activity.ContextTypes.Comment === self.contextType) {
-        obj.contextExtraId = postObfuscator.obfuscate(self[$contextExtraId]!);
+      obj.contextId = ContextIdObfuscator[obj.contextType].obfuscate(_this[$contextId]);
+      if (Activity.ContextTypes.Comment === _this.contextType) {
+        obj.contextExtraId = postObfuscator.obfuscate(_this[$contextExtraId]!);
       }
     }
   }
 
   hideCloneFrom(obj: any): void {
-    const self = this;
-    self[$id] = obj.id;
-    self[$subjectId] = obj.subjectId;
-    self[$objectId] = obj.objectId;
-    self[$contextId] = obj.contextId;
-    self[$contextExtraId] = obj.contextExtraId;
+    const _this = this;
+    _this[$id] = obj.id;
+    _this[$subjectId] = obj.subjectId;
+    _this[$objectId] = obj.objectId;
+    _this[$contextId] = obj.contextId;
+    _this[$contextExtraId] = obj.contextExtraId;
   }
 }
 

@@ -16,8 +16,8 @@ export class PlusOneButtonComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
-    self.plusOne = new SwitchDebouncer(self.initialOn, self.onAction, self.offAction);
+    const _this = this;
+    _this.plusOne = new SwitchDebouncer(_this.initialOn, _this.onAction, _this.offAction);
   }
 
   onPlusClick() {

@@ -88,10 +88,10 @@ export class AuthService extends JwtHelper<UserRecord, AccessTokenData> {
   }
 
   requireRole(requiredRole: string): RequestHandler {
-    const self = this;
+    const _this = this;
     const requiredRank = UserRanks[requiredRole];
     return asyncMiddleware(async function(req: Request, res: Response, next: NextFunction) {
-      const user = await self.decodeRequestUser(req);
+      const user = await _this.decodeRequestUser(req);
       if (user) {
         req[$requestUser] = user;
         if (req[$requestUser].role >= requiredRank) {

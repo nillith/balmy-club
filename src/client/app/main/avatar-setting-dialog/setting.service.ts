@@ -12,9 +12,9 @@ export class SettingService {
   }
 
   showAvatarSettingDialog(anchor: HTMLElement) {
-    const self = this;
+    const _this = this;
     setTimeout(() => {
-      self.avatarSettingDialog = self.dialog.open(AvatarSettingDialogComponent, {
+      _this.avatarSettingDialog = _this.dialog.open(AvatarSettingDialogComponent, {
         data: {
           anchor
         },

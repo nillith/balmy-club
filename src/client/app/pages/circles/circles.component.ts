@@ -29,10 +29,10 @@ export class CirclesComponent implements OnInit {
   saveButtonText = StringIds.Save;
 
   setSelectCircle(circle: CircleModel) {
-    const self = this;
-    self.selectedCircle = circle;
-    self.circleModifier = circle.createModifier();
-    self.saveButtonText = self.isCreatingNewCircle() ? StringIds.Create : StringIds.Save;
+    const _this = this;
+    _this.selectedCircle = circle;
+    _this.circleModifier = circle.createModifier();
+    _this.saveButtonText = _this.isCreatingNewCircle() ? StringIds.Create : StringIds.Save;
   }
 
   ngOnInit() {
@@ -40,50 +40,50 @@ export class CirclesComponent implements OnInit {
   }
 
   isCreatingNewCircle() {
-    const self = this;
-    return !!self.selectedCircle && self.selectedCircle.isNew();
+    const _this = this;
+    return !!_this.selectedCircle && _this.selectedCircle.isNew();
   }
 
   onSelectCircle(i: number) {
-    const self = this;
-    self.setSelectCircle(self.circles[i]);
+    const _this = this;
+    _this.setSelectCircle(_this.circles[i]);
   }
 
   createCircle() {
-    const self = this;
-    if (!self.isCreatingNewCircle()) {
-      const circle = self.iService.buildCircle();
-      self.setSelectCircle(circle);
+    const _this = this;
+    if (!_this.isCreatingNewCircle()) {
+      const circle = _this.iService.buildCircle();
+      _this.setSelectCircle(circle);
     }
   }
 
   onRemoveUser(i: number) {
-    const self = this;
-    self.circleModifier.addToRemoveListByIndex(i);
+    const _this = this;
+    _this.circleModifier.addToRemoveListByIndex(i);
   }
 
   cancelEdit() {
-    const self = this;
-    self.selectedCircle = null;
-    self.circleModifier = null;
+    const _this = this;
+    _this.selectedCircle = null;
+    _this.circleModifier = null;
   }
 
   async saveEdit() {
-    const self = this;
+    const _this = this;
     try {
-      const {circleModifier} = self;
+      const {circleModifier} = _this;
       if (!isValidCircleName(circleModifier.name)) {
-        self.toastService.showToast(`invalid circle name`);
+        _this.toastService.showToast(`invalid circle name`);
       }
-      self.loading = true;
+      _this.loading = true;
       circleModifier.commit();
       const {circle} = circleModifier;
       await circle.save();
-      self.loading = false;
-      self.setSelectCircle(circle);
-      self.toastService.showToast(`Succeed!`);
+      _this.loading = false;
+      _this.setSelectCircle(circle);
+      _this.toastService.showToast(`Succeed!`);
     } catch (e) {
-      self.toastService.showToast(e.message || e);
+      _this.toastService.showToast(e.message || e);
     }
   }
 }

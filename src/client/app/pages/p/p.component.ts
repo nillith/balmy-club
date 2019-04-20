@@ -20,22 +20,17 @@ export class PostPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
-    self.route.params.subscribe(async (params) => {
+    const _this = this;
+    _this.route.params.subscribe(async (params) => {
       try {
         const postId = params['postId'];
-        self.postId = postId;
-        if (!isValidStringId(self.postId)) {
-          return self.toastService.showToast('unknown post');
+        _this.postId = postId;
+        if (!isValidStringId(_this.postId)) {
+          return _this.toastService.showToast('unknown post');
         }
-        self.post = await self.postApi.getPostById(self.postId);
-        // self.user.id = postId;
-        // self.updateCircleStatus();
-        // self.loading = false;
-        // self.streamFetcher = new UserStreamFetcher(self.http, self.user, self.iService);
-//        self.updateExtraMenuItems();
+        _this.post = await _this.postApi.getPostById(_this.postId);
       } catch (e) {
-        self.toastService.showToast(e.error || e.message);
+        _this.toastService.showToast(e.error || e.message);
       }
     });
   }

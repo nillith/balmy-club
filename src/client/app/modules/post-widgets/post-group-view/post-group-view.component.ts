@@ -23,19 +23,19 @@ export class PostGroupViewComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit() {
-    const self = this;
-    self.masonry = new Masonry(self.container.nativeElement, {
+    const _this = this;
+    _this.masonry = new Masonry(_this.container.nativeElement, {
       itemSelector: ".post-group-item"
     });
 
-    self.onChildSizeChange = debounce(() => {
+    _this.onChildSizeChange = debounce(() => {
       setTimeout(() => {
-        self.masonry.layout();
+        _this.masonry.layout();
       });
     }, 180);
     setTimeout(() => {
-      self.masonry.layout();
-      self.isVisible = true;
+      _this.masonry.layout();
+      _this.isVisible = true;
     });
   }
 

@@ -34,23 +34,23 @@ export class PostEditorComponent implements OnInit {
   enabledActions = getIconMenuOption([MenuActions.Link]);
 
   constructor(private viewContainerRef: ViewContainerRef, private postApi: PostsApiService) {
-    const self = this;
-    const hostComponent = self.viewContainerRef["_view"].component;
+    const _this = this;
+    const hostComponent = _this.viewContainerRef["_view"].component;
     if (hostComponent.onChildSizeChange) {
-      self.notifyParent = () => {
+      _this.notifyParent = () => {
         hostComponent.onChildSizeChange();
       };
     }
-    self.plusAction = async () => {
-      await self.postApi.plusOne(self.post.id);
-      self.post.plusedByMe = true;
-      ++self.post.plusCount;
+    _this.plusAction = async () => {
+      await _this.postApi.plusOne(_this.post.id);
+      _this.post.plusedByMe = true;
+      ++_this.post.plusCount;
     };
 
-    self.unPlusAction = async () => {
-      await self.postApi.unPlusOne(self.post.id);
-      self.post.plusedByMe = false;
-      --self.post.plusCount;
+    _this.unPlusAction = async () => {
+      await _this.postApi.unPlusOne(_this.post.id);
+      _this.post.plusedByMe = false;
+      --_this.post.plusCount;
     };
   }
 
@@ -58,19 +58,19 @@ export class PostEditorComponent implements OnInit {
   }
 
   toggleEditMode() {
-    const self = this;
-    self.editMode = !self.editMode;
-    self.notifyParent();
+    const _this = this;
+    _this.editMode = !_this.editMode;
+    _this.notifyParent();
   }
 
   onMenu(action: MenuActions) {
-    const self = this;
+    const _this = this;
     switch (action) {
       case MenuActions.Edit:
-        self.toggleEditMode();
+        _this.toggleEditMode();
         break;
       case MenuActions.Link:
-        window.open(`p/${self.post.id}`);
+        window.open(`p/${_this.post.id}`);
         break;
     }
   }
@@ -80,8 +80,8 @@ export class PostEditorComponent implements OnInit {
   }
 
   saveEdit() {
-    const self = this;
-    self.post.content = self.editor.markdown;
+    const _this = this;
+    _this.post.content = _this.editor.markdown;
     this.toggleEditMode();
   }
 

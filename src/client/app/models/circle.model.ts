@@ -13,15 +13,15 @@ export class CircleModelModifier {
   name?: string;
 
   addToRemoveListByIndex(idx: number) {
-    const self = this;
-    const user = self.users && self.users[idx];
+    const _this = this;
+    const user = _this.users && _this.users[idx];
     if (!user) {
       return;
     }
 
-    self.users.splice(idx, 1);
+    _this.users.splice(idx, 1);
     if (user.id) {
-      self.removeUserList.push(user);
+      _this.removeUserList.push(user);
     }
   }
 
@@ -30,17 +30,17 @@ export class CircleModelModifier {
   }
 
   constructor(public circle: CircleModel) {
-    const self = this;
-    self.name = circle.name;
-    self.users = [...circle.users];
+    const _this = this;
+    _this.name = circle.name;
+    _this.users = [...circle.users];
   }
 
   commit() {
-    const self = this;
-    const {circle} = self;
-    circle.name = self.name;
-    circle.addUserIds = self.addUserList.map(u => u.id);
-    circle.removeUserIds = self.removeUserList.map(u => u.id);
+    const _this = this;
+    const {circle} = _this;
+    circle.name = _this.name;
+    circle.addUserIds = _this.addUserList.map(u => u.id);
+    circle.removeUserIds = _this.removeUserList.map(u => u.id);
     circle.buildLookTable();
   }
 }
@@ -65,12 +65,12 @@ export class CircleModel extends ModelBase {
   }
 
   public buildLookTable() {
-    const self = this;
-    const map = self.userIdMap = {};
-    if (!self.users) {
+    const _this = this;
+    const map = _this.userIdMap = {};
+    if (!_this.users) {
       return;
     }
-    for (const u of self.users) {
+    for (const u of _this.users) {
       map[u.id] = true;
     }
   }
@@ -81,13 +81,13 @@ export class CircleModel extends ModelBase {
 
 
   protected async create(): Promise<void> {
-    const self = this;
-    self.id = await self.http.post(API_URL, {
-      name: self.name,
-      userIds: self.users && self.users.map(u => u.id)
+    const _this = this;
+    _this.id = await _this.http.post(API_URL, {
+      name: _this.name,
+      userIds: _this.users && _this.users.map(u => u.id)
 
     }, {responseType: 'text'}).toPromise();
-    self.iService.onCircleCreated(self);
+    _this.iService.onCircleCreated(_this);
   }
 
 

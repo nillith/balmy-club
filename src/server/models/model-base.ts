@@ -44,23 +44,23 @@ export class DatabaseRecordBase {
   }
 
   toJSON(): any {
-    const self = this;
+    const _this = this;
     const result: any = {};
-    cloneFields(self, self.constructor[$outboundCloneFields], result);
-    self.obfuscateCloneTo(result);
+    cloneFields(_this, _this.constructor[$outboundCloneFields], result);
+    _this.obfuscateCloneTo(result);
     return result;
   }
 
   assign(from: any) {
-    const self = this;
-    cloneFields(from, self.constructor[$outboundCloneFields], self);
-    self.hideCloneFrom(from);
+    const _this = this;
+    cloneFields(from, _this.constructor[$outboundCloneFields], _this);
+    _this.hideCloneFrom(from);
   }
 
   unObfuscateAssign(from: any) {
-    const self = this;
-    cloneFields(from, self.constructor[$outboundCloneFields], self);
-    self.unObfuscateCloneFrom(from);
+    const _this = this;
+    cloneFields(from, _this.constructor[$outboundCloneFields], _this);
+    _this.unObfuscateCloneFrom(from);
   }
 }
 

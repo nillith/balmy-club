@@ -21,13 +21,13 @@ export class NotificationDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
+    const _this = this;
     setTimeout(function() {
 
-      // self.notificationsApi.fetchNotification();
-      const {nativeElement} = self.hostElement;
+      // _this.notificationsApi.fetchNotification();
+      const {nativeElement} = _this.hostElement;
       const {width, height} = nativeElement.getBoundingClientRect();
-      const {anchor, dialogRef} = self;
+      const {anchor, dialogRef} = _this;
       const rect = anchor.getBoundingClientRect();
       const top = Math.floor(rect.bottom + 10);
       const right = Math.floor(rect.left - 133);

@@ -8,7 +8,7 @@ const RULE_NAME = 'mention';
 const PATTERN = new RegExp(MENTION_PATTERN, 'y');
 
 export const MentionPlugin = function(markdownIt: MarkdownIt) {
-  const mentionRenderer = function(tokens: Token[], index: number, options: any, env: any, self: Renderer) {
+  const mentionRenderer = function(tokens: Token[], index: number, options: any, env: any, _this: Renderer) {
     const token = tokens[index];
     if (!token) {
       return;

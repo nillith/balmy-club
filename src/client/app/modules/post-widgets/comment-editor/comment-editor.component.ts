@@ -38,45 +38,45 @@ export class CommentEditorComponent implements OnInit {
               public iService: IService,
               private toast: ToastService,
               private commentsApi: CommentsApiService) {
-    const self = this;
-    self.plusAction = async () => {
-      await self.commentsApi.plusOne(self.comment.id);
-      self.comment.plusedByMe = true;
-      ++self.comment.plusCount;
+    const _this = this;
+    _this.plusAction = async () => {
+      await _this.commentsApi.plusOne(_this.comment.id);
+      _this.comment.plusedByMe = true;
+      ++_this.comment.plusCount;
     };
 
-    self.unPlusAction = async () => {
-      await self.commentsApi.unPlusOne(self.comment.id);
-      self.comment.plusedByMe = false;
-      --self.comment.plusCount;
+    _this.unPlusAction = async () => {
+      await _this.commentsApi.unPlusOne(_this.comment.id);
+      _this.comment.plusedByMe = false;
+      --_this.comment.plusCount;
     };
   }
 
   ngOnInit() {
-    const self = this;
+    const _this = this;
     if (!this.post) {
       throw Error('post required!');
     }
-    if (self.comment) {
-      if (self.iService.isMyId(self.comment.authorId)) {
-        self.enabledActions = getIconMenuOption([MenuActions.Edit, MenuActions.Delete]);
+    if (_this.comment) {
+      if (_this.iService.isMyId(_this.comment.authorId)) {
+        _this.enabledActions = getIconMenuOption([MenuActions.Edit, MenuActions.Delete]);
       }
     }
   }
 
   toggleEditMode() {
-    const self = this;
-    self.editMode = !self.editMode;
-    self.postEditor.notifyParent();
+    const _this = this;
+    _this.editMode = !_this.editMode;
+    _this.postEditor.notifyParent();
   }
 
   createComment() {
-    const self = this;
+    const _this = this;
     this.comment = {
       author: {
-        id: self.iService.me.id,
-        avatarUrl: self.iService.me.avatarUrl,
-        nickname: self.iService.me.nickname,
+        id: _this.iService.me.id,
+        avatarUrl: _this.iService.me.avatarUrl,
+        nickname: _this.iService.me.nickname,
       },
       content: ''
     } as CommentResponse;
@@ -84,68 +84,68 @@ export class CommentEditorComponent implements OnInit {
   }
 
   cancelEdit() {
-    const self = this;
-    if (!self.comment.id) {
-      self.comment = undefined;
+    const _this = this;
+    if (!_this.comment.id) {
+      _this.comment = undefined;
     }
 
-    self.toggleEditMode();
+    _this.toggleEditMode();
   }
 
   async saveEdit() {
-    const self = this;
-    self.loading = true;
-    const isNew = !self.comment.id;
+    const _this = this;
+    _this.loading = true;
+    const isNew = !_this.comment.id;
     try {
-      self.comment.content = self.editor.markdown;
+      _this.comment.content = _this.editor.markdown;
       this.toggleEditMode();
-      const comment = self.iService.createComment(self.post.id);
-      comment.content = self.comment.content;
+      const comment = _this.iService.createComment(_this.post.id);
+      comment.content = _this.comment.content;
       await comment.save();
       if (isNew) {
-        if (!self.post.comments) {
-          self.post.comments = [comment];
+        if (!_this.post.comments) {
+          _this.post.comments = [comment];
         } else {
-          self.post.comments.push(comment);
+          _this.post.comments.push(comment);
         }
       }
     } catch (e) {
-      self.toast.showToast(e.error || e.mentionIds);
+      _this.toast.showToast(e.error || e.mentionIds);
     } finally {
-      self.loading = false;
+      _this.loading = false;
       if (isNew) {
-        self.comment = undefined;
+        _this.comment = undefined;
       }
     }
   }
 
 
   async onMenu(action: MenuActions) {
-    const self = this;
+    const _this = this;
     try {
-      self.menuBusy = true;
+      _this.menuBusy = true;
       switch (action) {
         case MenuActions.Edit:
-          self.toggleEditMode();
+          _this.toggleEditMode();
           break;
         case MenuActions.Delete:
           try {
-            if (self.comment.id) {
-              await self.commentsApi.deleteCommentById(self.comment.id);
+            if (_this.comment.id) {
+              await _this.commentsApi.deleteCommentById(_this.comment.id);
             }
-            if (self.post.comments) {
-              const index = self.post.comments.indexOf(self.comment);
+            if (_this.post.comments) {
+              const index = _this.post.comments.indexOf(_this.comment);
               if (index !== -1) {
-                self.post.comments.splice(index, 1);
+                _this.post.comments.splice(index, 1);
               }
             }
           } catch (e) {
-            self.toast.showToast(e.error || e.mentionIds);
+            _this.toast.showToast(e.error || e.mentionIds);
           }
           break;
       }
     } finally {
-      self.menuBusy = false;
+      _this.menuBusy = false;
     }
 
   }

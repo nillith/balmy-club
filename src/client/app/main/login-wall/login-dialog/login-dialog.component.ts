@@ -127,13 +127,13 @@ export class LoginDialogComponent implements OnInit {
   }
 
   onChangeDialogType(t: number) {
-    const self = this;
-    self.togging = true;
+    const _this = this;
+    _this.togging = true;
     setTimeout(() => {
-      self.togging = false;
-      self.dialogType = t;
-      self.uiConfig = UiConfigs[t];
-      self.error = '';
+      _this.togging = false;
+      _this.dialogType = t;
+      _this.uiConfig = UiConfigs[t];
+      _this.error = '';
     }, 233);
   }
 
@@ -177,11 +177,11 @@ export class LoginDialogComponent implements OnInit {
   }
 
   async onSubmit() {
-    const self = this;
+    const _this = this;
     try {
-      self.error = '';
-      const {dialogType, dialogModel, authService} = self;
-      self.loading = true;
+      _this.error = '';
+      const {dialogType, dialogModel, authService} = _this;
+      _this.loading = true;
       switch (dialogType) {
         case DialogTypes.Login:
           await authService.login(dialogModel as LoginRequest);
@@ -197,19 +197,19 @@ export class LoginDialogComponent implements OnInit {
           break;
       }
     } catch (e) {
-      self.error = e.error || e.message;
+      _this.error = e.error || e.message;
     } finally {
       setTimeout(() => {
-        self.loading = false;
+        _this.loading = false;
       }, 300);
     }
   }
 
   onLanguageChange() {
-    const self = this;
-    self.changingLanguage = true;
+    const _this = this;
+    _this.changingLanguage = true;
     setTimeout(() => {
-      self.changingLanguage = false;
+      _this.changingLanguage = false;
     });
   }
 }

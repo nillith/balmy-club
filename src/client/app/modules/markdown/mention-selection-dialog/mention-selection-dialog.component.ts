@@ -34,11 +34,11 @@ export class MentionSelectionDialogComponent implements OnInit {
                 contextUsers: MinimumUser[]
               },
               public i: IService) {
-    const self = this;
-    self.anchor = data.anchor;
-    self.contextUsers = data.contextUsers;
-    self.allUsers = self.contextUsers.concat(self.i.allUsers);
-    self.filteredUsers = self.allUsers;
+    const _this = this;
+    _this.anchor = data.anchor;
+    _this.contextUsers = data.contextUsers;
+    _this.allUsers = _this.contextUsers.concat(_this.i.allUsers);
+    _this.filteredUsers = _this.allUsers;
   }
 
 
@@ -71,14 +71,14 @@ export class MentionSelectionDialogComponent implements OnInit {
   }
 
   onInputChange(value) {
-    const self = this;
+    const _this = this;
     if (!value) {
-      self.filteredUsers = self.allUsers;
+      _this.filteredUsers = _this.allUsers;
       return;
     }
     try {
       const reg = new RegExp(value, 'i');
-      self.filteredUsers = self.allUsers.filter((u) => {
+      _this.filteredUsers = _this.allUsers.filter((u) => {
         return reg.test(u.nickname);
       });
     } catch (e) {
@@ -87,15 +87,15 @@ export class MentionSelectionDialogComponent implements OnInit {
   }
 
   onListButtonClick(user) {
-    const self = this;
-    if (self.selected) {
+    const _this = this;
+    if (_this.selected) {
       return;
     }
-    self.selected = true;
-    self.dialogRef.close();
-    if (self.selectionListener) {
+    _this.selected = true;
+    _this.dialogRef.close();
+    if (_this.selectionListener) {
       setTimeout(() => {
-        self.selectionListener.onUserSelected(user);
+        _this.selectionListener.onUserSelected(user);
       });
     }
   }

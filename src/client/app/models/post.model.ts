@@ -16,8 +16,8 @@ export class PostModel extends TextContentModel {
   }
 
   protected async create(): Promise<void> {
-    const self = this;
-    const data = await self.http.post(API_URLS.POSTS, self.cloneModelFields([
+    const _this = this;
+    const data = await _this.http.post(API_URLS.POSTS, _this.cloneModelFields([
       'content',
       'reShareFromPostId',
       'visibility',
@@ -30,7 +30,7 @@ export class PostModel extends TextContentModel {
   }
 
   async plusOne() {
-    const self = this;
-    const data = await self.http.post(`${API_URLS.POSTS}/${self.id}/plus`, undefined, {responseType: 'text'}).toPromise();
+    const _this = this;
+    const data = await _this.http.post(`${API_URLS.POSTS}/${_this.id}/plus`, undefined, {responseType: 'text'}).toPromise();
   }
 }

@@ -122,8 +122,8 @@ export class TextContentBuilder {
   }
 
   extractMentionsFromContent(): Mentions {
-    const self = this;
-    const {content} = self;
+    const _this = this;
+    const {content} = _this;
     if (!content) {
       return [] as Mentions;
     }
@@ -140,7 +140,7 @@ export class TextContentBuilder {
   }
 
   __sanitizeContentMentions(mentions: Mentions, mentionableUsers: MentionableUsers) {
-    const self = this;
+    const _this = this;
     if (_.isEmpty(mentionableUsers)) {
       return [] as Mentions;
     }
@@ -156,15 +156,15 @@ export class TextContentBuilder {
     });
 
     if (!_.isEmpty(mentions)) {
-      self.content = sanitizeContentMentions(self.content!, idNicknameMap);
+      _this.content = sanitizeContentMentions(_this.content!, idNicknameMap);
     }
     return mentions;
   }
 
   async sanitizeContentMentions(mentions: Mentions): Promise<Mentions> {
-    const self = this;
-    assertSanitizeParams(self, mentions);
-    return self.__sanitizeContentMentions(mentions, await getMentionableUsers(mentions, self[$authorId]));
+    const _this = this;
+    assertSanitizeParams(_this, mentions);
+    return _this.__sanitizeContentMentions(mentions, await getMentionableUsers(mentions, _this[$authorId]));
   }
 }
 

@@ -60,22 +60,22 @@ export class SettingsComponent implements OnInit {
   }
 
   copyMeToSettingsData() {
-    const self = this;
+    const _this = this;
     for (const k of settingFields) {
-      self.settingsData[k] = self.iService.me[k];
+      _this.settingsData[k] = _this.iService.me[k];
     }
   }
 
   async saveSettings() {
-    const self = this;
-    self.loading = true;
+    const _this = this;
+    _this.loading = true;
     try {
-      await self.iService.saveSettings(self.settingsData);
-      self.toastService.showToast('save succeed!');
+      await _this.iService.saveSettings(_this.settingsData);
+      _this.toastService.showToast('save succeed!');
     } catch (e) {
-      self.toastService.showToast(e.error || e.message);
+      _this.toastService.showToast(e.error || e.message);
     } finally {
-      self.loading = false;
+      _this.loading = false;
     }
   }
 }

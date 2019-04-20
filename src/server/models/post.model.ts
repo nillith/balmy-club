@@ -75,19 +75,19 @@ export class PostBuilder extends TextContentBuilder {
   }
 
   async build(): Promise<[Mentions, RawPost]> {
-    const self = this;
-    let mentions = self.extractMentionsFromContent();
+    const _this = this;
+    let mentions = _this.extractMentionsFromContent();
     if (!_.isEmpty(mentions)) {
-      mentions = await self.sanitizeContentMentions(mentions);
+      mentions = await _this.sanitizeContentMentions(mentions);
     }
     const mentionIds = JSON.stringify(mentions.map((m) => m.id));
     const raw: RawPost = {
-      authorId: self[$authorId],
-      content: self.content,
-      createdAt: self.createdAt,
+      authorId: _this[$authorId],
+      content: _this.content,
+      createdAt: _this.createdAt,
       mentionIds,
-      reShareFromPostId: self[$reShareFromPostId] || null,
-      visibility: self.visibility,
+      reShareFromPostId: _this[$reShareFromPostId] || null,
+      visibility: _this.visibility,
     };
     return [mentions, raw];
   }

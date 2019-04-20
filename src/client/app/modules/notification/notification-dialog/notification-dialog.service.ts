@@ -12,11 +12,11 @@ export class NotificationDialogService {
   }
 
   async popup(anchor: HTMLElement) {
-    const self = this;
-    const count = self.notificationsApi.unreadCount
+    const _this = this;
+    const count = _this.notificationsApi.unreadCount
     if (count > 0) {
       setTimeout(() => {
-        self.dialog.open(NotificationDialogComponent, {
+        _this.dialog.open(NotificationDialogComponent, {
           data: {
             anchor
           },

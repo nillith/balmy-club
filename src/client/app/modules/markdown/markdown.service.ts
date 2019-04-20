@@ -57,8 +57,8 @@ export class MarkdownService {
   }
 
   private prepareOptions(option: any) {
-    const self = this;
-    option.language = option.language || self.i18Service.language.replace(/-.*$/, '');
+    const _this = this;
+    option.language = option.language || _this.i18Service.language.replace(/-.*$/, '');
     option.usageStatistics = false;
     setIfUndefined(option, 'usageStatistics', false);
     setIfUndefined(option, 'hideModeSwitch', true);

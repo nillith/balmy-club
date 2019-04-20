@@ -82,41 +82,41 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
   }
 
   getJwtPayload(): any {
-    const self = this;
+    const _this = this;
     const result: any = {};
-    result.id = userObfuscator.obfuscate(self[$id]);
-    result.usename = self[$username];
-    result.role = self.role;
+    result.id = userObfuscator.obfuscate(_this[$id]);
+    result.usename = _this[$username];
+    result.role = _this.role;
     return result;
   }
 
   async verifyPassword(password: string): Promise<boolean> {
-    const self = this;
-    assertCanVerifyPassword(self);
-    return passwordService.verifyPassword(password, self[$salt]!, self[$hash]!);
+    const _this = this;
+    assertCanVerifyPassword(_this);
+    return passwordService.verifyPassword(password, _this[$salt]!, _this[$hash]!);
   }
 
   async hashPassword(password: string) {
-    const self = this;
-    [self[$salt], self[$hash]] = await generateSaltHashForPassword(password);
+    const _this = this;
+    [_this[$salt], _this[$hash]] = await generateSaltHashForPassword(password);
   }
 
   async changePassword(newPassword: string, driver: DatabaseDriver = db) {
-    const self = this;
-    await self.hashPassword(newPassword);
+    const _this = this;
+    await _this.hashPassword(newPassword);
     await UserModel.changePassword({
-      userId: self[$id],
-      salt: self[$salt]!,
-      hash: self[$hash]!
+      userId: _this[$id],
+      salt: _this[$salt]!,
+      hash: _this[$hash]!
     }, driver);
   }
 
   async getLoginData(expire?: string | number, driver: DatabaseDriver = db) {
-    const self = this;
+    const _this = this;
 
-    const tokenPromise = authService.sign(self, expire);
+    const tokenPromise = authService.sign(_this, expire);
     const circlesPromise = CircleModel
-      .getCirclesByOwnerId(self[$id], driver)
+      .getCirclesByOwnerId(_this[$id], driver)
       .then((circles) => {
         return Promise.all(_.map(circles, async (circle) => {
           circle.users = await UserModel.findMinimumUsersInCircle(circle, driver);
@@ -125,10 +125,10 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
       });
 
     const [rows] = await driver.query(`SELECT nickname, avatarUrl, bannerUrl, email FROM Users WHERE id = :id LIMIT 1`, {
-      id: self[$id]
+      id: _this[$id]
     });
 
-    const user = self.toJSON();
+    const user = _this.toJSON();
     if (rows && rows[0]) {
       const row = rows[0];
       user.nickname = row.nickname;
@@ -154,12 +154,12 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
   }
 
   async saveSettings(data: ChangeSettingsRequest, driver: DatabaseDriver = db) {
-    const self = this;
+    const _this = this;
     const sql = createSaveSettingsSql(data);
-    (data as any).id = self[$id];
+    (data as any).id = _this[$id];
     await driver.query(sql, data);
     if (data.password) {
-      await self.changePassword(data.password, driver);
+      await _this.changePassword(data.password, driver);
     }
   }
 
@@ -179,12 +179,12 @@ const {
 UserRecord.prototype.obfuscateCloneTo = obfuscateCloneTo;
 UserRecord.prototype.unObfuscateCloneFrom = unObfuscateCloneFrom;
 UserRecord.prototype.hideCloneFrom = function(this: any, from: any) {
-  const self = this;
+  const _this = this;
   hideCloneFrom.call(this, from);
-  self[$username] = from.username;
-  self[$email] = from.email;
-  self[$salt] = from.salt;
-  self[$hash] = from.hash;
+  _this[$username] = from.username;
+  _this[$email] = from.email;
+  _this[$salt] = from.salt;
+  _this[$hash] = from.hash;
 };
 
 interface ChangePasswordParams {

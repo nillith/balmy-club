@@ -63,50 +63,50 @@ export class UserPageComponent implements OnInit {
   }
 
   ngOnInit() {
-    const self = this;
-    self.route.params.subscribe(async (params) => {
+    const _this = this;
+    _this.route.params.subscribe(async (params) => {
       try {
         const userId = params['userId'];
-        self.userId = userId;
-        if (!isValidStringId(self.userId)) {
-          return self.toastService.showToast('unknown user');
+        _this.userId = userId;
+        if (!isValidStringId(_this.userId)) {
+          return _this.toastService.showToast('unknown user');
         }
-        self.user = await self.iService.viewUserById(self.userId);
-        self.user.id = userId;
-        self.updateCircleStatus();
-        self.loading = false;
-        self.streamFetcher = new UserStreamFetcher(self.http, self.user, self.iService);
-        self.updateExtraMenuItems();
+        _this.user = await _this.iService.viewUserById(_this.userId);
+        _this.user.id = userId;
+        _this.updateCircleStatus();
+        _this.loading = false;
+        _this.streamFetcher = new UserStreamFetcher(_this.http, _this.user, _this.iService);
+        _this.updateExtraMenuItems();
       } catch (e) {
-        self.toastService.showToast(e.error || e.message);
+        _this.toastService.showToast(e.error || e.message);
       }
     });
   }
 
   updateExtraMenuItems() {
-    const self = this;
-    const {user} = self;
+    const _this = this;
+    const {user} = _this;
     if (user.blockedByMe) {
-      self.extraMenuItems = getIconMenuOption([MenuActions.UnBlock]);
+      _this.extraMenuItems = getIconMenuOption([MenuActions.UnBlock]);
     } else if (user.isCircledByMe) {
-      self.extraMenuItems = getIconMenuOption([MenuActions.Block]);
+      _this.extraMenuItems = getIconMenuOption([MenuActions.Block]);
     } else {
-      self.extraMenuItems = [];
+      _this.extraMenuItems = [];
     }
-    self.extraMenuItems = []; // TODO
+    _this.extraMenuItems = []; // TODO
   }
 
   updateCircleStatus() {
-    const self = this;
-    self.userInCircleIds = self.iService.getCirclesIdsContainsUser(self.user.id);
-    self.user.isCircledByMe = !!self.userInCircleIds.length;
-    self.circleSelects = [...self.userInCircleIds];
+    const _this = this;
+    _this.userInCircleIds = _this.iService.getCirclesIdsContainsUser(_this.user.id);
+    _this.user.isCircledByMe = !!_this.userInCircleIds.length;
+    _this.circleSelects = [..._this.userInCircleIds];
     this.updateCircleButtonText();
   }
 
   updateCircleButtonText() {
-    const self = this;
-    self.circleButtonText = self.user.isCircledByMe ? StringIds.Circled : StringIds.Circle;
+    const _this = this;
+    _this.circleButtonText = _this.user.isCircledByMe ? StringIds.Circled : StringIds.Circle;
   }
 
   onCircleButtonClick() {
@@ -114,22 +114,22 @@ export class UserPageComponent implements OnInit {
   }
 
   async onCircleSelectorClose() {
-    const self = this;
-    self.circlesUpdating = true;
+    const _this = this;
+    _this.circlesUpdating = true;
     try {
-      const {circleSelects, userInCircleIds} = self;
+      const {circleSelects, userInCircleIds} = _this;
       let addCircleIds = _.difference(circleSelects, userInCircleIds);
       let removeCircleIds = _.difference(userInCircleIds, circleSelects);
 
       if (!addCircleIds.length && !removeCircleIds.length) {
         return;
       }
-      await self.iService.changeUserCircles(self.user, addCircleIds, removeCircleIds);
-      self.updateCircleStatus();
+      await _this.iService.changeUserCircles(_this.user, addCircleIds, removeCircleIds);
+      _this.updateCircleStatus();
     } catch (e) {
-      self.toastService.showToast(e.error || e.message);
+      _this.toastService.showToast(e.error || e.message);
     } finally {
-      self.circlesUpdating = false;
+      _this.circlesUpdating = false;
     }
   }
 

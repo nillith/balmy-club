@@ -39,13 +39,13 @@ export class AvatarSettingDialogComponent implements OnInit {
   }
 
   logout() {
-    const self = this;
-    self.dialogRef.afterClosed().subscribe(() => {
+    const _this = this;
+    _this.dialogRef.afterClosed().subscribe(() => {
       setTimeout(function() {
-        self.i.logout();
+        _this.i.logout();
       }, 200);
     });
-    self.closeDialog();
+    _this.closeDialog();
   }
 
   closeDialog() {

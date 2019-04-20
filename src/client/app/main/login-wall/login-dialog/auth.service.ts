@@ -22,9 +22,9 @@ export class AuthService {
   }
 
   private async signUpWithPayload(payload: SignUpRequest) {
-    const self = this;
-    const authData = await self.postSignUpPayload(payload);
-    self.iService.onLogin(JSON.parse(authData));
+    const _this = this;
+    const authData = await _this.postSignUpPayload(payload);
+    _this.iService.onLogin(JSON.parse(authData));
     location.reload();
   }
 
@@ -34,30 +34,30 @@ export class AuthService {
   }
 
   async signUpWithToken(payload: SignUpWithTokenRequest) {
-    const self = this;
+    const _this = this;
     const {token, username, password, nickname} = payload;
-    await self.signUpWithPayload({
+    await _this.signUpWithPayload({
       token, username, password, nickname, type: SignUpTypes.WithToken
     });
   }
 
   async signUpWithUsername(payload: DirectSignUpRequest) {
-    const self = this;
+    const _this = this;
     const {email, username, password, nickname} = payload;
-    await self.signUpWithPayload({
+    await _this.signUpWithPayload({
       email, username, password, nickname, type: SignUpTypes.Direct
     });
   }
 
 
   async login(payload: LoginRequest) {
-    const self = this;
+    const _this = this;
     const {username, password, rememberMe} = payload;
-    const loginResult = await self.http.post(API_URLS.LOGIN, {
+    const loginResult = await _this.http.post(API_URLS.LOGIN, {
       username,
       password,
       rememberMe
     }).toPromise() as any;
-    self.iService.onLogin(loginResult);
+    _this.iService.onLogin(loginResult);
   }
 }
