@@ -18,6 +18,8 @@ import {isValidTimestamp} from "../../shared/utils";
 import db from "../persistence/index";
 import {Activity} from "../../shared/interf";
 import _ from 'lodash';
+import {assertValidRawActivity, RawActivity} from "./activity.model";
+import {UserRecord} from "./user.model";
 
 export class NotificationRecord extends DatabaseRecordBase {
   [$recipientId]: number;
@@ -37,7 +39,7 @@ export class NotificationRecord extends DatabaseRecordBase {
 const ObjectIdObfuscator = {
   [Activity.ObjectTypes.Post]: postObfuscator,
   [Activity.ObjectTypes.Comment]: commentObfuscator,
-  [Activity.ObjectTypes.Comment]: userObfuscator,
+  [Activity.ObjectTypes.User]: userObfuscator,
 };
 
 const ContextIdObfuscator = {
@@ -45,7 +47,22 @@ const ContextIdObfuscator = {
   [Activity.ContextTypes.Comment]: commentObfuscator,
 };
 
-export class Notification extends DatabaseRecordBase {
+export interface RawNotificationMessage {
+  rawActivity: RawActivity;
+  rawNotification: RawNotification;
+  notificationId: number;
+  contextExtraId?: number;
+  recipient?: UserRecord;
+}
+
+export const assertValidRawNotificationMessage = devOnly(function(data: any) {
+  assertValidRawActivity(data.rawActivity);
+  assertValidRawNotification(data.rawNotification);
+  console.assert(isNumericId(data.notificationId), `invalid notificationId ${data.notificationId}`);
+});
+
+
+export class NotificationDataRecord extends DatabaseRecordBase {
   static readonly [$outboundCloneFields] = [
     'subjectNickname',
     'subjectAvatarUrl',
@@ -96,6 +113,34 @@ export class Notification extends DatabaseRecordBase {
     _this[$contextId] = obj.contextId;
     _this[$contextExtraId] = obj.contextExtraId;
   }
+
+  static async fromRawNotificationMessage(data: RawNotificationMessage): Promise<NotificationDataRecord | undefined> {
+    assertValidRawNotificationMessage(data);
+    const result = Object.create(NotificationDataRecord.prototype);
+    const rawActivity = data.rawActivity;
+    result[$id] = data.notificationId;
+    result[$contextExtraId] = data.contextExtraId;
+    result[$subjectId] = rawActivity.subjectId;
+    result[$objectId] = rawActivity.objectId;
+    result[$contextId] = rawActivity.contextId;
+    result.objectType = rawActivity.objectType;
+    result.actionType = rawActivity.actionType;
+    result.timestamp = rawActivity.timestamp;
+    result.contextType = rawActivity.contextType;
+
+    let recipient = data.recipient as any;
+    if (!recipient) {
+      const [rows] = await db.query(`SELECT nickname, avatarUrl FROM Users WHERE id =:recipientId`, data.rawNotification);
+      if (rows && rows[0]) {
+        recipient = rows[0] as any;
+      }
+    }
+    if (recipient) {
+      result.subjectNickname = recipient.nickname;
+      result.subjectAvatarUrl = recipient.avatarUrl;
+      return result;
+    }
+  }
 }
 
 export interface RawNotification {
@@ -104,7 +149,7 @@ export interface RawNotification {
   timestamp: number;
 }
 
-const assertValidRawNotification = devOnly(function(data: any) {
+export const assertValidRawNotification = devOnly(function(data: any) {
   console.assert(isNumericId(data.recipientId), `invalid recipientId: ${data.recipientId}`);
   console.assert(isNumericId(data.activityId), `invalid activityId: ${data.activityId}`);
   console.assert(isValidTimestamp(data.timestamp), `invalid timestamp: ${data.timestamp}`);
@@ -151,6 +196,13 @@ export class NotificationModel {
     return insertReturnId(SQLs.INSERT as string, raw, driver);
   }
 
+  static async create(raw: RawNotification, drive: DatabaseDriver = db): Promise<NotificationRecord> {
+    const id = await this.insert(raw, drive);
+    const row = Object.create(raw);
+    row.id = id;
+    return fromDatabaseRow(row, NotificationRecord);
+  }
+
   static async broadcastInsert(params: BroadcastParams, driver: DatabaseDriver = db) {
     assertBroadcastParams(params);
     const {recipientIds, activityId, timestamp} = params;
@@ -166,12 +218,12 @@ export class NotificationModel {
     return count;
   }
 
-  static async getUserNotifications(userId: number, driver: DatabaseDriver = db): Promise<Notification[]> {
+  static async getUserNotifications(userId: number, driver: DatabaseDriver = db): Promise<NotificationDataRecord[]> {
     const [rows] = await driver.query(SQLs.USER_NOTIFICATIONS as string, {userId}) as any;
     const contextIdToNotification: any = {};
     const commentIds: number[] = [];
     const results = _.map(rows, (row) => {
-      const notification = fromDatabaseRow(row, Notification);
+      const notification = fromDatabaseRow(row, NotificationDataRecord);
       if (notification.contextType === Activity.ContextTypes.Post) {
         contextIdToNotification[row.contextId] = notification;
         commentIds.push(notification[$contextId]);

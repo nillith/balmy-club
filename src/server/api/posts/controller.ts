@@ -3,7 +3,7 @@ import {respondWith} from "../../utils/index";
 import {isValidPostContent, isValidStringId, isValidTimestamp, utcTimestamp} from "../../../shared/utils";
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../shared/interf";
 import {MAX_VISIBLE_CIRCLE_NUMBER, POSTS_GROUP_SIZE} from "../../../shared/constants";
-import {PostBuilder, PostModel, PostViewer, PublishPostData} from "../../models/post.model";
+import {PostBuilder, PostModel, PostObserver, PublishPostData} from "../../models/post.model";
 import db from "../../persistence/index";
 import {$id, circleObfuscator, INVALID_NUMERIC_ID, postObfuscator} from "../../service/obfuscator.service";
 import {ActivityModel, RawActivity} from "../../models/activity.model";
@@ -13,6 +13,7 @@ import {getRequestUser} from "../../service/auth.service";
 import {isString} from "util";
 import {PublishPostRequest} from "../../../shared/contracts";
 import _ from 'lodash';
+import {messengerService} from "../../service/messenger.service";
 
 const filterShareCircleIds = function(circleIds: any): number[] {
   const result: number[] = [];
@@ -186,31 +187,46 @@ export const plusPost = async function(req: Request, res: Response, next: NextFu
   const postId = postObfuscator.unObfuscate(id);
   if (INVALID_NUMERIC_ID !== postId) {
     const observer = getRequestUser(req);
-    const postViewer: PostViewer = {
+    const postViewer: PostObserver = {
       postId, observerId: observer[$id]
     };
-    if (await PostModel.isAccessible(postViewer)) {
+    const authorId = await PostModel.getAuthorIdIfAccessible(postViewer);
+    if (INVALID_NUMERIC_ID !== authorId) {
+      const isAuthor = authorId === observer[$id];
+      let rawActivity: RawActivity;
+      let rawNotification: RawNotification;
+      let notificationId: number;
       const timestamp = utcTimestamp();
       await db.inTransaction(async (conn) => {
         await conn.query('INSERT INTO PostPlusOnes (postId, userId) VALUES (:postId, :observerId)', postViewer);
 
-        const rawActivity = {
+        rawActivity = {
           subjectId: observer[$id],
           objectId: postId,
           objectType: Activity.ObjectTypes.Post,
           actionType: Activity.ContentActions.PlusOne,
           timestamp,
         };
-        const activityId = await ActivityModel.insert(rawActivity as RawActivity, conn);
-        const rawNotification: RawNotification = {
-          recipientId: observer[$id],
-          activityId,
-          timestamp,
-        };
-        await NotificationModel.insert(rawNotification, conn);
+        const activityId = await ActivityModel.insert(rawActivity, conn);
+        if (!isAuthor) {
+          rawNotification = {
+            recipientId: authorId,
+            activityId,
+            timestamp,
+          };
+          notificationId = await NotificationModel.insert(rawNotification, conn);
+        }
         await conn.query('UPDATE Posts SET plusCount = plusCount + 1 WHERE id = :postId', postViewer);
       });
-      return respondWith(res, 200);
+      respondWith(res, 200);
+      if (!isAuthor) {
+        return messengerService.postRawNotification({
+          rawActivity: rawActivity!,
+          rawNotification: rawNotification!,
+          notificationId: notificationId!,
+        });
+      }
+      return;
     }
   }
   return respondWith(res, 404);
@@ -221,7 +237,7 @@ export const unPlusPost = async function(req: Request, res: Response, next: Next
   const postId = postObfuscator.unObfuscate(id);
   if (INVALID_NUMERIC_ID !== postId) {
     const observer = getRequestUser(req);
-    const postViewer: PostViewer = {
+    const postViewer: PostObserver = {
       postId, observerId: observer[$id]
     };
     if (await PostModel.isAccessible(postViewer)) {

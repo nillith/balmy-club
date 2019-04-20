@@ -3,6 +3,6 @@
     {{StringIds.CircledYou | i18n}}
   </div>
   <div *ngSwitchCase="Activity.UserActions.Mention">
-    <a href="contextUrl()" target="_blank">{{StringIds.MentionedYou | i18n}}</a>
+    <a href="{{contextUrl()}}" target="_blank">{{StringIds.MentionedYou | i18n}}</a>
   </div>
 </div>

@@ -5,6 +5,7 @@ import {
   $outboundCloneFields,
   $reShareFromPostId,
   $visibleCircleIds,
+  INVALID_NUMERIC_ID,
   obfuscatorFuns,
   POST_OBFUSCATE_MAPS,
 } from "../service/obfuscator.service";
@@ -133,7 +134,7 @@ const assertIsValidUserTimelineParams = devOnly(function(params: any) {
   assertValidTimelineParams(params);
 });
 
-export interface PostViewer {
+export interface PostObserver {
   postId: number;
   observerId: number;
 }
@@ -229,15 +230,16 @@ const GET_POST_BY_ID_SQL = (function() {
   return `SELECT ${POST_PUBLIC_SQL_COLUMNS_WITH_USER.join(', ')} FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} LIMIT 1`;
 })();
 
-const IS_POST_ACCESSIBLE_SQL = (function() {
+const GET_AUTHOR_ID_IF_ACCESSIBLE_SQL = (function() {
   const leftJoins = ['Posts'];
   const ands = ['Posts.id = :postId', 'Posts.deletedAt IS NULL'];
   processVisibilityOption({
     withPrivatePost: true,
   }, ands, leftJoins);
-  return `SELECT Posts.id FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} LIMIT 1`;
+  return `SELECT Posts.authorId FROM ${leftJoins.join(' LEFT JOIN ')} WHERE ${ands.join(' AND ')} LIMIT 1`;
 })();
 
+const IS_POST_AUTHOR_SQL = 'SELECT id FROM Posts WHERE id = :postId AND authorId = :observerId';
 
 const POST_OTHER_COMMENTER_IDS_SQL = 'SELECT id FROM Comments WHERE postId = :postId AND authorId != :observerId AND authorId NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :observerId) AND authorId NOT IN (SELECT blockeeId FROM UserBlockUser WHERE blockerId = :observerId)';
 
@@ -266,7 +268,7 @@ export class PostModel {
     });
   }
 
-  static async getPostById(params: PostViewer, driver: DatabaseDriver = db) {
+  static async getPostById(params: PostObserver, driver: DatabaseDriver = db) {
     const [rows] = await driver.query(GET_POST_BY_ID_SQL, params);
     if (rows && rows[0]) {
       return fromDatabaseRow(rows[0], PostRecord);
@@ -288,13 +290,37 @@ export class PostModel {
     return this.getPostsBySQL(HOME_STREAM_POSTS_SQL, params, driver);
   }
 
-  static async isAccessible(params: PostViewer, driver: DatabaseDriver = db): Promise<boolean> {
+  static async getAuthorIdIfAccessible(params: PostObserver, driver: DatabaseDriver = db): Promise<number> {
     assertValidPostViewer(params);
-    const [rows] = await driver.query(IS_POST_ACCESSIBLE_SQL, params);
-    return !!rows && !!rows[0] && !!rows[0].id;
+    const [rows] = await driver.query(GET_AUTHOR_ID_IF_ACCESSIBLE_SQL, params);
+    if (rows && rows[0] && rows[0].authorId) {
+      return rows[0].authorId;
+    } else {
+      return INVALID_NUMERIC_ID;
+    }
   }
 
-  static async getOtherCommenterIds(params: PostViewer, driver: DatabaseDriver = db): Promise<number[]> {
+  static async isAccessible(params: PostObserver, driver: DatabaseDriver = db): Promise<boolean> {
+    return INVALID_NUMERIC_ID !== await this.getAuthorIdIfAccessible(params, driver);
+  }
+
+  static async isAuthor(params: PostObserver, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidPostViewer(params);
+    const [rows] = await driver.query(IS_POST_AUTHOR_SQL, params);
+    return !_.isEmpty(rows);
+  }
+
+  static async getAuthorId(postId: number, driver: DatabaseDriver = db): Promise<number> {
+    const [rows] = await driver.query('SELECT authorId FROM Posts WHERE id = :postId', {
+      postId
+    });
+    if (rows && rows[0]) {
+      return rows[0].authorId;
+    }
+    return INVALID_NUMERIC_ID;
+  }
+
+  static async getOtherCommenterIds(params: PostObserver, driver: DatabaseDriver = db): Promise<number[]> {
     assertValidPostViewer(params);
     const [rows] = await driver.query(POST_OTHER_COMMENTER_IDS_SQL, params);
     return _.map(rows as any[], row => row.id);

@@ -3,7 +3,12 @@ import config from '../config';
 import {authService} from "./auth.service";
 import {INVALID_NUMERIC_ID} from "./obfuscator.service";
 import {AUTH, IPCMessageTypes, PING, PONG} from "../../shared/constants";
-import {NotificationModel} from "../models/notification.model";
+import {
+  assertValidRawNotificationMessage,
+  NotificationDataRecord,
+  NotificationModel,
+  RawNotificationMessage
+} from "../models/notification.model";
 
 const $userId = Symbol();
 const $authTimeoutId = Symbol();
@@ -179,6 +184,26 @@ class MessengerService {
 
   close(cb) {
     this.wss.close(cb);
+  }
+
+  postOneNotification(client: WSClient, notification: NotificationDataRecord) {
+    sendString(client, JSON.stringify({
+      type: IPCMessageTypes.Notification,
+      data: notification
+    }));
+  }
+
+  async postRawNotification(rawMessage: RawNotificationMessage) {
+    const _this = this;
+    assertValidRawNotificationMessage(rawMessage);
+    const client = clientRegistry.get(rawMessage.rawNotification.recipientId);
+    if (!client) {
+      return;
+    }
+    const notification = await NotificationDataRecord.fromRawNotificationMessage(rawMessage);
+    if (notification) {
+      _this.postOneNotification(client, notification);
+    }
   }
 }
 

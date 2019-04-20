@@ -1,5 +1,5 @@
-import {DatabaseDriver, DatabaseRecordBase, insertReturnId} from "./model-base";
-import {$contextId, $objectId, $subjectId} from "../service/obfuscator.service";
+import {DatabaseDriver, DatabaseRecordBase, fromDatabaseRow, insertReturnId} from "./model-base";
+import {$contextExtraId, $contextId, $objectId, $subjectId} from "../service/obfuscator.service";
 import {Activity} from "../../shared/interf";
 import {isValidTimestamp} from "../../shared/utils";
 import {devOnly, isNumericId} from "../utils/index";
@@ -14,6 +14,7 @@ export class ActivityRecord extends DatabaseRecordBase {
   timestamp: number;
   [$contextId]?: number;
   contextType?: number;
+  [$contextExtraId]?: number;
 
   constructor(id: number, subjectId: number, objectId: number, objectType: number, actionType: number, timestamp: number, contextId?: number, contextType?: number) {
     super(id);
@@ -61,5 +62,12 @@ export class ActivityModel {
   static async insert(raw: RawActivity, drive: DatabaseDriver = db): Promise<number> {
     assertValidRawActivity(raw);
     return insertReturnId(SQLs.INSERT as string, raw, drive);
+  }
+
+  static async create(raw: RawActivity, drive: DatabaseDriver = db): Promise<ActivityRecord> {
+    const id = await this.insert(raw, drive);
+    const row = Object.create(raw);
+    row.id = id;
+    return fromDatabaseRow(row, ActivityRecord);
   }
 }

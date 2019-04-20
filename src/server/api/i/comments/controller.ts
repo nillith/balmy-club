@@ -6,7 +6,7 @@ import {isNumericId, respondWith} from "../../../utils/index";
 import {isString} from "util";
 import db from "../../../persistence/index";
 import {Activity} from "../../../../shared/interf";
-import {PostModel, PostViewer} from "../../../models/post.model";
+import {PostModel, PostObserver} from "../../../models/post.model";
 import {ActivityModel, RawActivity} from "../../../models/activity.model";
 import {BroadcastParams, NotificationModel, RawNotification} from "../../../models/notification.model";
 import {CommentBuilder, CommentModel, PublishCommentData} from "../../../models/comment.model";
@@ -39,7 +39,7 @@ export const publishComment = async function(req: Request, res: Response, next: 
   }
 
   const commenter = getRequestUser(req);
-  const postViewer: PostViewer = {
+  const postViewer: PostObserver = {
     postId: payload.postId,
     observerId: commenter[$id]
   };
