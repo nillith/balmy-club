@@ -50,7 +50,7 @@ export const values = {
   [StringIds.PlusOnePost]: '+1 你的信息',
   [StringIds.PublishedPost]: '发布了信息',
   [StringIds.PlusOneComment]: '+1 你的评论',
-  [StringIds.PublishedComment]: '发表了评论',
+  [StringIds.PublishedComment]: '评论了你的信息',
   [StringIds.MentionedYou]: '提及你',
   [StringIds.CircledYou]: '圈了你',
 };

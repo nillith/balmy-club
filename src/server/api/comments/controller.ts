@@ -33,8 +33,10 @@ export const plusComment = async function(req: Request, res: Response, next: Nex
         rawActivity = {
           subjectId: observer[$id],
           objectId: commentId,
-          objectType: Activity.ObjectTypes.Post,
+          objectType: Activity.ObjectTypes.Comment,
           actionType: Activity.ContentActions.PlusOne,
+          contextType: Activity.ContextTypes.Post,
+          contextId: postId,
           timestamp,
         };
         const activityId = await ActivityModel.insert(rawActivity, conn);

@@ -50,7 +50,7 @@ export const values = {
   [StringIds.PlusOnePost]: '+1 Your Post',
   [StringIds.PublishedPost]: 'Published One Post',
   [StringIds.PlusOneComment]: '+1 Your Comment',
-  [StringIds.PublishedComment]: 'Published Comment',
+  [StringIds.PublishedComment]: 'Commented Your Post',
   [StringIds.MentionedYou]: 'Mentioned You',
   [StringIds.CircledYou]: 'Circled You',
 };

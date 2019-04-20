@@ -7,11 +7,13 @@ import {isString} from "util";
 import db from "../../../persistence/index";
 import {Activity} from "../../../../shared/interf";
 import {PostModel, PostObserver} from "../../../models/post.model";
-import {ActivityModel, RawActivity} from "../../../models/activity.model";
-import {BroadcastParams, NotificationModel, RawNotification} from "../../../models/notification.model";
+import {ActivityModel, RawActivity, RawMentionActivities} from "../../../models/activity.model";
+import {BroadcastParams, NotificationModel, RawBulkNotifications} from "../../../models/notification.model";
 import {CommentBuilder, CommentModel, PublishCommentData} from "../../../models/comment.model";
 import {getRequestUser} from "../../../service/auth.service";
 import {PublishCommentRequest} from "../../../../shared/contracts";
+import {messengerService, RawAlikeNotifications} from "../../../service/messenger.service";
+import {bulkInsertIds} from "../../../models/model-base";
 
 
 const getNewCommentPayloadOrErr = function(body: PublishCommentRequest): PublishCommentData | string {
@@ -33,7 +35,6 @@ const getNewCommentPayloadOrErr = function(body: PublishCommentRequest): Publish
 
 export const publishComment = async function(req: Request, res: Response, next: NextFunction) {
   const payload = getNewCommentPayloadOrErr(req.body);
-  console.log(payload);
   if (isString(payload)) {
     return respondWith(res, 400, payload);
   }
@@ -43,54 +44,90 @@ export const publishComment = async function(req: Request, res: Response, next: 
     postId: payload.postId,
     observerId: commenter[$id]
   };
-  if (!await PostModel.isAccessible(postViewer)) {
+
+  const postAuthorId = await PostModel.getAuthorIdIfAccessible(postViewer);
+
+  if (INVALID_NUMERIC_ID === postAuthorId) {
     return respondWith(res, 400);
   }
 
   const timestamp = utcTimestamp();
   const comment = new CommentBuilder(commenter[$id], payload.postId, payload.content, timestamp);
   const [mentions, rawComment] = await comment.build();
-  const commenterIds = await PostModel.getOtherCommenterIds(postViewer);
+  const commentListenerIds = await PostModel.getOtherCommenterIds(postViewer);
+  if (postAuthorId !== postViewer.observerId) {
+    commentListenerIds.push(postAuthorId);
+  }
+  const mentionIds = mentions.map(m => m.id);
+  let rawMentionAlikes: RawAlikeNotifications | undefined;
+  let rawCommentAlikes: RawAlikeNotifications | undefined;
+
   await db.inTransaction(async (connection) => {
     const commentId = await CommentModel.insert(rawComment, connection);
-    const rawActivity: RawActivity = {
+    const rawCommentActivity: RawActivity = {
       subjectId: commenter[$id],
       objectId: commentId,
+      contextType: Activity.ContextTypes.Post,
+      contextId: postViewer.postId,
       objectType: Activity.ObjectTypes.Comment,
       actionType: Activity.ContentActions.Create,
       timestamp,
     };
-    const commentActivityId = await ActivityModel.insert(rawActivity, connection);
-    if (!_.isEmpty(mentions)) {
-      await (Promise as any).map(mentions, async (m) => {
-        const rawMentionActivity = {
-          subjectId: commenter[$id],
-          objectId: m.id,
-          objectType: Activity.ObjectTypes.User,
-          actionType: Activity.UserActions.Mention,
-          timestamp,
-        };
-        const mentionActivityId = await ActivityModel.insert(rawMentionActivity as RawActivity, connection);
-        const rawNotification: RawNotification = {
-          recipientId: m.id,
-          activityId: mentionActivityId,
-          timestamp,
-        };
-        await NotificationModel.insert(rawNotification, connection);
-      });
+    const commentActivityId = await ActivityModel.insert(rawCommentActivity, connection);
+
+    if (!_.isEmpty(mentionIds)) {
+      const rawMentionActivities: RawMentionActivities = {
+        mentionIds,
+        subjectId: commenter[$id],
+        timestamp,
+        contextId: commentId,
+        contextType: Activity.ContextTypes.Comment
+      };
+      const rawMentionNotifications: RawBulkNotifications = {
+        recipientIds: mentionIds,
+        activityIds: bulkInsertIds(await ActivityModel.insertMentions(rawMentionActivities, connection)),
+        timestamp
+      };
+
+      rawMentionAlikes = {
+        notificationIds: bulkInsertIds(await NotificationModel.insertBulkNotifications(rawMentionNotifications, connection)),
+        recipientIds: mentionIds,
+        subjectId: postViewer.observerId,
+        contextId: commentId,
+        contextType: Activity.ContextTypes.Comment,
+        timestamp,
+        contextExtraId: postViewer.postId,
+        objectType: Activity.ObjectTypes.User,
+        actionType: Activity.UserActions.Mention
+      };
     }
 
-    if (!_.isEmpty(commenterIds)) {
+    if (!_.isEmpty(commentListenerIds)) {
       const params: BroadcastParams = {
-        recipientIds: commenterIds as number[],
+        recipientIds: commentListenerIds,
         activityId: commentActivityId,
         timestamp,
       };
 
-      await NotificationModel.broadcastInsert(params, connection);
+      rawCommentAlikes = {
+        notificationIds: bulkInsertIds(await NotificationModel.broadcastInsert(params, connection)),
+        recipientIds: commentListenerIds,
+        subjectId: rawCommentActivity.subjectId!,
+        contextId: rawCommentActivity.contextId!,
+        contextType: rawCommentActivity.contextType!,
+        timestamp,
+        objectType: rawCommentActivity.objectType!,
+        actionType: rawCommentActivity.actionType!
+      };
     }
   });
   respondWith(res, 200);
+  if (rawMentionAlikes) {
+    await messengerService.postRawAlikeNotifications(rawMentionAlikes);
+  }
+  if (rawCommentAlikes) {
+    await messengerService.postRawAlikeNotifications(rawCommentAlikes);
+  }
 };
 
 export const deleteCommentById = async function(req: Request, res: Response, next: NextFunction) {

@@ -1,5 +1,5 @@
 <div>
-  <a href="p/{{notification.contextExtraId}}#{{notification.contextId}}" target="_blank">
+  <a href="p/{{notification.contextId}}#{{notification.objectId}}" target="_blank">
     <div [ngSwitch]="notification.actionType">
       <div *ngSwitchCase="Activity.ContentActions.PlusOne">
         {{StringIds.PlusOneComment | i18n}}

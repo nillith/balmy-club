@@ -6,14 +6,20 @@ import {MAX_VISIBLE_CIRCLE_NUMBER, POSTS_GROUP_SIZE} from "../../../shared/const
 import {PostBuilder, PostModel, PostObserver, PublishPostData} from "../../models/post.model";
 import db from "../../persistence/index";
 import {$id, circleObfuscator, INVALID_NUMERIC_ID, postObfuscator} from "../../service/obfuscator.service";
-import {ActivityModel, RawActivity} from "../../models/activity.model";
-import {BroadcastParams, NotificationModel, RawNotification} from "../../models/notification.model";
+import {ActivityModel, RawActivity, RawMentionActivities} from "../../models/activity.model";
+import {
+  BroadcastParams,
+  NotificationModel,
+  RawBulkNotifications,
+  RawNotification
+} from "../../models/notification.model";
 import {CommentModel} from "../../models/comment.model";
 import {getRequestUser} from "../../service/auth.service";
 import {isString} from "util";
 import {PublishPostRequest} from "../../../shared/contracts";
 import _ from 'lodash';
-import {messengerService} from "../../service/messenger.service";
+import {messengerService, RawAlikeNotifications} from "../../service/messenger.service";
+import {bulkInsertIds} from "../../models/model-base";
 
 const filterShareCircleIds = function(circleIds: any): number[] {
   const result: number[] = [];
@@ -85,7 +91,8 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
   const postBuilder = new PostBuilder(author, data, timestamp);
   const [mentions, rawPost] = await postBuilder.build();
   const subscriberIds = await author.getSubscriberIds();
-
+  const mentionIds = mentions.map(m => m.id);
+  let rawMentionAlikes: RawAlikeNotifications | undefined;
   await db.inTransaction(async (connection) => {
     const postId = await PostModel.insert(rawPost, connection);
 
@@ -106,28 +113,39 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
       };
       await NotificationModel.broadcastInsert(params, connection);
     }
-    if (!_.isEmpty(mentions)) {
-      await (Promise as any).map(mentions, async (m) => {
-        const rawMentionActivity = {
-          subjectId: author[$id],
-          objectId: m.id,
-          objectType: Activity.ObjectTypes.User,
-          actionType: Activity.UserActions.Mention,
-          timestamp,
-          contextId: postId,
-          contextType: Activity.ContextTypes.Post
-        };
-        const mentionActivityId = await ActivityModel.insert(rawMentionActivity, connection);
-        const rawNotification: RawNotification = {
-          recipientId: m.id,
-          activityId: mentionActivityId,
-          timestamp,
-        };
-        await NotificationModel.insert(rawNotification, connection);
-      });
+
+    if (!_.isEmpty(mentionIds)) {
+      const rawMentionActivities: RawMentionActivities = {
+        mentionIds,
+        subjectId: author[$id],
+        timestamp,
+        contextId: postId,
+        contextType: Activity.ContextTypes.Post
+      };
+      const rawMentionNotifications: RawBulkNotifications = {
+        recipientIds: mentionIds,
+        activityIds: bulkInsertIds(await ActivityModel.insertMentions(rawMentionActivities, connection)),
+        timestamp
+      };
+
+      console.log(rawMentionNotifications);
+
+      rawMentionAlikes = {
+        notificationIds: bulkInsertIds(await NotificationModel.insertBulkNotifications(rawMentionNotifications, connection)),
+        recipientIds: mentionIds,
+        subjectId: rawMentionActivities.subjectId,
+        contextId: rawMentionActivities.contextId,
+        contextType: rawMentionActivities.contextType,
+        timestamp,
+        objectType: Activity.ObjectTypes.User,
+        actionType: Activity.UserActions.Mention,
+      };
     }
   });
   respondWith(res, 200);
+  if (rawMentionAlikes) {
+    await messengerService.postRawAlikeNotifications(rawMentionAlikes);
+  }
 };
 
 

@@ -31,7 +31,7 @@ export const PONG = 'PONG';
 export const AUTH = 'AUTH';
 
 
-export const IPCMessageTypes = {
+export const RemoteMessageTypes = {
   // client side only start
   Token: 1,
   Read: 2,

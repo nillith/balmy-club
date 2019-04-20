@@ -12,14 +12,14 @@ import {
   postObfuscator,
   userObfuscator
 } from "../service/obfuscator.service";
-import {DatabaseDriver, DatabaseRecordBase, fromDatabaseRow, insertReturnId} from "./model-base";
+import {BulkInsertResult, DatabaseDriver, DatabaseRecordBase, fromDatabaseRow, insertReturnId} from "./model-base";
 import {devOnly, isNumericId} from "../utils/index";
 import {isValidTimestamp} from "../../shared/utils";
 import db from "../persistence/index";
 import {Activity} from "../../shared/interf";
 import _ from 'lodash';
 import {assertValidRawActivity, RawActivity} from "./activity.model";
-import {UserRecord} from "./user.model";
+import {UserModel, UserRecord} from "./user.model";
 
 export class NotificationRecord extends DatabaseRecordBase {
   [$recipientId]: number;
@@ -62,7 +62,7 @@ export const assertValidRawNotificationMessage = devOnly(function(data: any) {
 });
 
 
-export class NotificationDataRecord extends DatabaseRecordBase {
+export class FullNotificationRecord extends DatabaseRecordBase {
   static readonly [$outboundCloneFields] = [
     'subjectNickname',
     'subjectAvatarUrl',
@@ -97,7 +97,7 @@ export class NotificationDataRecord extends DatabaseRecordBase {
     obj.id = notificationObfuscator.obfuscate(_this[$id]);
     obj.subjectId = userObfuscator.obfuscate(_this[$subjectId]);
     obj.objectId = ObjectIdObfuscator[obj.objectType].obfuscate(_this[$objectId]);
-    if (obj[$contextId]) {
+    if (_this[$contextId]) {
       obj.contextId = ContextIdObfuscator[obj.contextType].obfuscate(_this[$contextId]);
       if (Activity.ContextTypes.Comment === _this.contextType) {
         obj.contextExtraId = postObfuscator.obfuscate(_this[$contextExtraId]!);
@@ -114,9 +114,9 @@ export class NotificationDataRecord extends DatabaseRecordBase {
     _this[$contextExtraId] = obj.contextExtraId;
   }
 
-  static async fromRawNotificationMessage(data: RawNotificationMessage): Promise<NotificationDataRecord | undefined> {
+  static async fromRawNotificationMessage(data: RawNotificationMessage): Promise<FullNotificationRecord | undefined> {
     assertValidRawNotificationMessage(data);
-    const result = Object.create(NotificationDataRecord.prototype);
+    const result = Object.create(FullNotificationRecord.prototype);
     const rawActivity = data.rawActivity;
     result[$id] = data.notificationId;
     result[$contextExtraId] = data.contextExtraId;
@@ -130,10 +130,7 @@ export class NotificationDataRecord extends DatabaseRecordBase {
 
     let recipient = data.recipient as any;
     if (!recipient) {
-      const [rows] = await db.query(`SELECT nickname, avatarUrl FROM Users WHERE id =:recipientId`, data.rawNotification);
-      if (rows && rows[0]) {
-        recipient = rows[0] as any;
-      }
+      recipient = await UserModel.findNicknameAvatarById(data.rawNotification.recipientId);
     }
     if (recipient) {
       result.subjectNickname = recipient.nickname;
@@ -171,9 +168,28 @@ const assertBroadcastParams = devOnly(function(data: any) {
   console.assert(isValidTimestamp(timestamp), `invalid timestamp ${timestamp}`);
 });
 
+export interface RawBulkNotifications {
+  recipientIds: number[];
+  activityIds: number[];
+  timestamp: number;
+}
+
+const assertRawMentionNotifications = devOnly(function(data: any) {
+  console.assert(isValidTimestamp(data.timestamp), `invalid timestamp ${data.timestamp}`);
+  console.assert(data.recipientIds.length, `no recipientId`);
+  console.assert(data.recipientIds.length === data.activityIds.length, `id number mismatch ${data.recipientIds.length}:${data.activityIds.length}`);
+  for (const id of data.recipientIds) {
+    console.assert(isNumericId(id), `invalid recipient id ${id}`);
+  }
+
+  for (const id of data.activityIds) {
+    console.assert(isNumericId(id), `invalid activity id ${id}`);
+  }
+});
+
 const enum SQLs {
   INSERT = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES (:recipientId, :activityId, :timestamp)',
-  BROADCAST_INSERT = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES ?',
+  BULK_INSERT = 'INSERT INTO Notifications (recipientId, activityId, `timestamp`) VALUES ?',
   UNREAD_COUNT = 'SELECT COUNT(id) AS count FROM Notifications WHERE recipientId = :userId AND NOT isRead',
   USER_NOTIFICATIONS = 'SELECT Notifications.id, Activities.subjectId, Users.nickname AS subjectNickname, Users.avatarUrl AS subjectAvatarUrl, Activities.objectId, Activities.contextId, Activities.objectType, Activities.actionType, Activities.contextType FROM Notifications LEFT JOIN Activities ON (Notifications.activityId = Activities.id) LEFT JOIN Users ON (Activities.subjectId = Users.id) WHERE recipientId = :userId AND NOT isRead AND Activities.id IS NOT NULL ORDER BY Notifications.timestamp DESC LIMIT 100;'
 }
@@ -183,6 +199,11 @@ export interface NotificationObserver {
   userId: number;
   isRead: boolean;
 }
+
+export type BulkRow = [number, number, number];
+
+export type BulkInsertNotification = [BulkRow[]];
+
 
 const assertValidNotificationObserver = devOnly(function(data: any) {
   console.assert(isNumericId(data.notificationId), `invalid notification id ${data.notificationId}`);
@@ -203,12 +224,25 @@ export class NotificationModel {
     return fromDatabaseRow(row, NotificationRecord);
   }
 
-  static async broadcastInsert(params: BroadcastParams, driver: DatabaseDriver = db) {
+  static async bulkInsert(params: BulkInsertNotification, driver: DatabaseDriver = db): Promise<BulkInsertResult> {
+    const [result] = await driver.query(SQLs.BULK_INSERT as string, params);
+    return result as BulkInsertResult;
+  }
+
+  static async broadcastInsert(params: BroadcastParams, driver: DatabaseDriver = db): Promise<BulkInsertResult> {
     assertBroadcastParams(params);
     const {recipientIds, activityId, timestamp} = params;
-    return driver.query(SQLs.BROADCAST_INSERT as string, [recipientIds.map((id) => {
-      return [id, activityId, timestamp];
-    })]);
+    return this.bulkInsert([recipientIds.map((recipientId) => {
+      return [recipientId, activityId, timestamp] as BulkRow;
+    })], driver);
+  }
+
+  static async insertBulkNotifications(params: RawBulkNotifications, driver: DatabaseDriver = db): Promise<BulkInsertResult> {
+    assertRawMentionNotifications(params);
+    const {recipientIds, activityIds, timestamp} = params;
+    return this.bulkInsert([recipientIds.map((recipientId, index) => {
+      return [recipientId, activityIds[index], timestamp]as BulkRow;
+    })], driver);
   }
 
   static async getUnreadCountForUser(userId: number, driver: DatabaseDriver = db): Promise<number> {
@@ -218,13 +252,13 @@ export class NotificationModel {
     return count;
   }
 
-  static async getUserNotifications(userId: number, driver: DatabaseDriver = db): Promise<NotificationDataRecord[]> {
+  static async getUserNotifications(userId: number, driver: DatabaseDriver = db): Promise<FullNotificationRecord[]> {
     const [rows] = await driver.query(SQLs.USER_NOTIFICATIONS as string, {userId}) as any;
     const contextIdToNotification: any = {};
     const commentIds: number[] = [];
     const results = _.map(rows, (row) => {
-      const notification = fromDatabaseRow(row, NotificationDataRecord);
-      if (notification.contextType === Activity.ContextTypes.Post) {
+      const notification = fromDatabaseRow(row, FullNotificationRecord);
+      if (notification.contextType === Activity.ContextTypes.Comment) {
         contextIdToNotification[row.contextId] = notification;
         commentIds.push(notification[$contextId]);
       }

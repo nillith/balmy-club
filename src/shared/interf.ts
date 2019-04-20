@@ -60,11 +60,25 @@ export namespace Activity {
   export function isValidActivity(objectType?: number, actionType?: number, contextType?: number) {
     if (contextType) {
       if (contextType in ContextTypes) {
-        return objectType === ObjectTypes.User && actionType === UserActions.Mention;
+        switch (objectType) {
+          case ObjectTypes.User:
+            return actionType === UserActions.Mention;
+          case ObjectTypes.Comment:
+            return contextType === ContextTypes.Post && actionType! in ContentActions;
+          default:
+            return false;
+        }
       } else {
         return false;
       }
     } else {
+      switch (objectType) {
+        case  ObjectTypes.User:
+          return actionType !== UserActions.Mention;
+        case ObjectTypes.Comment:
+          return false;
+      }
+
       return isValidAction(objectType, actionType);
     }
   }

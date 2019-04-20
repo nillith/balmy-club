@@ -42,7 +42,7 @@
   <mat-divider></mat-divider>
 
   <div *ngIf="post.comments && post.comments.length">
-    <mat-expansion-panel #panel (opened)="notifyParent()" (closed)="notifyParent()">
+    <mat-expansion-panel [expanded]="expandComments" #panel (opened)="notifyParent()" (closed)="notifyParent()">
       <mat-expansion-panel-header>
         <mat-panel-title>
           {{StringIds.ShowAllXComments | i18n:post.comments}}

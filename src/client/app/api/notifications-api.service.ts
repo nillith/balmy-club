@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {ToastService} from "../services/toast.service";
 import {environment} from "../../environments/environment";
 import {getAccessToken} from "../../utils/auth";
-import {IPCMessageTypes, PING, PONG} from "../../../shared/constants";
+import {RemoteMessageTypes, PING, PONG} from "../../../shared/constants";
 
 declare namespace SharedWorker {
   interface AbstractWorker extends EventTarget {
@@ -96,14 +96,14 @@ export class NotificationsApiService {
         _this.onWorkerMessage(e.data);
       }
     };
-    _this[IPCMessageTypes.Token]();
+    _this[RemoteMessageTypes.Token]();
   }
 
   onLogout() {
     const _this = this;
     if (_this.messagePort) {
       _this.messagePort.postMessage(JSON.stringify({
-        type: IPCMessageTypes.Logout,
+        type: RemoteMessageTypes.Logout,
       }));
       setTimeout(() => {
         _this.messagePort.close();
@@ -112,10 +112,10 @@ export class NotificationsApiService {
     }
   }
 
-  [IPCMessageTypes.Token](data?: any) {
+  [RemoteMessageTypes.Token](data?: any) {
     const _this = this;
     _this.messagePort.postMessage(JSON.stringify({
-      type: IPCMessageTypes.Token,
+      type: RemoteMessageTypes.Token,
       data: {
         url: environment.wsUrl,
         token: getAccessToken()
@@ -123,13 +123,13 @@ export class NotificationsApiService {
     }));
   }
 
-  [IPCMessageTypes.Sync](data: any) {
+  [RemoteMessageTypes.Sync](data: any) {
     const _this = this;
     _this.unreadCount = data.unreadCount;
     _this.notifications = data.notifications;
   }
 
-  [IPCMessageTypes.Notification](data: any) {
+  [RemoteMessageTypes.Notification](data: any) {
     const _this = this;
     data.subject = {
       id: data.subjectId,
@@ -140,7 +140,7 @@ export class NotificationsApiService {
     ++_this.unreadCount;
   }
 
-  [IPCMessageTypes.Read](data: any) {
+  [RemoteMessageTypes.Read](data: any) {
     const _this = this;
     const id = data as string;
     const notification = _this.notifications.find(n => n.id === id);
@@ -177,7 +177,7 @@ export class NotificationsApiService {
     await _this.http.post(`${API_URLS.NOTIFICATIONS}/${notificationId}/read`, undefined, {responseType: 'text'}).toPromise();
     --_this.unreadCount;
     _this.messagePort.postMessage(JSON.stringify({
-      type: IPCMessageTypes.Read,
+      type: RemoteMessageTypes.Read,
       data: notificationId
     }));
   }

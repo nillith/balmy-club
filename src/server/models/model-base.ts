@@ -23,6 +23,20 @@ export const assertValidId = devOnly(function(id: any) {
   console.assert(isNumericId(id), `invalid id: ${id}`);
 });
 
+export interface BulkInsertResult {
+  insertId: number;
+  affectedRows: number;
+}
+
+export function bulkInsertIds(insertResult: BulkInsertResult): number[] {
+  const {insertId, affectedRows} = insertResult;
+  const result: number[] = [insertId];
+  for (let i = 1; i < affectedRows; ++i) {
+    result.push(insertId + i);
+  }
+  return result;
+}
+
 export class DatabaseRecordBase {
   static readonly [$outboundCloneFields]: string[] = [];
   [$id]: number;

@@ -20,7 +20,7 @@ export class PostEditorComponent implements OnInit {
 
   @Input() post: PostResponse;
   @Input() limitCommentHeight = false;
-  @Input() showComments = true;
+  @Input() expandComments = false;
   plusAction: NullaryAsyncAction;
   unPlusAction: NullaryAsyncAction;
 

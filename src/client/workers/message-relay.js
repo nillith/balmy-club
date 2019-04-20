@@ -169,7 +169,7 @@ const NotificationsStore = {
   notifications: [],
 }
 
-const IPCMessageTypes = {
+const RemoteMessageTypes = {
   // client side only start
   Token: 1,
   Read: 2,
@@ -195,11 +195,11 @@ function broadcastOther (msg, port) {
 }
 
 const WebSocketMessageHandlers = {
-  [IPCMessageTypes.Sync]: function (data) {
+  [RemoteMessageTypes.Sync]: function (data) {
     NotificationsStore.unreadCount = data.unreadCount
     NotificationsStore.notifications = data.notifications
   },
-  [IPCMessageTypes.Notification]: function (data) {
+  [RemoteMessageTypes.Notification]: function (data) {
 
     NotificationsStore.notifications.push(data)
   }
@@ -230,7 +230,7 @@ function onWebSocketAuthenticated (ws) {
   resetReConnectParams()
   if (!synced) {
     webSocketClient.send(JSON.stringify({
-      type: IPCMessageTypes.Sync
+      type: RemoteMessageTypes.Sync
     }))
   }
 }
@@ -257,7 +257,7 @@ function tryReConnect () {
     const port = PORTS[reConnectPortIndex]
     if (port) {
       port.postMessage(JSON.stringify({
-        type: IPCMessageTypes.Token
+        type: RemoteMessageTypes.Token
       }))
     }
     ++reConnectPortIndex
@@ -276,18 +276,18 @@ function onWebSocketClose () {
 }
 
 const PortMessageHandlers = {
-  [IPCMessageTypes.Token] (port, msg) {
+  [RemoteMessageTypes.Token] (port, msg) {
     if (!webSocketClient) {
       openWebSocket(msg.url, msg.token)
     }
   },
-  [IPCMessageTypes.Sync] (port, msg) {
+  [RemoteMessageTypes.Sync] (port, msg) {
     port.postMessage(JSON.stringify({
-      type: IPCMessageTypes.Sync,
+      type: RemoteMessageTypes.Sync,
       data: NotificationsStore
     }))
   },
-  [IPCMessageTypes.Read] (port, id) {
+  [RemoteMessageTypes.Read] (port, id) {
     const index = NotificationsStore.notifications.findIndex((n) => {
       return n.id === id
     })
@@ -299,12 +299,12 @@ const PortMessageHandlers = {
     NotificationsStore.notifications.splice(index, 1)
     --NotificationsStore.unreadCount
     const msgStr = JSON.stringify({
-      type: IPCMessageTypes.Read,
+      type: RemoteMessageTypes.Read,
       data: id
     })
     broadcastOther(msgStr, port)
   },
-  [IPCMessageTypes.Logout] () {
+  [RemoteMessageTypes.Logout] () {
     closeWorker()
   }
 }

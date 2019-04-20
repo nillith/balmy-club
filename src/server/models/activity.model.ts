@@ -1,9 +1,10 @@
-import {DatabaseDriver, DatabaseRecordBase, fromDatabaseRow, insertReturnId} from "./model-base";
+import {BulkInsertResult, DatabaseDriver, DatabaseRecordBase, fromDatabaseRow, insertReturnId} from "./model-base";
 import {$contextExtraId, $contextId, $objectId, $subjectId} from "../service/obfuscator.service";
 import {Activity} from "../../shared/interf";
 import {isValidTimestamp} from "../../shared/utils";
 import {devOnly, isNumericId} from "../utils/index";
 import db from "../persistence/index";
+import {NotificationRecord} from "./notification.model";
 
 
 export class ActivityRecord extends DatabaseRecordBase {
@@ -38,6 +39,29 @@ export interface RawActivity {
   contextType?: number;
 }
 
+export interface RawMentionActivities {
+  mentionIds: number[];
+  subjectId: number;
+  timestamp: number;
+  contextId: number;
+  contextType: number;
+}
+
+export const assertValidRawMentionActivities = devOnly(function(data: any) {
+  console.assert(isNumericId(data.subjectId), `invalid subjectId: ${data.subjectId}`);
+  console.assert(isValidTimestamp(data.timestamp), `invalid timestamp: ${data.timestamp}`);
+  console.assert(isNumericId(data.contextId), `invalid context id ${data.contextId}`);
+  console.assert(Activity.isValidContextType(data.contextType), `invalid context type ${data.contextType}`);
+});
+
+// const rawMentionActivity = {
+//   subjectId: commenter[$id],
+//   objectId: m.id,
+//   objectType: Activity.ObjectTypes.User,
+//   actionType: Activity.UserActions.Mention,
+//   timestamp,
+// };
+
 export const assertValidRawActivity = devOnly(function(data: any) {
   console.assert(isNumericId(data.subjectId), `invalid subjectId: ${data.subjectId}`);
   console.assert(isNumericId(data.objectId), `invalid objectId: ${data.objectId}`);
@@ -54,7 +78,8 @@ export const assertValidRawActivity = devOnly(function(data: any) {
 
 
 const enum SQLs {
-  INSERT = 'INSERT INTO `Activities` (subjectId, objectId, objectType, actionType, contextId, contextType, `timestamp`) VALUES (:subjectId, :objectId, :objectType, :actionType, :contextId, :contextType, :timestamp)',
+  INSERT = 'INSERT INTO Activities (subjectId, objectId, objectType, actionType, contextId, contextType, `timestamp`) VALUES (:subjectId, :objectId, :objectType, :actionType, :contextId, :contextType, :timestamp)',
+  BULK_INSERT = 'INSERT INTO Activities (subjectId, objectId, objectType, actionType, contextId, contextType, `timestamp`) VALUES ?',
 }
 
 export class ActivityModel {
@@ -69,5 +94,16 @@ export class ActivityModel {
     const row = Object.create(raw);
     row.id = id;
     return fromDatabaseRow(row, ActivityRecord);
+  }
+
+  static async insertMentions(raw: RawMentionActivities, driver: DatabaseDriver = db): Promise<BulkInsertResult> {
+    assertValidRawMentionActivities(raw);
+    const {mentionIds, subjectId, timestamp, contextId, contextType} = raw;
+    const objectType = Activity.ObjectTypes.User;
+    const actionType = Activity.UserActions.Mention;
+    const [result] = await driver.query(SQLs.BULK_INSERT as string, [mentionIds.map((mentionId) => {
+      return [subjectId, mentionId, objectType, actionType, contextId, contextType, timestamp];
+    })]);
+    return result as BulkInsertResult;
   }
 }

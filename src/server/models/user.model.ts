@@ -10,7 +10,7 @@ import {
   Observation,
 } from "./model-base";
 import {authService, JwtSignable} from "../service/auth.service";
-import {devOnly, isNumericId} from "../utils/index";
+import {devOnly, disableStringify, isNumericId} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
 import {isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../shared/utils";
 import {
@@ -24,7 +24,6 @@ import _ from 'lodash';
 import {CircleModel, CircleRecord} from "./circle.model";
 import {ChangeSettingsRequest, MinimumUser} from "../../shared/contracts";
 import {isNull, isUndefined} from "util";
-import {NotificationModel} from "./notification.model";
 
 
 const createSaveSettingsSql = (function() {
@@ -249,6 +248,12 @@ async function generateSaltHashForPassword(password: string): Promise<[Buffer, B
   return [salt, hash];
 }
 
+export interface NicknameAvatar {
+  id: number;
+  nickname: string;
+  avatarUrl?: string;
+}
+
 
 export class UserModel {
   static async insert(raw: RawUser, drive: DatabaseDriver = db): Promise<number> {
@@ -316,6 +321,27 @@ export class UserModel {
         id: userObfuscator.obfuscate(id),
         nickname, avatarUrl
       };
+    });
+  }
+
+  static async findNicknameAvatarById(userId: number, driver: DatabaseDriver = db): Promise<NicknameAvatar | undefined> {
+    const [rows] = await driver.query(`SELECT id, nickname, avatarUrl FROM Users WHERE id =:userId`, {
+      userId
+    });
+    if (rows && rows[0]) {
+      disableStringify(rows[0]);
+      return rows[0];
+    }
+  }
+
+  static async findNicknameAvatarsByIds(userIds: number[], driver: DatabaseDriver = db): Promise<NicknameAvatar[]> {
+    const [rows] = await driver.query(`SELECT id, nickname, avatarUrl FROM Users WHERE id = (:userIds)`, {
+      userIds
+    });
+
+    return _.map(rows, (row) => {
+      disableStringify(row);
+      return row;
     });
   }
 }
