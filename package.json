@@ -17,6 +17,11 @@
     "e2e": "ng e2e",
     "build:docker": "npm run build && node build-scripts/create-docker-image"
   },
+  "nyc": {
+    "lines": 0,
+    "functions": 0,
+    "branches": 0
+  },
   "private": true,
   "dependencies": {
     "bluebird": "^3.5.4",
@@ -120,7 +125,6 @@
     "ncp": "^2.0.0",
     "nodemon": "^1.18.10",
     "nyc": "^13.3.0",
-    "protractor": "~5.4.0",
     "rxjs": "~6.3.3",
     "ts-node": "~7.0.0",
     "tsconfig-paths": "^3.8.0",
