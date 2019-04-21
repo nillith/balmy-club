@@ -1,5 +1,5 @@
-<mat-card>
-  <mat-card-header fxLayout="row" fxLayoutAlign="left center">
+<mat-card *ngIf="post && post.author && post.comments">
+  <mat-card-header  fxLayout="row" fxLayoutAlign="left center">
     <app-avatar [user]="post.author"></app-avatar>
     <a href="{{ post.author | userLink}}" class="app-nickname-link" target="_blank">{{post.author.nickname}}</a>
     <mat-icon>navigate_next</mat-icon>

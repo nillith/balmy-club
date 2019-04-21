@@ -4,6 +4,9 @@ import { PostEditorComponent } from './post-editor.component';
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 import {MarkdownModule} from "../../markdown/markdown.module";
 import {CommentEditorComponent} from "../comment-editor/comment-editor.component";
+import {WidgetsModule} from "../../widgets/widgets.module";
+import {I18nModule} from "../../i18n/i18n.module";
+import {CommonPipesModule} from "../../common-pipes/common-pipes.module";
 
 describe('PostEditorComponent', () => {
   let component: PostEditorComponent;
@@ -12,7 +15,7 @@ describe('PostEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PostEditorComponent, CommentEditorComponent],
-      imports: [ImportsTestingModule, MarkdownModule],
+      imports: [ImportsTestingModule, MarkdownModule, WidgetsModule, I18nModule, CommonPipesModule],
     })
     .compileComponents();
   }));

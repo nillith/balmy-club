@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PlusOneButtonComponent } from './plus-one-button.component';
+import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 
 describe('PlusOneButtonComponent', () => {
   let component: PlusOneButtonComponent;
@@ -8,9 +9,9 @@ describe('PlusOneButtonComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PlusOneButtonComponent ]
-    })
-    .compileComponents();
+      declarations: [PlusOneButtonComponent],
+      imports: [ImportsTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

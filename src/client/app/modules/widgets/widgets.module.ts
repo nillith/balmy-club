@@ -23,7 +23,6 @@ const exportedComponents = [
   declarations: [...exportedComponents],
   imports: [
     ImportsModule,
-    MarkdownModule,
     CommonPipesModule,
     I18nModule
   ],

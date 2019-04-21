@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="notification">
   <a href="p/{{notification.objectId}}" target="_blank">
     <div [ngSwitch]="notification.actionType">
       <div *ngSwitchCase="Activity.ContentActions.PlusOne">

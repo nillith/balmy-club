@@ -1,3 +1,8 @@
-language: node_js
-node_js:
-  - "10"
+language : node_js
+node_js :
+ - stable
+install:
+ - npm install
+script:
+ - npm run server:test
+after_success: npm run server:coverage

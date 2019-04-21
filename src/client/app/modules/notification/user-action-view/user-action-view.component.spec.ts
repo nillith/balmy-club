@@ -1,6 +1,9 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { UserActionViewComponent } from './user-action-view.component';
+import {UserActionViewComponent} from './user-action-view.component';
+import {I18nModule} from "../../i18n/i18n.module";
+import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
+import {Activity} from "../../../../../shared/interf";
 
 describe('UserActionViewComponent', () => {
   let component: UserActionViewComponent;
@@ -8,9 +11,9 @@ describe('UserActionViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserActionViewComponent ]
-    })
-    .compileComponents();
+      declarations: [UserActionViewComponent],
+      imports: [ImportsTestingModule, I18nModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -5,12 +5,13 @@ import {MAT_DIALOG_DATA} from "@angular/material";
 import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
 import {MentionSelectionDialogComponent} from "./mention-selection-dialog.component";
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
+import {I18nModule} from "../../i18n/i18n.module";
 
 describe('MentionSelectionDialogService', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MentionSelectionDialogComponent],
-      imports: [ImportsTestingModule],
+      imports: [ImportsTestingModule, I18nModule],
       providers: [
         {
           provide: MAT_DIALOG_DATA,

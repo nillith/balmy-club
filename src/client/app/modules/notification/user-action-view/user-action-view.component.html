@@ -1,4 +1,4 @@
-<div [ngSwitch]="notification.actionType">
+<div *ngIf="notification" [ngSwitch]="notification.actionType">
   <div *ngSwitchCase="Activity.UserActions.Circle">
     {{StringIds.CircledYou | i18n}}
   </div>

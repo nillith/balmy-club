@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UserPageComponent } from './user-page.component';
+import {ProjectModulesImportsTestingModule} from "../../modules/imports/project-modules-imports-testing.module.spec";
 
 describe('UserPageComponent', () => {
   let component: UserPageComponent;
@@ -8,9 +9,9 @@ describe('UserPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserPageComponent ]
-    })
-    .compileComponents();
+      declarations: [UserPageComponent],
+      imports: [ProjectModulesImportsTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PostActionViewComponent } from './post-action-view.component';
+import {I18nModule} from "../../i18n/i18n.module";
+import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 
 describe('PostActionViewComponent', () => {
   let component: PostActionViewComponent;
@@ -8,10 +10,11 @@ describe('PostActionViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PostActionViewComponent ]
-    })
-    .compileComponents();
+      declarations: [PostActionViewComponent],
+      imports: [ImportsTestingModule, I18nModule],
+    }).compileComponents();
   }));
+
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PostActionViewComponent);

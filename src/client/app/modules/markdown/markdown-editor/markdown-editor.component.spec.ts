@@ -4,6 +4,8 @@ import { MarkdownEditorComponent } from './markdown-editor.component';
 import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
 import {MentionSelectionDialogComponent} from "../mention-selection-dialog/mention-selection-dialog.component";
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
+import {I18nModule} from "../../i18n/i18n.module";
+import {WidgetsModule} from "../../widgets/widgets.module";
 
 describe('MarkdownEditorComponent', () => {
   let component: MarkdownEditorComponent;
@@ -11,7 +13,7 @@ describe('MarkdownEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ImportsTestingModule],
+      imports: [ImportsTestingModule, I18nModule, WidgetsModule],
       declarations: [ MarkdownEditorComponent, MentionSelectionDialogComponent]
     })
       .overrideModule(BrowserDynamicTestingModule, {

@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DiscoverComponent } from './discover.component';
+import {ProjectModulesImportsTestingModule} from "../../modules/imports/project-modules-imports-testing.module.spec";
 
 describe('DiscoverComponent', () => {
   let component: DiscoverComponent;
@@ -8,9 +9,9 @@ describe('DiscoverComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DiscoverComponent ]
-    })
-    .compileComponents();
+      declarations: [DiscoverComponent],
+      imports: [ProjectModulesImportsTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -4,6 +4,8 @@ import {MentionSelectionDialogComponent} from './mention-selection-dialog.compon
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/testing";
 import {anchor, matDialogRef} from "../../../test-providers.spec";
+import {I18nModule} from "../../i18n/i18n.module";
+import {WidgetsModule} from "../../widgets/widgets.module";
 
 describe('MentionSelectionDialogComponent', () => {
   let component: MentionSelectionDialogComponent;
@@ -13,7 +15,7 @@ describe('MentionSelectionDialogComponent', () => {
     TestBed
       .configureTestingModule({
         declarations: [MentionSelectionDialogComponent],
-        imports: [ImportsTestingModule],
+        imports: [ImportsTestingModule, I18nModule, WidgetsModule],
         providers: [anchor, matDialogRef]
       })
       .overrideModule(BrowserDynamicTestingModule, {

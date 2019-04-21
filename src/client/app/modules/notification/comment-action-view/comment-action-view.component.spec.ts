@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CommentActionViewComponent } from './comment-action-view.component';
+import {I18nModule} from "../../i18n/i18n.module";
+import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 
 describe('CommentActionViewComponent', () => {
   let component: CommentActionViewComponent;
@@ -8,9 +10,9 @@ describe('CommentActionViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommentActionViewComponent ]
-    })
-    .compileComponents();
+      declarations: [CommentActionViewComponent],
+      imports: [ImportsTestingModule, I18nModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
