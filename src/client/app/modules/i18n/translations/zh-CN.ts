@@ -8,6 +8,7 @@ export const values = {
   [StringIds.Email]: 'Email',
   [StringIds.ForgotPassword]: '忘记密码',
   [StringIds.RememberMe]: '记住我',
+  [StringIds.StarsRequiredField]: '带*的为必填项',
   [StringIds.RecoverPassword]: '找回密码',
   [StringIds.ConfirmPassword]: '确认密码',
   [StringIds.ChangePassword]: '修改密码',

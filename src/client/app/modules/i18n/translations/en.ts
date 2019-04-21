@@ -8,6 +8,7 @@ export const values = {
   [StringIds.Email]: 'Email',
   [StringIds.ForgotPassword]: 'Forgot Password',
   [StringIds.RememberMe]: 'Remember Me',
+  [StringIds.StarsRequiredField]: '* Indicates Required Field',
   [StringIds.RecoverPassword]: 'Recover Password',
   [StringIds.ConfirmPassword]: 'Confirm',
   [StringIds.ChangePassword]: 'Change Password',

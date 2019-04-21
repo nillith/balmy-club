@@ -1,4 +1,4 @@
-<form name="form" #formRef="ngForm" *ngIf="!changingLanguage">
+<form name="form" #formRef="ngForm" *ngIf="!changingLanguage" (submit)="onSubmit(formRef)">
   <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center center">
     <img src="../../../../assets/logo.png" class="app-logo-median">
   </h2>
@@ -6,6 +6,9 @@
     [class.login-main-content]="DialogTypes.Login === dialogType"
     [class.sign-up-main-content]="DialogTypes.SignUp === dialogType"
     fxLayout="column">
+    <mat-label class="required-field-hint" *ngIf="uiConfig.requiredFieldHint">
+      {{StringIds.StarsRequiredField | i18n}}
+    </mat-label>
     <mat-form-field *ngIf="uiConfig.username">
       <input matInput placeholder="{{StringIds.Username | i18n}}"
              type="text" pattern="^{{appConstants.USERNAME_PATTERN}}$"
@@ -44,7 +47,7 @@
              (ngModelChange)="onConfirmChange()">
     </mat-form-field>
     <section *ngIf="uiConfig.mainExtra" fxLayout="row" fxLayoutAlign="center center">
-      <mat-checkbox *ngIf="uiConfig.rememberMe" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
+      <mat-checkbox *ngIf="uiConfig.rememberMe" [disabled]="loading" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
         {{StringIds.RememberMe | i18n}}
       </mat-checkbox>
       <div class="app-fill-space"></div>
@@ -63,9 +66,9 @@
       </mat-error>
     </div>
     <div fxLayout="row" fxLayoutAlign="center center" style="width:100%">
-      <button [disabled]="!formRef.form.valid || loading" mat-button mat-raised-button
-              color="mat-red"
-              (click)="onSubmit()" #button>
+      <button mat-button mat-raised-button
+              color="mat-red" type="submit"
+              #button>
       <span>
         <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'"
                             [textId]="submitButtonText"></app-spinner-switch>

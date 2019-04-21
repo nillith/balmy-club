@@ -1,9 +1,16 @@
+//@import "../../../../styles/mixin";
 form {
   width: 400px;
   height: 100%;
   padding: 20px;
   margin: 5px;
   font-size: medium;
+}
+
+.required-field-hint{
+  margin-bottom: 10px;
+  //font-family: mat-font-family($app-font-config);
+  font-size: small;
 }
 
 mat-radio-button:nth-child(1) {
@@ -15,7 +22,7 @@ mat-radio-button:nth-child(1) {
 }
 
 .sign-up-main-content {
-  height: 330px;
+  height: 370px;
 }
 
 .mat-button, .mat-raised-button {

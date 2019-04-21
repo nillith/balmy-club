@@ -92,7 +92,6 @@ export class NotificationsApiService {
       if (e.data === PING) {
         _this.messagePort.postMessage(PONG);
       } else {
-        console.log(e.data);
         _this.onWorkerMessage(e.data);
       }
     };

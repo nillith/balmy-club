@@ -4,6 +4,7 @@ export enum StringIds {
   Email,
   ForgotPassword,
   RememberMe,
+  StarsRequiredField,
   RecoverPassword,
   ConfirmPassword,
   ChangePassword,

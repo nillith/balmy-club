@@ -39,6 +39,7 @@ const PasswordToggleTexts = {
 };
 
 interface UiConfig {
+  requiredFieldHint?: boolean;
   username?: boolean;
   nickname?: boolean;
   password?: boolean;
@@ -61,6 +62,7 @@ const UiConfigs = {
     signUpToggle: true
   } as UiConfig,
   [DialogTypes.SignUp]: {
+    requiredFieldHint: true,
     username: true,
     nickname: true,
     email: true,
@@ -176,8 +178,12 @@ export class LoginDialogComponent implements OnInit {
     }
   }
 
-  async onSubmit() {
+  async onSubmit(ngForm: NgForm) {
     const _this = this;
+    if (!ngForm.form.valid || _this.loading) {
+      return;
+    }
+
     try {
       _this.error = '';
       const {dialogType, dialogModel, authService} = _this;
