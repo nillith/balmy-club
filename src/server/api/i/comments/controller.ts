@@ -136,7 +136,7 @@ export const deleteCommentById = async function(req: Request, res: Response, nex
     return respondWith(res, 404);
   }
   const author = getRequestUser(req);
-  const result = await CommentModel.deleteCommentById({
+  const result = await CommentModel.deleteByAuthor({
     commentId,
     authorId: author[$id]
   });

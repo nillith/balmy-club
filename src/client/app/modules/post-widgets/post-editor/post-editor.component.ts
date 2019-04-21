@@ -3,9 +3,10 @@ import {MarkdownEditorComponent} from "../../markdown/markdown-editor/markdown-e
 import {StringIds} from '../../i18n/translations/string-ids';
 import {PostsApiService} from "../../../api/posts-api.service";
 import {noop} from "../../../../../shared/utils";
-import {getIconMenuOption, MenuActions} from "../../../../constants";
+import {getIconMenuOption, IconMenuOption, MenuActions} from "../../../../constants";
 import {NullaryAsyncAction} from "../../../../utils/switch-debouncer";
-import {MinimumUser, PostResponse} from "../../../../../shared/contracts";
+import {PostResponse} from "../../../../../shared/contracts";
+import {IService} from "../../../services/i.service";
 
 @Component({
   selector: 'app-post-editor',
@@ -23,7 +24,8 @@ export class PostEditorComponent implements OnInit {
   @Input() expandComments = false;
   plusAction: NullaryAsyncAction;
   unPlusAction: NullaryAsyncAction;
-
+  menuBusy = false;
+  hostComponent: any;
 
 
   notifyParent = noop;
@@ -31,11 +33,11 @@ export class PostEditorComponent implements OnInit {
   @ViewChild('markdownEditor')
   private editor: MarkdownEditorComponent;
 
-  enabledActions = getIconMenuOption([MenuActions.Link]);
+  enabledActions: IconMenuOption[] = [];
 
-  constructor(private viewContainerRef: ViewContainerRef, private postApi: PostsApiService) {
+  constructor(private viewContainerRef: ViewContainerRef, private postApi: PostsApiService, private iService: IService) {
     const _this = this;
-    const hostComponent = _this.viewContainerRef["_view"].component;
+    const hostComponent = _this.hostComponent = _this.viewContainerRef["_view"].component;
     if (hostComponent.onChildSizeChange) {
       _this.notifyParent = () => {
         hostComponent.onChildSizeChange();
@@ -55,6 +57,13 @@ export class PostEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    const _this = this;
+    const menuActions = [MenuActions.Link];
+    if (_this.post.authorId === _this.iService.me.id) {
+      menuActions.push(MenuActions.Delete, MenuActions.Edit);
+    }
+    console.log(``)
+    _this.enabledActions = getIconMenuOption(menuActions);
   }
 
   toggleEditMode() {
@@ -63,15 +72,25 @@ export class PostEditorComponent implements OnInit {
     _this.notifyParent();
   }
 
-  onMenu(action: MenuActions) {
+  async onMenu(action: MenuActions) {
     const _this = this;
-    switch (action) {
-      case MenuActions.Edit:
-        _this.toggleEditMode();
-        break;
-      case MenuActions.Link:
-        window.open(`p/${_this.post.id}`);
-        break;
+    _this.menuBusy = true;
+    try {
+      switch (action) {
+        case MenuActions.Edit:
+          _this.toggleEditMode();
+          break;
+        case MenuActions.Link:
+          window.open(`p/${_this.post.id}`);
+          break;
+        case MenuActions.Delete:
+          await _this.postApi.deleteMyPost(_this.post.id)
+          if (_this.hostComponent.removePostById) {
+            _this.hostComponent.removePostById(_this.post.id);
+          }
+      }
+    } finally {
+      _this.menuBusy = false;
     }
   }
 

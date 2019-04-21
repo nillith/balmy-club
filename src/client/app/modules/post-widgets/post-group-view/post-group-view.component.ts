@@ -46,4 +46,15 @@ export class PostGroupViewComponent implements OnInit, AfterViewInit {
 
   }
 
+  removePostById(id: string) {
+    const _this = this;
+    const index = _this.posts.findIndex((p) => p.id === id);
+    if (-1 !== index) {
+      _this.posts.splice(index, 1);
+      setTimeout(() => {
+        _this.masonry.layout();
+      });
+    }
+  }
+
 }

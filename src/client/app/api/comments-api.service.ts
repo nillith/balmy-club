@@ -19,7 +19,7 @@ export class CommentsApiService {
     const data = await _this.http.delete(`${API_URLS.COMMENTS}/${commentId}/plus`, {responseType: 'text'}).toPromise();
   }
 
-  async deleteCommentById(commentId: string) {
+  async deleteMyComment(commentId: string) {
     const _this = this;
     const data = await _this.http.delete(`${API_URLS.MY_COMMENTS}/${commentId}`, {responseType: 'text'}).toPromise();
   }

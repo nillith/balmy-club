@@ -131,7 +131,7 @@ export class CommentEditorComponent implements OnInit {
         case MenuActions.Delete:
           try {
             if (_this.comment.id) {
-              await _this.commentsApi.deleteCommentById(_this.comment.id);
+              await _this.commentsApi.deleteMyComment(_this.comment.id);
             }
             if (_this.post.comments) {
               const index = _this.post.comments.indexOf(_this.comment);

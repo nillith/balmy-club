@@ -1,4 +1,4 @@
-import {isValidTimestamp} from "../../shared/utils";
+import {isValidTimestamp, utcTimestamp} from "../../shared/utils";
 import {
   $authorId,
   $id,
@@ -259,6 +259,18 @@ const HOME_STREAM_POSTS_SQL = createTimelineSql({
   circledOnly: true,
 });
 
+export interface PostAuthor {
+  postId: number;
+  authorId: number;
+}
+
+const assertValidPostAuthor = devOnly(function(params: any) {
+  console.assert(isNumericId(params.postId), `invalid postId ${params.commentId}`);
+  console.assert(isNumericId(params.authorId), `invalid authorId ${params.authorId}`);
+});
+
+const DELETE_IF_IS_AUTHOR = 'UPDATE Posts SET deletedAt = :timestamp WHERE id = :postId AND authorId = :authorId';
+
 export class PostModel {
 
   private static async getPostsBySQL(sql: string, params: any, driver: DatabaseDriver = db): Promise<PostRecord[]> {
@@ -326,14 +338,14 @@ export class PostModel {
     return _.map(rows as any[], row => row.id);
   }
 
-  reShareFromPostId?: number | string;
-  [$reShareFromPostId]?: string;
-  visibility?: PostVisibilities;
-  [$authorId]?: string;
-  [$visibleCircleIds]?: string[];
-  visibleCircleIds?: (number[]) | (string[]);
-  reShareCount?: number;
-  comments?: any[];
+
+  static async deleteByAuthor(params: PostAuthor, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidPostAuthor(params);
+    const replacements = Object.create(params);
+    replacements.timestamp = utcTimestamp();
+    const [rows] = await driver.query(DELETE_IF_IS_AUTHOR, replacements) as any;
+    return rows.affectedRows === 1;
+  }
 
   static async insert(raw: RawPost, drive: DatabaseDriver = db): Promise<number> {
     assertValidRawModel(raw);

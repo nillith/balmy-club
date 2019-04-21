@@ -31,4 +31,9 @@ export class PostsApiService {
     };
     return data as any as PostModel;
   }
+
+  async deleteMyPost(postId: string) {
+    const _this = this;
+    const data = await _this.http.delete(`${API_URLS.MY_POSTS}/${postId}`, {responseType: 'text'}).toPromise();
+  }
 }

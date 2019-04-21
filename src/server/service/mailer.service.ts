@@ -19,7 +19,7 @@ const mailerOptions = {
 const makeSignUpLink = (function() {
   const secure = config.isProd ? 's' : '';
   return async function(payload: SignUpPayload) {
-    return `http${secure}://${mailerSecrets.host}/sign-up?token=${await signUpService.sign(payload)}`;
+    return `http${secure}://${config.host}/sign-up?token=${await signUpService.sign(payload)}`;
   };
 })();
 

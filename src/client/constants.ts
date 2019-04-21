@@ -45,6 +45,7 @@ export const API_URLS = {
   SETTINGS: 'api/i/settings',
   NOTIFICATIONS: 'api/i/notifications',
   MY_COMMENTS: 'api/i/comments',
+  MY_POSTS: 'api/i/posts',
   HOME_TIMELINE: 'api/i/home-timeline',
   COMMENTS: 'api/comments',
   USERS: 'api/users',

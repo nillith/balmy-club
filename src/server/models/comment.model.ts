@@ -151,7 +151,7 @@ export class CommentModel {
     return INVALID_NUMERIC_ID !== commentAuthorId;
   }
 
-  static async deleteCommentById(params: CommentAuthor, driver: DatabaseDriver = db): Promise<boolean> {
+  static async deleteByAuthor(params: CommentAuthor, driver: DatabaseDriver = db): Promise<boolean> {
     assertValidCommentOwner(params);
     const replacements = Object.create(params);
     replacements.timestamp = utcTimestamp();

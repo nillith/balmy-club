@@ -13,11 +13,11 @@ export const unsignedIntegerToBuffer = function(n: number): Buffer {
   if (hexStr.length & 1) {
     hexStr = '0' + hexStr;
   }
-  return Buffer.from(hexStr, 'HEX');
+  return Buffer.from(hexStr, HEX);
 };
 
 export const bufferToUnsignedInteger = function(buf: Buffer): number {
-  return parseInt(buf.toString('HEX'), RADIX);
+  return parseInt(buf.toString(HEX), RADIX);
 };
 
 
