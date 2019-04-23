@@ -3,7 +3,13 @@ import {PostBuilder, PostModel, PublishPostData} from "../../../models/post.mode
 import {PublishPostRequest} from "../../../../shared/contracts";
 import {MAX_VISIBLE_CIRCLE_NUMBER} from "../../../../shared/constants";
 import {isValidPostContent, isValidStringId, utcTimestamp} from "../../../../shared/utils";
-import {$id, circleObfuscator, INVALID_NUMERIC_ID, postObfuscator} from "../../../service/obfuscator.service";
+import {
+  $id,
+  $mentionIds,
+  circleObfuscator,
+  INVALID_NUMERIC_ID,
+  postObfuscator
+} from "../../../service/obfuscator.service";
 import {Activity, isValidPostVisibility, PostVisibilities} from "../../../../shared/interf";
 import {respondWith} from "../../../utils/index";
 import {isString} from "util";
@@ -83,12 +89,13 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
   const timestamp = utcTimestamp();
   const author = getRequestUser(req);
   const postBuilder = new PostBuilder(author, data, timestamp);
-  const [mentions, rawPost] = await postBuilder.build();
+  await postBuilder.prepare();
+
   const subscriberIds = await author.getSubscriberIds();
-  const mentionIds = mentions.map(m => m.id);
+  const mentionIds = postBuilder[$mentionIds];
   let rawMentionAlikes: RawAlikeNotifications | undefined;
   await db.inTransaction(async (connection) => {
-    const postId = await PostModel.insert(rawPost, connection);
+    const postId = await PostModel.insert(postBuilder, connection);
 
     const rawPostActivity = {
       subjectId: author[$id],

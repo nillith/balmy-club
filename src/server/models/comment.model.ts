@@ -4,13 +4,11 @@ import db from "../persistence/index";
 import _ from 'lodash';
 import {
   assertValidRawTextContent,
-  Mentions,
   TextContentBuilder,
   TextContentOutboundCloneFields,
   TextContentRecord
 } from "./text-content.model";
 import {
-  $authorId,
   $outboundCloneFields,
   $postId,
   COMMENT_OBFUSCATE_MAPS,
@@ -26,29 +24,12 @@ export interface PublishCommentData {
   content: string;
 }
 
-export class CommentBuilder extends TextContentBuilder {
-  [$postId]: number;
+export class CommentBuilder extends TextContentBuilder implements RawComment {
+  postId: number;
 
   constructor(authorId: number, postId: number, content: string, createdAt: number) {
     super(authorId, content, createdAt);
-    this[$postId] = postId;
-  }
-
-  async build(): Promise<[Mentions, RawComment]> {
-    const _this = this;
-    let mentions = _this.extractMentionsFromContent();
-    if (!_.isEmpty(mentions)) {
-      mentions = await _this.sanitizeContentMentions(mentions);
-    }
-    const mentionIds = JSON.stringify(mentions.map((m) => m.id));
-    const raw: RawComment = {
-      authorId: _this[$authorId],
-      postId: _this[$postId],
-      content: _this.content,
-      createdAt: _this.createdAt,
-      mentionIds
-    };
-    return [mentions, raw];
+    this.postId = postId;
   }
 }
 

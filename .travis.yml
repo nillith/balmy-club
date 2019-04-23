@@ -4,5 +4,5 @@ node_js :
 install:
  - npm install
 script:
- - npm run server:test
+ - npm run test
 after_success: npm run server:coverage

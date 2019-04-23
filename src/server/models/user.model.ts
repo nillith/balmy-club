@@ -248,9 +248,12 @@ async function generateSaltHashForPassword(password: string): Promise<[Buffer, B
   return [salt, hash];
 }
 
-export interface NicknameAvatar {
+export interface UserIdNickname {
   id: number;
   nickname: string;
+}
+
+export interface NicknameAvatar extends UserIdNickname {
   avatarUrl?: string;
 }
 
@@ -344,20 +347,12 @@ export class UserModel {
       return row;
     });
   }
+
+  static async findMentionableUsers(userIds: number[], mentionerId: number): Promise<UserIdNickname[]> {
+    const [rows] = await db.query('SELECT Users.id, Users.nickname FROM Users WHERE Users.id IN (:userIds) AND Users.id NOT IN (SELECT blockerId FROM UserBlockUser WHERE blockeeId = :mentionerId)', {
+      userIds,
+      mentionerId
+    });
+    return rows as UserIdNickname[];
+  }
 }
-
-
-// static async getAllCircleForUser(ownerId: number, driver: DatabaseDriver = db) {
-//   const [circleRows] = await driver.query('SELECT id, name, userCount FROM Circles WHERE ownerId = :ownerId', {ownerId});
-//   const data = await Promise.all(_.map((circleRows || []) as any[], async (circle) => {
-//     const [userRows] = await driver.query('SELECT Users.id, Users.nickname, Users.avatarUrl FROM Users WHERE Users.id IN (SELECT userId FROM CircleUser WHERE circleId = :id)', circle);
-//     circle.users = userRows;
-//     disableStringify(circle);
-//     disableStringify(circle.users);
-//     return circle as CircleUsers;
-//   }));
-//   disableStringify(data);
-//   const pack = new CirclePacker();
-//   pack.circles = data;
-//   return pack;
-// }

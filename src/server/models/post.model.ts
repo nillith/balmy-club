@@ -1,6 +1,5 @@
 import {isValidTimestamp, utcTimestamp} from "../../shared/utils";
 import {
-  $authorId,
   $id,
   $outboundCloneFields,
   $reShareFromPostId,
@@ -17,7 +16,6 @@ import {POSTS_GROUP_SIZE} from "../../shared/constants";
 import _ from 'lodash';
 import {
   assertValidRawTextContent,
-  Mentions,
   RawTextContent,
   TextContentBuilder,
   TextContentOutboundCloneFields,
@@ -57,9 +55,9 @@ export interface PublishPostData {
   visibleCircleIds?: number[];
 }
 
-export class PostBuilder extends TextContentBuilder {
-  [$reShareFromPostId]?: number;
-  [$visibleCircleIds]?: number[];
+export class PostBuilder extends TextContentBuilder implements RawPost {
+  reShareFromPostId?: number;
+  visibleCircleIds?: number[];
   visibility: PostVisibilities;
 
 
@@ -74,28 +72,10 @@ export class PostBuilder extends TextContentBuilder {
     }
     this.visibility = data.visibility;
   }
-
-  async build(): Promise<[Mentions, RawPost]> {
-    const _this = this;
-    let mentions = _this.extractMentionsFromContent();
-    if (!_.isEmpty(mentions)) {
-      mentions = await _this.sanitizeContentMentions(mentions);
-    }
-    const mentionIds = JSON.stringify(mentions.map((m) => m.id));
-    const raw: RawPost = {
-      authorId: _this[$authorId],
-      content: _this.content,
-      createdAt: _this.createdAt,
-      mentionIds,
-      reShareFromPostId: _this[$reShareFromPostId] || null,
-      visibility: _this.visibility,
-    };
-    return [mentions, raw];
-  }
 }
 
 export interface RawPost extends RawTextContent {
-  reShareFromPostId: number | null;
+  reShareFromPostIdL?: number;
   visibility: PostVisibilities;
 }
 

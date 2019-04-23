@@ -1,7 +1,13 @@
 import {NextFunction, Request, Response} from "express";
 import _ from 'lodash';
 import {isValidPostContent, utcTimestamp} from "../../../../shared/utils";
-import {$id, commentObfuscator, INVALID_NUMERIC_ID, postObfuscator} from "../../../service/obfuscator.service";
+import {
+  $id,
+  $mentionIds,
+  commentObfuscator,
+  INVALID_NUMERIC_ID,
+  postObfuscator
+} from "../../../service/obfuscator.service";
 import {isNumericId, respondWith} from "../../../utils/index";
 import {isString} from "util";
 import db from "../../../persistence/index";
@@ -52,18 +58,19 @@ export const publishComment = async function(req: Request, res: Response, next: 
   }
 
   const timestamp = utcTimestamp();
+
   const comment = new CommentBuilder(commenter[$id], payload.postId, payload.content, timestamp);
-  const [mentions, rawComment] = await comment.build();
+  await comment.prepare();
   const commentListenerIds = await PostModel.getOtherCommenterIds(postViewer);
   if (postAuthorId !== postViewer.observerId) {
     commentListenerIds.push(postAuthorId);
   }
-  const mentionIds = mentions.map(m => m.id);
+  const mentionIds: number[] = comment[$mentionIds];
   let rawMentionAlikes: RawAlikeNotifications | undefined;
   let rawCommentAlikes: RawAlikeNotifications | undefined;
 
   await db.inTransaction(async (connection) => {
-    const commentId = await CommentModel.insert(rawComment, connection);
+    const commentId = await CommentModel.insert(comment, connection);
     const rawCommentActivity: RawActivity = {
       subjectId: commenter[$id],
       objectId: commentId,
