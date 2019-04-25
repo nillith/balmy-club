@@ -20,6 +20,7 @@ import {getRequestUser} from "../../../service/auth.service";
 import {PublishCommentRequest} from "../../../../shared/contracts";
 import {messengerService, RawAlikeNotifications} from "../../../service/messenger.service";
 import {bulkInsertIds} from "../../../models/model-base";
+import {sanitizeMentions} from "../../../models/text-content.model";
 
 
 const getNewCommentPayloadOrErr = function(body: PublishCommentRequest): PublishCommentData | string {
@@ -39,7 +40,7 @@ const getNewCommentPayloadOrErr = function(body: PublishCommentRequest): Publish
 };
 
 
-export const publishComment = async function(req: Request, res: Response, next: NextFunction) {
+export const createComment = async function(req: Request, res: Response, next: NextFunction) {
   const payload = getNewCommentPayloadOrErr(req.body);
   if (isString(payload)) {
     return respondWith(res, 400, payload);
@@ -137,7 +138,7 @@ export const publishComment = async function(req: Request, res: Response, next: 
   }
 };
 
-export const deleteCommentById = async function(req: Request, res: Response, next: NextFunction) {
+export const deleteComment = async function(req: Request, res: Response, next: NextFunction) {
   const commentId = commentObfuscator.unObfuscate(req.params.id);
   if (INVALID_NUMERIC_ID === commentId) {
     return respondWith(res, 404);
@@ -147,5 +148,35 @@ export const deleteCommentById = async function(req: Request, res: Response, nex
     commentId,
     authorId: author[$id]
   });
+  return respondWith(res, result ? 200 : 404);
+};
+
+export const editComment = async function(req: Request, res: Response, next: NextFunction) {
+  const commentId = commentObfuscator.unObfuscate(req.params.id);
+  if (INVALID_NUMERIC_ID === commentId) {
+    return respondWith(res, 404);
+  }
+
+  let rowContent = _.trim(req.body.content);
+  if (!isValidPostContent(rowContent)) {
+    return respondWith(res, 400);
+  }
+
+
+  const author = getRequestUser(req);
+  const [content, mentionIds] = await sanitizeMentions(rowContent, author[$id]);
+
+  if (!isValidPostContent(content)) {
+    return respondWith(res, 400);
+  }
+
+  const commentEdit = {
+    commentId,
+    authorId: author[$id],
+    content,
+    updatedAt: utcTimestamp(),
+  };
+
+  const result = await CommentModel.editByAuthor(commentEdit);
   return respondWith(res, result ? 200 : 404);
 };

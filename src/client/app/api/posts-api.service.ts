@@ -36,4 +36,9 @@ export class PostsApiService {
     const _this = this;
     const data = await _this.http.delete(`${API_URLS.MY_POSTS}/${postId}`, {responseType: 'text'}).toPromise();
   }
+
+  async editMyPost(commentId: string, content: string) {
+    const _this = this;
+    const data = await _this.http.patch(`${API_URLS.MY_POSTS}/${commentId}`, {content}, {responseType: 'text'}).toPromise();
+  }
 }

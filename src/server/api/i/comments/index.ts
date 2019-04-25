@@ -1,9 +1,10 @@
 import {Router} from "express";
-import {deleteCommentById, publishComment} from "./controller";
+import {deleteComment, editComment, createComment} from "./controller";
 import {asyncMiddleware} from "../../../utils/index";
 
 const router = Router();
 
-router.post('/', asyncMiddleware(publishComment));
-router.delete('/:id', asyncMiddleware(deleteCommentById));
+router.post('/', asyncMiddleware(createComment));
+router.delete('/:id', asyncMiddleware(deleteComment));
+router.patch('/:id', asyncMiddleware(editComment));
 export default router;

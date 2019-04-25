@@ -1,8 +1,9 @@
 import {Router} from "express";
-import {deletePostById, publishNewPost} from "./controller";
+import {deletePost, createPost, editPost} from "./controller";
 import {asyncMiddleware} from "../../../utils/index";
 
 const router = Router();
-router.post('/', asyncMiddleware(publishNewPost));
-router.delete('/:id', asyncMiddleware(deletePostById));
+router.post('/', asyncMiddleware(createPost));
+router.delete('/:id', asyncMiddleware(deletePost));
+router.patch('/:id', asyncMiddleware(editPost));
 export default router;

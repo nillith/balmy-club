@@ -23,4 +23,9 @@ export class CommentsApiService {
     const _this = this;
     const data = await _this.http.delete(`${API_URLS.MY_COMMENTS}/${commentId}`, {responseType: 'text'}).toPromise();
   }
+
+  async editMyComment(commentId: string, content: string) {
+    const _this = this;
+    const data = await _this.http.patch(`${API_URLS.MY_COMMENTS}/${commentId}`, {content}, {responseType: 'text'}).toPromise();
+  }
 }

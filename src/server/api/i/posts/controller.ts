@@ -20,6 +20,7 @@ import {ActivityModel, RawMentionActivities} from "../../../models/activity.mode
 import {BroadcastParams, NotificationModel, RawBulkNotifications} from "../../../models/notification.model";
 import {bulkInsertIds} from "../../../models/model-base";
 import _ from 'lodash';
+import {sanitizeMentions} from "../../../models/text-content.model";
 
 const filterShareCircleIds = function(circleIds: any): number[] {
   const result: number[] = [];
@@ -78,7 +79,7 @@ const getNewPostPayloadOrErr = function(body: PublishPostRequest): PublishPostDa
 };
 
 
-export const publishNewPost = async function(req: Request, res: Response, next: NextFunction) {
+export const createPost = async function(req: Request, res: Response, next: NextFunction) {
   const {body} = req;
 
   const data = getNewPostPayloadOrErr(body);
@@ -147,9 +148,8 @@ export const publishNewPost = async function(req: Request, res: Response, next: 
   }
 };
 
-export const deletePostById = async function(req: Request, res: Response, next: NextFunction) {
+export const deletePost = async function(req: Request, res: Response, next: NextFunction) {
   const postId = postObfuscator.unObfuscate(req.params.id);
-  console.log(postId);
   if (INVALID_NUMERIC_ID === postId) {
     return respondWith(res, 404);
   }
@@ -158,5 +158,36 @@ export const deletePostById = async function(req: Request, res: Response, next: 
     postId,
     authorId: author[$id]
   });
+  return respondWith(res, result ? 200 : 403);
+};
+
+
+export const editPost = async function(req: Request, res: Response, next: NextFunction) {
+  const postId = postObfuscator.unObfuscate(req.params.id);
+  if (INVALID_NUMERIC_ID === postId) {
+    return respondWith(res, 404);
+  }
+
+  let rowContent = _.trim(req.body.content);
+  if (!isValidPostContent(rowContent)) {
+    return respondWith(res, 400);
+  }
+
+  const author = getRequestUser(req);
+  const [content, mentionIds] = await sanitizeMentions(rowContent, author[$id]);
+
+  if (!isValidPostContent(content)) {
+    return respondWith(res, 400);
+  }
+
+  const postEdit = {
+    postId,
+    authorId: author[$id],
+    content,
+    updatedAt: utcTimestamp(),
+  };
+
+
+  const result = await PostModel.editByAuthor(postEdit);
   return respondWith(res, result ? 200 : 403);
 };

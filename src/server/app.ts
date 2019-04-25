@@ -13,6 +13,7 @@ import redisClient from './cache/redis';
 import http from 'http';
 import {$msg, $status} from "./constants/symbols";
 import morgan from "morgan";
+import helmet from "helmet";
 
 const {STATUS_CODES} = http;
 const RedisStore = connectRedis(session);
@@ -30,6 +31,21 @@ app.set("port", process.env.PORT || 3000);
 app.set('views', `${config.root}/server/views`);
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
+app.use(helmet({
+  frameguard: {
+    action: 'deny'
+  },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+    }
+  },
+  referrerPolicy: {
+    policy: 'same-origin'
+  }
+}));
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));

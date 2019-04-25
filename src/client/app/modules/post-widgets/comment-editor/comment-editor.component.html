@@ -28,7 +28,8 @@
       <div class="app-fill-space"></div>
       <app-plus-one-button [initialOn]="comment.plusedByMe" [onAction]="plusAction" [offAction]="unPlusAction"></app-plus-one-button>
       <button mat-icon-button *ngIf="comment.plusCount > 0">{{comment.plusCount}}</button>
-      <button [disabled]="menuBusy" mat-icon-button [matMenuTriggerFor]="menu">
+
+      <button *ngIf="enabledActions && enabledActions.length" [disabled]="menuBusy" mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>more_vert</mat-icon>
       </button>
       <mat-menu #menu="matMenu">

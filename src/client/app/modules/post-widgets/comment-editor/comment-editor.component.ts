@@ -57,10 +57,10 @@ export class CommentEditorComponent implements OnInit {
     if (!this.post) {
       throw Error('post required!');
     }
-    if (_this.comment) {
-      if (_this.iService.isMyId(_this.comment.authorId)) {
-        _this.enabledActions = getIconMenuOption([MenuActions.Edit, MenuActions.Delete]);
-      }
+    if (_this.comment && _this.iService.isMyId(_this.comment.authorId)) {
+      _this.enabledActions = getIconMenuOption([MenuActions.Edit, MenuActions.Delete]);
+    } else {
+      _this.enabledActions = [];
     }
   }
 
@@ -99,15 +99,17 @@ export class CommentEditorComponent implements OnInit {
     try {
       _this.comment.content = _this.editor.markdown;
       this.toggleEditMode();
-      const comment = _this.iService.createComment(_this.post.id);
-      comment.content = _this.comment.content;
-      await comment.save();
       if (isNew) {
+        const comment = _this.iService.createComment(_this.post.id);
+        comment.content = _this.comment.content;
+        await comment.save();
         if (!_this.post.comments) {
           _this.post.comments = [comment];
         } else {
           _this.post.comments.push(comment);
         }
+      } else {
+        await _this.commentsApi.editMyComment(_this.comment.id, _this.comment.content);
       }
     } catch (e) {
       _this.toast.showToast(e.error || e.mentionIds);

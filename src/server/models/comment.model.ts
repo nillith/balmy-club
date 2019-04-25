@@ -16,7 +16,7 @@ import {
   obfuscatorFuns
 } from "../service/obfuscator.service";
 import {PostObserver} from "./post.model";
-import {utcTimestamp} from "../../shared/utils";
+import {isValidPostContent, isValidTimestamp, utcTimestamp} from "../../shared/utils";
 
 
 export interface PublishCommentData {
@@ -87,7 +87,8 @@ const assertValidCommentViewer = devOnly(function(params: any) {
 
 const enum SQLs {
   INSERT = 'INSERT INTO Comments (postId, authorId, content, createdAt, mentionIds) VALUES(:postId, :authorId, :content, :createdAt, :mentionIds)',
-  DELETE_IF_IS_AUTHOR = 'UPDATE Comments SET deletedAt = :timestamp WHERE id = :commentId AND authorId = :authorId'
+  DELETE_IF_IS_AUTHOR = 'UPDATE Comments SET deletedAt = :timestamp WHERE id = :commentId AND authorId = :authorId',
+  UPDATE_IF_IS_AUTHOR = 'UPDATE Comments SET updatedAt = :updatedAt, content = :content WHERE id = :commentId AND authorId = :authorId'
 }
 
 export interface CommentAuthor {
@@ -95,9 +96,21 @@ export interface CommentAuthor {
   authorId: number;
 }
 
-const assertValidCommentOwner = devOnly(function(params: any) {
+export interface CommentEditAuthor extends CommentAuthor {
+  content: string;
+  updatedAt: number;
+}
+
+const assertValidCommentAuthor = devOnly(function(params: any) {
   console.assert(isNumericId(params.commentId), `invalid commentId ${params.commentId}`);
   console.assert(isNumericId(params.authorId), `invalid authorId ${params.authorId}`);
+});
+
+const assertValidCommentEditAuthor = devOnly(function(params: any) {
+  assertValidCommentAuthor(params);
+  console.assert(params.content && params.content.trim(), `empty content!`);
+  console.assert(isValidPostContent(params.content), `invalid content`);
+  console.assert(isValidTimestamp(params.updatedAt), `invallid timestamp ${params.updatedAt}`);
 });
 
 export class CommentModel {
@@ -133,10 +146,16 @@ export class CommentModel {
   }
 
   static async deleteByAuthor(params: CommentAuthor, driver: DatabaseDriver = db): Promise<boolean> {
-    assertValidCommentOwner(params);
+    assertValidCommentAuthor(params);
     const replacements = Object.create(params);
     replacements.timestamp = utcTimestamp();
     const [rows] = await driver.query(SQLs.DELETE_IF_IS_AUTHOR as string, replacements) as any;
+    return rows.affectedRows === 1;
+  }
+
+  static async editByAuthor(params: CommentEditAuthor, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidCommentEditAuthor(params);
+    const [rows] = await driver.query(SQLs.UPDATE_IF_IS_AUTHOR as string, params) as any;
     return rows.affectedRows === 1;
   }
 }

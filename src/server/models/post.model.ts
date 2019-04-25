@@ -1,4 +1,4 @@
-import {isValidTimestamp, utcTimestamp} from "../../shared/utils";
+import {isValidPostContent, isValidTimestamp, utcTimestamp} from "../../shared/utils";
 import {
   $id,
   $outboundCloneFields,
@@ -244,12 +244,25 @@ export interface PostAuthor {
   authorId: number;
 }
 
+export interface PostEditAuthor extends PostAuthor {
+  content: string;
+  updatedAt: number;
+}
+
 const assertValidPostAuthor = devOnly(function(params: any) {
   console.assert(isNumericId(params.postId), `invalid postId ${params.commentId}`);
   console.assert(isNumericId(params.authorId), `invalid authorId ${params.authorId}`);
 });
 
+const assertValidPostEditAuthor = devOnly(function(params: any) {
+  assertValidPostAuthor(params);
+  console.assert(params.content && params.content.trim(), `empty content!`);
+  console.assert(isValidPostContent(params.content), `invalid content`);
+  console.assert(isValidTimestamp(params.updatedAt), `invallid timestamp ${params.updatedAt}`);
+});
+
 const DELETE_IF_IS_AUTHOR = 'UPDATE Posts SET deletedAt = :timestamp WHERE id = :postId AND authorId = :authorId';
+const UPDATE_IF_IS_AUTHOR = 'UPDATE Posts SET updatedAt = :updatedAt, content = :content WHERE id = :postId AND authorId = :authorId';
 
 export class PostModel {
 
@@ -318,12 +331,19 @@ export class PostModel {
     return _.map(rows as any[], row => row.id);
   }
 
-
   static async deleteByAuthor(params: PostAuthor, driver: DatabaseDriver = db): Promise<boolean> {
     assertValidPostAuthor(params);
     const replacements = Object.create(params);
     replacements.timestamp = utcTimestamp();
     const [rows] = await driver.query(DELETE_IF_IS_AUTHOR, replacements) as any;
+    return rows.affectedRows === 1;
+  }
+
+  static async editByAuthor(params: PostEditAuthor, driver: DatabaseDriver = db): Promise<boolean> {
+    assertValidPostEditAuthor(params);
+    const replacements = Object.create(params);
+    replacements.timestamp = utcTimestamp();
+    const [rows] = await driver.query(UPDATE_IF_IS_AUTHOR, replacements) as any;
     return rows.affectedRows === 1;
   }
 

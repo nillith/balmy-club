@@ -62,7 +62,6 @@ export class PostEditorComponent implements OnInit {
     if (_this.post.authorId === _this.iService.me.id) {
       menuActions.push(MenuActions.Delete, MenuActions.Edit);
     }
-    console.log(``)
     _this.enabledActions = getIconMenuOption(menuActions);
   }
 
@@ -98,9 +97,10 @@ export class PostEditorComponent implements OnInit {
     this.toggleEditMode();
   }
 
-  saveEdit() {
+  async saveEdit() {
     const _this = this;
     _this.post.content = _this.editor.markdown;
+    await _this.postApi.editMyPost(_this.post.id, _this.post.content);
     this.toggleEditMode();
   }
 

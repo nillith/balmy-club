@@ -10,7 +10,7 @@ import admin from "./admin";
 const router = Router();
 
 router.use('/account', account);
-router.use('/users', requireLogin, users);
+router.use('/users', users);
 router.use('/i', requireLogin, i);
 router.use('/posts', requireLogin, posts);
 router.use('/comments', requireLogin, comments);
