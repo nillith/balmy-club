@@ -6,6 +6,7 @@ import {appConstants} from "../../../app.constants";
 import {DirectSignUpRequest, LoginRequest, SignUpRequest} from "../../../../../shared/contracts";
 import {AuthService} from "./auth.service";
 import {StringIds} from "../../../modules/i18n/translations/string-ids";
+import {I18nService} from "../../../modules/i18n/i18n.service";
 
 enum DialogTypes {
   Login,
@@ -109,7 +110,8 @@ export class LoginDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
               private activeRoute: ActivatedRoute,
               private router: Router,
-              private authService: AuthService) {
+              private authService: AuthService,
+              public i18nService: I18nService) {
   }
 
   ngOnInit() {
@@ -209,13 +211,5 @@ export class LoginDialogComponent implements OnInit {
         _this.loading = false;
       }, 300);
     }
-  }
-
-  onLanguageChange() {
-    const _this = this;
-    _this.changingLanguage = true;
-    setTimeout(() => {
-      _this.changingLanguage = false;
-    });
   }
 }

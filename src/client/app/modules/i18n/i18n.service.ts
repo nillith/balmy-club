@@ -13,6 +13,7 @@ export class I18nService {
   public values: any;
   public code: string;
   public name: string;
+  public changing = false;
 
   constructor() {
     const _this = this;
@@ -20,11 +21,19 @@ export class I18nService {
   }
 
   private setTranslation(trans) {
-    cloneFields(trans, [
-      'values', 'name', 'code'
-    ], this);
-  }
+    const _this = this;
+    if (_this.code !== trans.code) {
+      cloneFields(trans, [
+        'values', 'name', 'code'
+      ], this);
 
+      _this.changing = true;
+      setTimeout(() => {
+        _this.changing = false;
+      });
+      document.documentElement.setAttribute('lang', _this.code);
+    }
+  }
 
   get language() {
     return localStorage.getItem(LANGUAGE_OPTION_KEY) || navigator.language;

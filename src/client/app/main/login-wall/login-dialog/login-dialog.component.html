@@ -1,4 +1,4 @@
-<form name="form" #formRef="ngForm" *ngIf="!changingLanguage" (submit)="onSubmit(formRef)">
+<form name="form" #formRef="ngForm" *ngIf="!i18nService.changing" (submit)="onSubmit(formRef)">
   <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center center">
     <img src="../../../../assets/logo.png" class="app-logo-median">
   </h2>
@@ -76,7 +76,7 @@
       </button>
     </div>
     <div style="width:100%;padding-bottom: 20px;" fxLayout="row" fxLayoutAlign="center center" >
-      <app-language-selector (change)="onLanguageChange()"></app-language-selector>
+      <app-language-selector></app-language-selector>
 
 
 
