@@ -37,6 +37,7 @@
              minlength="{{appConstants.MIN_PASSWORD_LENGTH}}"
              id="password"
              name="password"
+             autocomplete="new-password"
              #password="ngModel" [(ngModel)]="settingsData.password">
     </mat-form-field>
 
@@ -46,6 +47,7 @@
              id="passwordConfirm"
              name="passwordConfirm"
              [disabled]="confirmDisabled()"
+             autocomplete="new-password"
              required
              #passwordConfirm="ngModel" [(ngModel)]="settingsData.passwordConfirm"
              (ngModelChange)="onConfirmChange()">
