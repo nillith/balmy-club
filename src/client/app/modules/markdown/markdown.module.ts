@@ -4,6 +4,7 @@ import {MarkdownEditorComponent} from "./markdown-editor/markdown-editor.compone
 import {ImportsModule} from "../imports/imports.module";
 import {MentionSelectionDialogComponent} from "./mention-selection-dialog/mention-selection-dialog.component";
 import {I18nModule} from "../i18n/i18n.module";
+import {CommonPipesModule} from "../common-pipes/common-pipes.module";
 
 
 export const exportedEntryComponents = [
@@ -21,6 +22,7 @@ const exportedComponents = [
   imports: [
     ImportsModule,
     I18nModule,
+    CommonPipesModule,
   ],
   exports: exportedComponents,
   entryComponents: exportedEntryComponents

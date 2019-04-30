@@ -5,14 +5,14 @@
     </button>
     <div>{{iService.me.nickname || 'Unknown'}}</div>
     <mat-icon>navigate_next</mat-icon>
-    <div style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
-      <mat-select #visibilitySelector style="width:150px;" (selectionChange)="onVisibilityChange($event)">
+    <div id="visibility-selector-anchor">
+      <mat-select #visibilitySelector id="visibility-selector" (selectionChange)="onVisibilityChange($event)">
         <mat-option *ngFor="let opt of visibilityOptions" [value]="opt.id">{{opt.name | i18n}}</mat-option>
       </mat-select>
     </div>
     <button class="visibility-setting" (click)="showVisibilitySelector()">{{visibilityName | i18n}}</button>
-    <div *ngIf="isPrivate()" style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
-      <mat-select #circleSelector style="width:150px;" (selectionChange)="onCircleChange($event)">
+    <div *ngIf="isPrivate()" id="circle-selector-anchor">
+      <mat-select #circleSelector id="circle-selector" (selectionChange)="onCircleChange($event)">
         <mat-option *ngFor="let opt of []" [value]="opt.id">{{opt.name | i18n}}</mat-option>
       </mat-select>
     </div>
@@ -27,7 +27,7 @@
   <div class="post-editor-dialog-action" fxLayout="row" fxLayoutAlign="left center" fxLayoutGap="15px">
     <div class="app-fill-space"></div>
     <button mat-raised-button (click)="cancelPost()">Cancel</button>
-    <button mat-raised-button (click)="publishPost()" [disabled]="editor.isEmpty()" style="width: 100px;">
+    <button mat-raised-button (click)="publishPost()" [disabled]="editor.isEmpty()" id="publish-post-button">
       <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'send'" [textId]="'Post'"></app-spinner-switch>
     </button>
   </div>

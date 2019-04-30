@@ -5,8 +5,8 @@
       <div class="user-banner-image">
         <app-avatar class="user-header-avatar" [user]="user" [size]="'128px'"></app-avatar>
         <div *ngIf="!user.isMe" class="user-circle-button">
-          <div style="width: 1px; height: 1px;overflow: hidden;margin: 0;padding: 0;">
-            <mat-select #circleSelector [(ngModel)]="circleSelects" multiple style="width:100px;"
+          <div class="user-circle-selector-anchor">
+            <mat-select #circleSelector [(ngModel)]="circleSelects" multiple class="user-circle-selector"
                         (closed)="onCircleSelectorClose()">
               <mat-option *ngFor="let opt of iService.circles" [value]="opt.id">{{opt.name}}</mat-option>
             </mat-select>

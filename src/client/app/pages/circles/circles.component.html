@@ -12,8 +12,8 @@
 </div>
 <div *ngIf="circleModifier">
   <mat-card fxLayout="row wrap" fxLayoutAlign="left center" class="circle-users-panel clearfix">
-    <mat-card-title style="width:100%">
-      <mat-form-field style="width: 100%;">
+    <mat-card-title class="fill-parent-width">
+      <mat-form-field class="fill-parent-width">
         <input matInput placeholder="{{StringIds.CircleName | i18n}}"
                type="text" pattern="^{{appConstants.CIRCLE_NAME_PATTERN}}$"
                name="name" required #name="ngModel"

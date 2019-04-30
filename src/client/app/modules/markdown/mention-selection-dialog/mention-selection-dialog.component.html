@@ -1,16 +1,15 @@
-<div style="width: 200px;height: 300px;">
+<div class="mention-selector-container">
   <mat-form-field>
     <input matInput
-           style="padding: 0;margin: 0;width:200px;"
-           class="mat-select-search-input"
+           class="mat-select-search-input mention-search"
            #searchSelectInput
            (input)="onInputChange($event.target.value)"
            [placeholder]="'Search'"/>
   </mat-form-field>
-  <div fxLayout="column" style="max-height: 230px; overflow-x: hidden;overflow-y:auto;">
-    <button class="app-content-button" *ngFor="let user of filteredUsers" (click)="onListButtonClick(user)" style="width:100%;height:100%;" fxLayout="row">
+  <div fxLayout="column" class="mention-list">
+    <button class="app-content-button mention-button" *ngFor="let user of filteredUsers" (click)="onListButtonClick(user)" fxLayout="row">
       <div class="app-avatar-small">
-        <img src="assets/default-avatar.png">
+        <img src="{{user | avatarUrl}}">
       </div>
       <div>
         {{user.nickname}}

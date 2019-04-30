@@ -30,11 +30,38 @@ mat-divider {
   @include button-text(blue);
 }
 
-
 .circle-selector-icon {
   color: #3377aa;
 
   svg {
     fill: #3377aa;
   }
+}
+
+#visibility-selector-anchor {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#visibility-selector {
+  width: 150px;
+}
+
+#circle-selector-anchor {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#circle-selector {
+  width: 150px;
+}
+
+#publish-post-button {
+  width: 100px;
 }

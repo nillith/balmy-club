@@ -1,4 +1,26 @@
 .mat-button-wrapper {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
+}
+
+.mention-selector-container {
+  width: 200px;
+  height: 300px;
+}
+
+.mention-button {
+  width: 100%;
+  height: 100%;
+}
+
+.mention-list {
+  max-height: 230px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.mention-search {
+  padding: 0;
+  margin: 0;
+  width: 200px;
 }

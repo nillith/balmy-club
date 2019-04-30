@@ -51,8 +51,20 @@ $width: 16px;
     width: $width !important;
   }
 
-  #other-circle-option-button-icon{
+  #other-circle-option-button-icon {
     position: relative;
     left: -10px;
   }
+}
+
+.user-circle-selector-anchor {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.user-circle-selector {
+  width: 100px;
 }

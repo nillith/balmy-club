@@ -7,7 +7,7 @@ form {
   font-size: medium;
 }
 
-.required-field-hint{
+.required-field-hint {
   margin-bottom: 10px;
   //font-family: mat-font-family($app-font-config);
   font-size: small;
@@ -50,4 +50,13 @@ mat-radio-button:nth-child(1) {
   margin-top: 10px;
   margin-bottom: 10px;
   min-height: 2.2em;
+}
+
+#login-submit-area {
+  width: 100%;
+}
+
+#login-footer {
+  width: 100%;
+  padding-bottom: 20px;
 }

@@ -21,7 +21,7 @@
       <app-markdown-viewer [content]="comment.content"></app-markdown-viewer>
     </div>
     <div *ngIf="!editMode && !comment" (click)="createComment()" class="comment-editor-fake"
-         style="cursor: text!important;">
+         id="fake-comment">
       {{StringIds.AddComment | i18n}}...
     </div>
     <div *ngIf="comment && comment.id" fxLayout="row" fxLayoutAlign="center center">
