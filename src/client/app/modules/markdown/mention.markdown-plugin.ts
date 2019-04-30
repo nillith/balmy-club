@@ -13,7 +13,7 @@ export const MentionPlugin = function(markdownIt: MarkdownIt) {
     if (!token) {
       return;
     }
-    return `<a class="app-nickname-link" href="u/${token.content}" target="_blank">+${token.info}</a>`;
+    return `<a class="app-nickname-link" href="u/${token.content}" target="_blank" data-user-id="${token.content}">+${token.info}</a>`;
   };
 
   const parser = function(state: StateInline, silent?: boolean): boolean | void {

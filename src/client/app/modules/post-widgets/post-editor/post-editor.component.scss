@@ -2,9 +2,11 @@
 
 .mat-card {
   width: 30em;
+  max-width: 95vw;
   margin: 0;
   padding: 0;
 }
+
 .comment-hr {
   margin-top: 2px;
   margin-bottom: 2px;
@@ -34,7 +36,7 @@ mat-divider {
 
 $padding: 1em;
 
-.post-editor-content-section{
+.post-editor-content-section {
   padding: $padding;
 }
 
@@ -42,5 +44,8 @@ $padding: 1em;
   padding: $padding 0 $padding $padding;
 }
 
+.post-comments-container {
+  width: 100%;
+}
 
 

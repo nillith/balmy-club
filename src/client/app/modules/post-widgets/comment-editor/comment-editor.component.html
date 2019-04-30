@@ -9,7 +9,7 @@
       <a href="{{ comment.author | userLink}}" class="app-nickname-link" target="_blank">{{comment.author.nickname}}</a>
     </div>
   </div>
-  <div class="app-fill-space">
+  <div class="comment-content">
     <div *ngIf="editMode && comment">
       <app-markdown-editor #markdownEditor [initialFocus]="true" [content]="comment.content" [contextUsers]="contextUsers"></app-markdown-editor>
       <mat-card-actions align="end">

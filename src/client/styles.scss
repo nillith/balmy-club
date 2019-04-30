@@ -110,11 +110,16 @@ body {
 
   margin: 0;
   padding: 0;
+  width: 100%;
+  word-wrap: break-word;
   .app-nickname-link {
     text-decoration: none;
     margin-left: 0.1em;
     margin-right: 0.1em;
     font-weight: bold;
+    position: relative;
+    border: 1px solid blue;
+    padding: 5px 0 5px;
   }
 
   p, table, ul, menu, ol, dir {

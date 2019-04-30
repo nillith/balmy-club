@@ -10,6 +10,7 @@ import {ChangeSettingsRequest, LoginResponse, MinimumUser, UserResponse} from ".
 import _ from 'lodash';
 import {CommentModel} from "../models/comment.model";
 import {NotificationsApiService} from "../api/notifications-api.service";
+import {UserInfoService} from "../modules/user-info/user-info.service";
 
 const STORAGE_KEYS = {
   USER: 'user',
@@ -29,7 +30,10 @@ export class IService {
   public allUsers: MinimumUser[] = [];
 
 
-  constructor(private http: HttpClient, private jwtHelper: JwtHelperService, private notificationsApi: NotificationsApiService) {
+  constructor(private http: HttpClient,
+              private jwtHelper: JwtHelperService,
+              private notificationsApi: NotificationsApiService,
+              private userInfoService: UserInfoService) {
     const _this = this;
     _this.unpackToken(getAccessToken());
     if (_this.isLoggedIn()) {
