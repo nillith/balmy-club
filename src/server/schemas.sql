@@ -1,7 +1,7 @@
 CREATE TABLE Users (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(32) UNIQUE,
-    nickname VARCHAR(32),
+    username VARCHAR(32) UNIQUE NOT NULL,
+    nickname VARCHAR(32) NOT NULL,
     avatarUrl VARCHAR(255),
     bannerUrl VARCHAR(255),
     email VARCHAR(255) UNIQUE,
@@ -42,17 +42,17 @@ CREATE TABLE Comments (
 );
 
 CREATE TABLE PostPlusOnes(
-id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-postId BIGINT UNSIGNED NOT NULL,
-userId BIGINT UNSIGNED NOT NULL,
-UNIQUE(postId, userId)
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    postId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
+    UNIQUE(postId, userId)
 );
 
 CREATE TABLE CommentPlusOnes(
-id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-commentId BIGINT UNSIGNED NOT NULL,
-userId BIGINT UNSIGNED NOT NULL,
-UNIQUE(commentId, userId)
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    commentId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
+    UNIQUE(commentId, userId)
 );
 
 CREATE TABLE Circles (
@@ -65,16 +65,16 @@ CREATE TABLE Circles (
 
 CREATE TABLE CircleUser (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    circleId BIGINT UNSIGNED,
-    userId BIGINT UNSIGNED,
+    circleId BIGINT UNSIGNED NOT NULL,
+    userId BIGINT UNSIGNED NOT NULL,
     UNIQUE (circleId, userId)
 );
 
 CREATE TABLE UserBlockUser(
-id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-blockeeId BIGINT UNSIGNED,
-blockerId BIGINT UNSIGNED,
-UNIQUE(blockeeId, blockerId)
+    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    blockeeId BIGINT UNSIGNED NOT NULL,
+    blockerId BIGINT UNSIGNED NOT NULL,
+    UNIQUE(blockeeId, blockerId)
 );
 
 CREATE TABLE PostCircle (
@@ -98,8 +98,8 @@ CREATE TABLE Activities (
 
 CREATE TABLE Notifications (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    recipientId BIGINT,
-    activityId BIGINT,
+    recipientId BIGINT NOT NULL,
+    activityId BIGINT NOT NULL,
     `timestamp` BIGINT,
     isRead BOOL DEFAULT FALSE,
     UNIQUE(recipientId, activityId),
@@ -107,9 +107,9 @@ CREATE TABLE Notifications (
 );
 
 CREATE TABLE Subscriptions (
-	id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    subscribeeId BIGINT,
-    subscriberId BIGINT,
+	  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    subscribeeId BIGINT NOT NULL,
+    subscriberId BIGINT NOT NULL,
     INDEX (subscribeeId),
     INDEX (subscriberId)
 );

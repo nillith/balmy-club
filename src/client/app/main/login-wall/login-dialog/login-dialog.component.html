@@ -1,6 +1,7 @@
-<form name="form" #formRef="ngForm" *ngIf="!i18nService.changing" (submit)="onSubmit(formRef)">
+<form name="form" #formRef="ngForm" *ngIf="!i18nService.changing" (ngSubmit)="onSubmit(formRef)"
+      (keydown.enter)="onSubmit(formRef)">
   <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center center">
-    <img src="../../../../assets/logo.png" class="app-logo-median">
+    <img src="/assets/logo.png" class="app-logo-median">
   </h2>
   <mat-dialog-content
     [class.login-main-content]="DialogTypes.Login === dialogType"
@@ -52,6 +53,7 @@
       </mat-checkbox>
       <div class="app-fill-space"></div>
       <button *ngIf="uiConfig.passwordToggle" class="app-button-link"
+              tabindex="-1"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.PasswordRecoverRequest : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{passwordToggleText | i18n}}?
@@ -59,7 +61,6 @@
     </section>
   </mat-dialog-content>
   <mat-dialog-actions>
-
     <div class="comp-submit-error">
       <mat-error>
         {{error}}
@@ -82,6 +83,7 @@
 
       <div class="app-fill-space"></div>
       <button *ngIf="uiConfig.signUpToggle" class="app-button-link login-wall-button-link"
+              tabindex="-1"
               (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.SignUp : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{signUpToggleText | i18n}}?

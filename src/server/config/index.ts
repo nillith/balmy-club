@@ -57,7 +57,7 @@ export const config = {
     saltBytes: 32,
     keyBytes: 64,
     iterations: 10000,
-    algorithm: 'sha256',
+    algorithm: 'sha512',
   }
 };
 export default config;

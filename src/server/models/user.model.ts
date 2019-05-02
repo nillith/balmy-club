@@ -12,7 +12,7 @@ import {
 import {authService, JwtSignable} from "../service/auth.service";
 import {devOnly, disableStringify, isNumericId} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
-import {isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../shared/utils";
+import {cloneFields, isValidEmailAddress, isValidNickname, isValidPassword, isValidUsername} from "../../shared/utils";
 import {
   $id,
   $outboundCloneFields,
@@ -27,19 +27,37 @@ import {isNull, isUndefined} from "util";
 
 
 const createSaveSettingsSql = (function() {
-  const AllowedDbColumnMap = {
-    username: 'username',
-    nickname: 'nickname',
-    avatarUrl: 'avatarUrl',
-    bannerUrl: 'bannerUrl',
-    email: 'email',
+  interface SettingColumnConfig {
+    replacement?: string;
+    allowNullInDb?: boolean;
+  }
+
+  const AllowedDbColumnMap: { [index: string]: SettingColumnConfig } = {
+    username: {},
+    nickname: {},
+    avatarUrl: {
+      allowNullInDb: true,
+    },
+    bannerUrl: {
+      allowNullInDb: true,
+    },
+    email: {
+      allowNullInDb: true,
+    },
+    password: {
+      replacement: '`salt` = :salt, `hash` = :hash'
+    }
   };
 
   return function(data: ChangeSettingsRequest) {
     const updates = Object.keys(data).map((k) => {
-      const col = AllowedDbColumnMap[k];
-      if (col && data[k]) {
-        return `\`${col}\` = :${k}`;
+      const colConfig = AllowedDbColumnMap[k];
+      if (!colConfig || (!colConfig.allowNullInDb && !data[k])) {
+        return;
+      } else if (colConfig.replacement) {
+        return colConfig.replacement;
+      } else {
+        return `\`${k}\` = :${k}`;
       }
     })
       .filter(Boolean)
@@ -123,17 +141,13 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
         }));
       });
 
-    const [rows] = await driver.query(`SELECT nickname, avatarUrl, bannerUrl, email FROM Users WHERE id = :id LIMIT 1`, {
+    const [rows] = await driver.query(`SELECT username, nickname, avatarUrl, bannerUrl, email FROM Users WHERE id = :id LIMIT 1`, {
       id: _this[$id]
     });
 
     const user = _this.toJSON();
     if (rows && rows[0]) {
-      const row = rows[0];
-      user.nickname = row.nickname;
-      user.avatarUrl = row.avatarUrl;
-      user.bannerUrl = row.bannerUrl;
-      user.email = row.email;
+      cloneFields(rows[0], ['username', 'nickname', 'avatarUrl', 'bannerUrl', 'email'], user);
     }
 
     return {
@@ -152,14 +166,19 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
     return !_.isEmpty(rows);
   }
 
-  async saveSettings(data: ChangeSettingsRequest, driver: DatabaseDriver = db) {
+  async saveSettings(data: ChangeSettingsRequest, driver: DatabaseDriver = db): Promise<boolean> {
     const _this = this;
     const sql = createSaveSettingsSql(data);
-    (data as any).id = _this[$id];
-    await driver.query(sql, data);
+    const replacements: any = Object.create(data);
+    replacements.id = _this[$id];
     if (data.password) {
-      await _this.changePassword(data.password, driver);
+      replacements.password = undefined;
+      await _this.hashPassword(data.password);
+      replacements.salt = _this[$salt];
+      replacements.hash = _this[$hash];
     }
+    const [result] = await driver.query(sql, replacements);
+    return 1 === (result as any).changedRows;
   }
 
   async getSubscriberIds(driver: DatabaseDriver = db): Promise<number[]> {
