@@ -90,6 +90,7 @@ if (env === 'development' || env === 'test') {
   });
 } else {
   app.use((err, req, res, next) => {
+    console.log(err);
     let status = err[$status];
     let msg = err[$msg] || STATUS_CODES[status];
     if (!status || !msg) {

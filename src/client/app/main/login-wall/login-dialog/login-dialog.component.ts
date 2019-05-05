@@ -205,7 +205,7 @@ export class LoginDialogComponent implements OnInit {
     if (!ngForm.form.valid || _this.loading) {
       return;
     }
-
+    let submitError;
     try {
       _this.error = '';
       const {dialogType, dialogModel, authService} = _this;
@@ -231,11 +231,14 @@ export class LoginDialogComponent implements OnInit {
           break;
       }
     } catch (e) {
-      _this.error = e.error || e.message;
+      submitError = (e.error && (e.error.message || e.error)) || e.message;
     } finally {
       setTimeout(() => {
         _this.loading = false;
-      }, 300);
+        if (submitError) {
+          _this.error = submitError;
+        }
+      }, 1000);
     }
   }
 }

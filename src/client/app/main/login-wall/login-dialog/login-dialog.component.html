@@ -69,6 +69,7 @@
     <div fxLayout="row" fxLayoutAlign="center center" id="login-submit-area">
       <button mat-button mat-raised-button
               color="mat-red" type="submit"
+              [disabled]="loading"
               #button>
       <span>
         <app-spinner-switch [showSpinner]="loading" [size]="20" [icon]="'input'"
