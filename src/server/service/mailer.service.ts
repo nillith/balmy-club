@@ -2,7 +2,12 @@ import nodeMailer from 'nodemailer';
 import config from '../config';
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mail, {Address} from "nodemailer/lib/mailer";
-import {SignUpPayload, signUpService} from "./auth.service";
+import {RecoverPasswordPayload, recoverPasswordService, SignUpPayload, signUpService} from "./auth.service";
+import {SignUpTypes} from "../../shared/contracts";
+import {PagePaths} from "../../shared/constants";
+import {ActionTicket, assertValidActionTicket} from "../models/user.model";
+import {devOnly} from "../utils/index";
+import {isValidEmailAddress} from "../../shared/utils";
 
 const mailerSecrets = config.secrets.mailer;
 const mailerOptions = {
@@ -19,9 +24,22 @@ const mailerOptions = {
 const makeSignUpLink = (function() {
   const secure = config.isProd ? 's' : '';
   return async function(payload: SignUpPayload) {
-    return `http${secure}://${config.host}/sign-up?token=${await signUpService.sign(payload)}`;
+    return `http${secure}://${config.host}/${PagePaths.SignUp}?token=${await signUpService.sign(payload)}`;
   };
 })();
+
+const makeResetPasswordLink = (function() {
+  const secure = config.isProd ? 's' : '';
+  return async function(actionTicket: ActionTicket) {
+    return `http${secure}://${config.host}/${PagePaths.ResetPassword}?token=${await recoverPasswordService.sign(new RecoverPasswordPayload(actionTicket))}`;
+  };
+})();
+
+
+const assertValidResetPasswordParams = devOnly(function(arg1: any, arg2: any) {
+  console.assert(isValidEmailAddress(arg1), `invalid email: ${arg1}`);
+  assertValidActionTicket(arg2);
+});
 
 class MailService {
   private readonly mailer: Mail;
@@ -38,12 +56,24 @@ class MailService {
   }
 
   async sendSignUpMail(payload: SignUpPayload) {
+    payload.type = SignUpTypes.Email;
     const signUpLink = await makeSignUpLink(payload);
     return this.sendMail({
       to: payload.email,
       subject: 'Sign Up',
       text: `click ${signUpLink}`,
       html: `<p><a href="${signUpLink}">Sign Up</a></p>`
+    });
+  }
+
+  async sendResetPasswordMail(email: string, actionTicket: ActionTicket) {
+    assertValidResetPasswordParams(email, actionTicket);
+    const resetPasswordLink = await makeResetPasswordLink(actionTicket);
+    return this.sendMail({
+      to: email,
+      subject: 'Reset Password',
+      text: `click ${resetPasswordLink}`,
+      html: `<p><a href="${resetPasswordLink}">Reset Password</a></p>`
     });
   }
 }

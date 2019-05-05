@@ -7,6 +7,7 @@ import {CommonPipesModule} from "../common-pipes/common-pipes.module";
 import {LanguageSelectorComponent} from './language-selector/language-selector.component';
 import {I18nModule} from "../i18n/i18n.module";
 import {PlusOneButtonComponent} from './plus-one-button/plus-one-button.component';
+import { EmptyComponent } from './empty/empty.component';
 
 
 export const exportedEntryComponents = [];
@@ -20,7 +21,7 @@ const exportedComponents = [
 
 
 @NgModule({
-  declarations: [...exportedComponents],
+  declarations: [...exportedComponents, EmptyComponent],
   imports: [
     ImportsModule,
     CommonPipesModule,

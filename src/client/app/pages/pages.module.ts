@@ -6,9 +6,11 @@ import {ProjectModulesImportsModule} from "../modules/imports/project-modules-im
 import {UserPageComponent} from './u/user-page.component';
 import {CirclesComponent} from './circles/circles.component';
 import {SettingsComponent} from './settings/settings.component';
-import { DiscoverComponent } from './discover/discover.component';
-import { PostPageComponent } from './p/p.component';
-import { NotificationsComponent } from './notifications/notifications.component';
+import {DiscoverComponent} from './discover/discover.component';
+import {PostPageComponent} from './p/p.component';
+import {NotificationsComponent} from './notifications/notifications.component';
+import {EmptyComponent} from "../modules/widgets/empty/empty.component";
+import {PagePaths} from "../../../shared/constants";
 
 const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent},
@@ -17,6 +19,8 @@ const routes: Routes = [
   {path: 'discover', component: DiscoverComponent},
   {path: 'u/:userId', component: UserPageComponent},
   {path: 'p/:postId', component: PostPageComponent},
+  {path: PagePaths.ResetPassword, component: EmptyComponent},
+  {path: PagePaths.SignUp, component: EmptyComponent},
   {path: 'notifications', component: NotificationsComponent},
 ];
 

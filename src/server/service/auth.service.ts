@@ -1,6 +1,6 @@
 import config from '../config';
 import jwt from 'jsonwebtoken';
-import {UserRecord} from '../models/user.model';
+import {ActionTicket, ActionTicketPayload, UserRecord} from '../models/user.model';
 import {NextFunction, Request, RequestHandler, Response} from "express";
 import {asyncMiddleware, respondWith} from "../utils/index";
 import {$status} from "../constants/symbols";
@@ -8,6 +8,7 @@ import {ACCESS_TOKEN_COOKIE_KEY, ACCESS_TOKEN_KEY, Roles, UserRanks} from "../..
 import {AccessTokenData} from "../../shared/interf";
 import {isString} from "util";
 import {INVALID_NUMERIC_ID, userObfuscator} from "./obfuscator.service";
+import {SignUpTypes} from "../../shared/contracts";
 
 const $requestUser = Symbol('request user');
 
@@ -125,14 +126,39 @@ export function getRequestUser(req: Request): UserRecord {
   return req[$requestUser];
 }
 
+export class JwtPayloadHolder implements JwtSignable {
+  constructor(readonly payload: any) {
+  }
+
+  getJwtPayload(): any {
+    return this.payload;
+  }
+}
+
 export class SignUpPayload implements JwtSignable {
+  type?: SignUpTypes;
+
   constructor(readonly email: string) {
   }
 
-  getJwtPayload(): object {
-    return this;
+  getJwtPayload(): any {
+    const _this = this;
+    return {
+      type: _this.type,
+      email: _this.email
+    };
+  }
+}
+
+export class RecoverPasswordPayload implements JwtSignable {
+  constructor(readonly payload: ActionTicket) {
+  }
+
+  getJwtPayload(): any {
+    return this.payload.toJSON();
   }
 }
 
 export const signUpService = new JwtHelper<SignUpPayload>(config.secrets.signUp!, '2d');
+export const recoverPasswordService = new JwtHelper<RecoverPasswordPayload, ActionTicketPayload>(config.secrets.recoverPassword!, '2d');
 

@@ -1,9 +1,14 @@
 import {Injectable} from '@angular/core';
 import {TRANSLATIONS} from "./translations";
 import {cloneFields} from "../../../../shared/utils";
+import {StringIds} from "./translations/string-ids";
+import * as en from "./translations/en";
+
+const english = en.values;
 
 const LANGUAGE_OPTION_KEY = 'language';
 const DEFAULT_LANGUAGE_CODE = 'en';
+
 
 @Injectable({
   providedIn: 'root'
@@ -45,5 +50,15 @@ export class I18nService {
 
     const trans = TRANSLATIONS[v] || TRANSLATIONS[DEFAULT_LANGUAGE_CODE];
     _this.setTranslation(trans);
+  }
+
+  translate(stringId: StringIds, interpolation?: any): any {
+    const str = this.values[stringId] || english[stringId] || stringId;
+    if (!interpolation) {
+      return str;
+    }
+    return String(str).replace(/{{(.*?)}}/g, (matched, group1) => {
+      return interpolation[group1.trim()];
+    });
   }
 }

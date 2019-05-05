@@ -8,6 +8,7 @@ export enum StringIds {
   RecoverPassword,
   ConfirmPassword,
   ChangePassword,
+  ResetPassword,
   Nickname,
   Notifications,
   Link,

@@ -3,16 +3,26 @@ import {MatDialogRef} from "@angular/material";
 import {NgForm, NgModel} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {appConstants} from "../../../app.constants";
-import {DirectSignUpRequest, LoginRequest, SignUpRequest} from "../../../../../shared/contracts";
+import {
+  DirectSignUpRequest,
+  ForgotPasswordRequest,
+  LoginRequest,
+  ResetPasswordRequest,
+  SignUpRequest
+} from "../../../../../shared/contracts";
 import {AuthService} from "./auth.service";
 import {StringIds} from "../../../modules/i18n/translations/string-ids";
 import {I18nService} from "../../../modules/i18n/i18n.service";
+import {AccountApiService} from "../../../api/account-api.service";
+import {ToastService} from "../../../services/toast.service";
+import {PagePaths} from "../../../../../shared/constants";
+import {Location} from '@angular/common';
 
 enum DialogTypes {
   Login,
   SignUp,
-  PasswordRecoverRequest,
-  PasswordRecover,
+  ForgotPassword,
+  ResetPassword,
 }
 
 const DialogUrl = {
@@ -24,8 +34,8 @@ const DialogUrl = {
 const SubmitButtonTexts = {
   [DialogTypes.Login]: StringIds.Login,
   [DialogTypes.SignUp]: StringIds.SignUp,
-  [DialogTypes.PasswordRecoverRequest]: StringIds.RecoverPassword,
-  [DialogTypes.PasswordRecover]: StringIds.ChangePassword,
+  [DialogTypes.ForgotPassword]: StringIds.RecoverPassword,
+  [DialogTypes.ResetPassword]: StringIds.ResetPassword,
 };
 
 const SignUpToggleTexts = {
@@ -35,8 +45,8 @@ const SignUpToggleTexts = {
 
 const PasswordToggleTexts = {
   [DialogTypes.Login]: StringIds.ForgotPassword,
-  [DialogTypes.PasswordRecoverRequest]: StringIds.Login,
-  [DialogTypes.PasswordRecover]: StringIds.Login,
+  [DialogTypes.ForgotPassword]: StringIds.Login,
+  [DialogTypes.ResetPassword]: StringIds.Login,
 };
 
 interface UiConfig {
@@ -71,17 +81,22 @@ const UiConfigs = {
     passwordConfirm: true,
     signUpToggle: true
   } as UiConfig,
-  [DialogTypes.PasswordRecoverRequest]: {
+  [DialogTypes.ForgotPassword]: {
     email: true,
     emailRequired: true,
     mainExtra: true,
     passwordToggle: true,
   } as UiConfig,
+  [DialogTypes.ResetPassword]: {
+    password: true,
+    passwordConfirm: true
+  } as UiConfig,
 };
 
 
-type LoginDialogModel = SignUpRequest | LoginRequest | {
+type LoginDialogModel = SignUpRequest | LoginRequest | ForgotPasswordRequest | {
   passwordConfirm?: string;
+  token?: string;
 };
 
 @Component({
@@ -102,31 +117,36 @@ export class LoginDialogComponent implements OnInit {
   loading = false;
   togging = false;
   dialogModel: LoginDialogModel = {};
-  signUpToken: string;
   error = '';
   redirect: string | null = null;
-  changingLanguage = false;
 
   constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
               private activeRoute: ActivatedRoute,
               private router: Router,
               private authService: AuthService,
+              private accountApi: AccountApiService,
+              private toast: ToastService,
+              private location: Location,
               public i18nService: I18nService) {
   }
 
   ngOnInit() {
+    const _this = this;
     const {pathname} = location;
     if (pathname) {
-      if (pathname.startsWith('/sign-up')) {
-        this.onChangeDialogType(DialogTypes.SignUp);
-        this.redirect = '';
-      } else if (pathname.startsWith('/login')) {
-        this.onChangeDialogType(DialogTypes.Login);
-        this.redirect = '';
+      if (pathname.startsWith(`/${PagePaths.SignUp}`)) {
+        _this.onChangeDialogType(DialogTypes.SignUp);
+        _this.redirect = '';
+      } else if (pathname.startsWith(`/${PagePaths.Login}`)) {
+        _this.onChangeDialogType(DialogTypes.Login);
+        _this.redirect = '';
+      } else if (pathname.startsWith(`/${PagePaths.ResetPassword}`)) {
+        _this.redirect = '';
+        _this.onChangeDialogType(DialogTypes.ResetPassword);
       }
     }
-    this.activeRoute.queryParams.subscribe(params => {
-      this.signUpToken = params['token'];
+    _this.activeRoute.queryParams.subscribe(params => {
+      (_this.dialogModel as any).token = params['token'];
     });
   }
 
@@ -197,11 +217,17 @@ export class LoginDialogComponent implements OnInit {
           break;
         case DialogTypes.SignUp:
           await authService.signUpWithUsername(dialogModel as DirectSignUpRequest);
-          this.closeDialog();
+          _this.closeDialog();
           break;
-        case DialogTypes.PasswordRecoverRequest:
+        case DialogTypes.ForgotPassword:
+          await _this.accountApi.forgotPassword(dialogModel as ForgotPasswordRequest);
           break;
-        case DialogTypes.PasswordRecover:
+        case DialogTypes.ResetPassword:
+          if (await _this.accountApi.resetPassword(dialogModel as ResetPasswordRequest)) {
+            _this.toast.showToast("password reset succeed!");
+            _this.onChangeDialogType(DialogTypes.Login);
+            _this.location.go(PagePaths.Login);
+          }
           break;
       }
     } catch (e) {

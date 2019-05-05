@@ -21,6 +21,7 @@ export const config = {
     session: env.SESSION_SECRET,
     auth: env.AUTH_SECRET,
     signUp: env.SIGN_UP_SECRET,
+    recoverPassword: env.RECOVER_PASSWORD_SECRET,
     redis: {
       host: env.REDIS_HOST,
       port: toNumber('REDIS_PORT') || 6379,
@@ -58,6 +59,7 @@ export const config = {
     keyBytes: 64,
     iterations: 10000,
     algorithm: 'sha512',
-  }
+  },
+  ticketBytes: 16
 };
 export default config;

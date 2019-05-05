@@ -1,20 +1,23 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {IService} from "../../../services/i.service";
 import {
-  LoginRequest} from "../../../../../shared/contracts";
-import {API_URLS} from "../../../../constants";
-import {
-  DirectSignUpRequest, EmailSignUpRequest, SignUpRequest, SignUpTypes,
+  DirectSignUpRequest,
+  EmailSignUpRequest,
+  LoginRequest,
+  SignUpRequest,
+  SignUpTypes,
   SignUpWithTokenRequest
 } from "../../../../../shared/contracts";
+import {API_URLS} from "../../../../constants";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private iService: IService) { }
+  constructor(private http: HttpClient, private iService: IService) {
+  }
 
 
   private async postSignUpPayload(payload: SignUpRequest): Promise<string> {
@@ -47,6 +50,10 @@ export class AuthService {
     await _this.signUpWithPayload({
       email, username, password, nickname, type: SignUpTypes.Direct
     });
+  }
+
+  async recoverPassword() {
+
   }
 
 

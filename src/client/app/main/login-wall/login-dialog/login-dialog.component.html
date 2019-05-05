@@ -54,7 +54,7 @@
       <div class="app-fill-space"></div>
       <button *ngIf="uiConfig.passwordToggle" class="app-button-link"
               tabindex="-1"
-              (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.PasswordRecoverRequest : DialogTypes.Login)"
+              (click)="onChangeDialogType(DialogTypes.Login === dialogType ? DialogTypes.ForgotPassword : DialogTypes.Login)"
               [disabled]="loading || togging">
         {{passwordToggleText | i18n}}?
       </button>

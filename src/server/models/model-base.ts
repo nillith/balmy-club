@@ -90,3 +90,7 @@ export const fromDatabaseRow = function <T extends DatabaseRecordBase>(row: any,
   result.assign(row);
   return result;
 };
+
+export function updateOneSucceed(queryResult: any): boolean {
+  return queryResult.affectedRows === 1;
+}

@@ -52,6 +52,15 @@ export interface SignUpWithTokenRequest extends SignUpInfo {
   type: SignUpTypes.WithToken;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  password: string;
+  token: string;
+}
+
 export type SignUpRequest = DirectSignUpRequest | EmailSignUpRequest | SignUpWithTokenRequest;
 
 export interface LoginRequest {

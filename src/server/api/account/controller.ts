@@ -2,10 +2,16 @@ import {NextFunction, Request, Response} from "express";
 import {respondWith} from "../../utils/index";
 import mailService from "../../service/mailer.service";
 import validator from 'validator';
-import {SignUpPayload, signUpService} from "../../service/auth.service";
-import {RawUser, UserModel} from "../../models/user.model";
+import {recoverPasswordService, SignUpPayload, signUpService} from "../../service/auth.service";
+import {ActionTicket, isValidActionTicketPayloadFormat, RawUser, UserModel} from "../../models/user.model";
 import {isString} from "util";
-import {isValidNickname, isValidPassword, isValidUsername} from "../../../shared/utils";
+import {
+  isValidEmailAddress,
+  isValidNickname,
+  isValidPassword,
+  isValidUsername,
+  utcTimestamp
+} from "../../../shared/utils";
 import _ from "lodash";
 import {SignUpRequest, SignUpTypes} from "../../../shared/contracts";
 
@@ -76,7 +82,7 @@ const getSignUpInfo = async function(body: SignUpRequest): Promise<RawUser | str
     return SignUpErrorMessages.usernameTaken;
   }
 
-  return {email, username, password, nickname};
+  return {email, username, password, nickname, createdAt: utcTimestamp()};
 };
 
 export const signUp = async function(req: Request, res: Response, next: NextFunction) {
@@ -102,7 +108,34 @@ export const signUp = async function(req: Request, res: Response, next: NextFunc
   return respondWith(res, 400);
 };
 
-export const changePassword = async function(req: Request, res: Response, next: NextFunction) {
+
+export const forgotPassword = async function(req: Request, res: Response, next: NextFunction) {
+  respondWith(res, 202);
+  const {email} = req.body;
+  if (isValidEmailAddress(email)) {
+    const user = await UserModel.findUserByEmail(email);
+    if (user) {
+      const ticket = await user.newActionTicket();
+      await mailService.sendResetPasswordMail(email, ticket);
+    }
+  }
+};
+
+export const resetPassword = async function(req: Request, res: Response, next: NextFunction) {
+  const {password, token} = req.body;
+  if (isValidPassword(password) && token) {
+    const payload = await recoverPasswordService.verify(token);
+    if (isValidActionTicketPayloadFormat(payload)) {
+      const actionTicket = ActionTicket.fromPayload(payload);
+      if (actionTicket) {
+        if (await UserModel.resetPassword(password, actionTicket)) {
+          return respondWith(res, 204);
+        } else {
+          return respondWith(res, 401, 'ticket expired!');
+        }
+      }
+    }
+  }
   respondWith(res, 405);
 };
 

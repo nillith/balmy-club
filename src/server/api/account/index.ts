@@ -1,9 +1,10 @@
 import {Router} from "express";
 import {asyncMiddleware} from "../../utils/index";
-import {changePassword, signUp} from "./controller";
+import {resetPassword, forgotPassword, signUp} from "./controller";
 const router = Router();
 
 router.post('/', asyncMiddleware(signUp));
-router.put('/password', asyncMiddleware(changePassword));
+router.post('/password', asyncMiddleware(resetPassword));
+router.put('/password', asyncMiddleware(forgotPassword));
 
 export default router;

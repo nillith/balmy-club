@@ -76,3 +76,7 @@ export const isValidPassword = function(password: string | undefined): boolean {
 export const isValidStringId = function(str: any): boolean {
   return !!str && 32 === str.length && /^[0-9a-fA-F]{32}$/.test(str);
 };
+
+export const isValidTicketFormat = function(str: any): boolean {
+  return isValidStringId(str);
+};

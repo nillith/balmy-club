@@ -12,6 +12,7 @@ export const values = {
   [StringIds.RecoverPassword]: '找回密码',
   [StringIds.ConfirmPassword]: '确认密码',
   [StringIds.ChangePassword]: '修改密码',
+  [StringIds.ResetPassword]: '重置密码',
   [StringIds.Nickname]: '昵称',
   [StringIds.Notifications]: '通知',
   [StringIds.Link]: '链接',

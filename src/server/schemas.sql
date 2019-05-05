@@ -6,9 +6,11 @@ CREATE TABLE Users (
     bannerUrl VARCHAR(255),
     email VARCHAR(255) UNIQUE,
     circlerCount INT DEFAULT 0,
-    role INT,
-    salt BLOB(32),
-    hash BLOB(64),
+    `role` INT,
+    createdAt BIGINT NOT NULL,
+    salt BLOB(32) NOT NULL,
+    `hash` BLOB(64) NOT NULL,
+    ticket BLOB(16) DEFAULT NULL,
     INDEX (username (10)),
     INDEX (email (10))
 );
@@ -22,7 +24,7 @@ CREATE TABLE Posts (
     plusCount INT UNSIGNED DEFAULT 0,
     reShareCount INT UNSIGNED DEFAULT 0,
     mentionIds TEXT,
-    createdAt BIGINT,
+    createdAt BIGINT NOT NULL,
     updatedAt BIGINT,
     deletedAt BIGINT,
     INDEX (authorId , createdAt)
@@ -35,7 +37,7 @@ CREATE TABLE Comments (
     content TEXT,
     plusCount INT UNSIGNED DEFAULT 0,
     mentionIds TEXT,
-    createdAt BIGINT,
+    createdAt BIGINT NOT NULL,
     updatedAt BIGINT,
     deletedAt BIGINT,
     INDEX (postId , authorId)
@@ -107,7 +109,7 @@ CREATE TABLE Notifications (
 );
 
 CREATE TABLE Subscriptions (
-	  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     subscribeeId BIGINT NOT NULL,
     subscriberId BIGINT NOT NULL,
     INDEX (subscribeeId),

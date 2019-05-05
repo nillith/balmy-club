@@ -43,3 +43,8 @@ export const RemoteMessageTypes = {
   Notification: 101,
 };
 
+export const PagePaths = {
+  ResetPassword: 'i/reset-password',
+  SignUp: 'sign-up',
+  Login: 'login',
+};

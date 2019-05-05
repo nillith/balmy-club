@@ -18,7 +18,7 @@ const randomPassword = (function() {
 
 describe('user', () => {
 
-  it('should return false for invalid password', () => {
+  it('should return false for invalid password', async () => {
     assert.isFalse(isValidPassword('1'));
     assert.isFalse(isValidPassword('@'));
     assert.isFalse(isValidPassword('#$'));

@@ -12,19 +12,11 @@ export class PasswordOptions {
 
 class PasswordService extends PasswordOptions {
   constructor(options: PasswordOptions) {
-    super(options.saltBytes, options.keyBytes, options.iterations, options.algorithm)
+    super(options.saltBytes, options.keyBytes, options.iterations, options.algorithm);
   }
 
-  async generateSalt(): Promise<Buffer> {
-    return new Promise<Buffer>((resolve, reject) => {
-      crypto.randomBytes(this.saltBytes, (err, salt) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(salt);
-        }
-      });
-    });
+  generateSalt(): Buffer {
+    return crypto.randomBytes(this.saltBytes);
   }
 
   async passwordHash(salt: Buffer, pass: string): Promise<Buffer> {
