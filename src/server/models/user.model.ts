@@ -12,7 +12,7 @@ import {
   updateOneSucceed,
 } from "./model-base";
 import {authService, JwtSignable} from "../service/auth.service";
-import {devOnly, disableStringify, isNumericId} from "../utils/index";
+import {devOnly, disableStringify, isNumericId, isValidURL, throwIfFalse} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
 import {
   cloneFields,
@@ -22,7 +22,8 @@ import {
   isValidStringId,
   isValidTicketFormat,
   isValidTimestamp,
-  isValidUsername
+  isValidUsername,
+  utcTimestamp
 } from "../../shared/utils";
 import {
   $id,
@@ -35,11 +36,19 @@ import {
 import _ from 'lodash';
 import {CircleModel, CircleRecord} from "./circle.model";
 import {ChangeSettingsRequest, MinimumUser} from "../../shared/contracts";
-import {isNull, isUndefined} from "util";
+import {isNull, isNumber, isUndefined} from "util";
 import config from "../config";
 
 export function generateTicket() {
   return crypto.randomBytes(config.ticketBytes);
+}
+
+function generateTextSecret(bytes) {
+  return crypto.randomBytes(bytes)
+    .toString('base64')
+    .replace(/\//g, '')
+    .replace(/\+/g, '')
+    .replace(/=/g, '');
 }
 
 const createSaveSettingsSql = (function() {
@@ -195,10 +204,15 @@ export class UserRecord extends DatabaseRecordBase implements JwtSignable {
     }, driver);
   }
 
+  async getToken(expire?: string | number) {
+    const _this = this;
+    return authService.sign(_this, expire);
+  }
+
   async getLoginData(expire?: string | number, driver: DatabaseDriver = db) {
     const _this = this;
 
-    const tokenPromise = authService.sign(_this, expire);
+    const tokenPromise = _this.getToken(expire);
     const circlesPromise = CircleModel
       .getCirclesByOwnerId(_this[$id], driver)
       .then((circles) => {
@@ -289,10 +303,13 @@ interface ChangePasswordParams {
   hash: Buffer;
 }
 
-const assertValidSaltHash = devOnly(function(data: any) {
-  console.assert(data.salt && data.salt.length === 32, `invalid salt`);
-  console.assert(data.hash && data.hash.length === 64, `invalid hash`);
-});
+
+function throwIfInvalidSaltHash(data: any) {
+  throwIfFalse(data.salt && data.salt.length === 32, `invalid salt`);
+  throwIfFalse(data.hash && data.hash.length === 64, `invalid hash`);
+}
+
+const assertValidSaltHash = devOnly(throwIfInvalidSaltHash);
 
 const assertValidChangePasswordParams = devOnly(function(data: any) {
   console.assert(isNumericId(data.userId), `invalid userId ${data.userId}`);
@@ -300,33 +317,66 @@ const assertValidChangePasswordParams = devOnly(function(data: any) {
 });
 
 export interface RawUser {
-  username: string;
+  username?: string;
   nickname: string;
   password: string;
+  twitterId?: number;
   createdAt: number;
   email?: string;
+  avatarUrl?: string;
+  bannerUrl?: string;
   role?: number;
   hash?: Buffer;
   salt?: Buffer;
 }
 
 const enum SQLs {
-  INSERT = 'INSERT INTO Users (username, nickname, email, role, createdAt, salt, hash) VALUES(:username, :nickname, :email, :role, :createdAt, :salt, :hash)',
+  INSERT = 'INSERT INTO Users (username, nickname, email, role, createdAt, salt, hash, twitterId, avatarUrl, bannerUrl) VALUES(:username, :nickname, :email, :role, :createdAt, :salt, :hash, :twitterId, :avatarUrl, :bannerUrl)',
   CHANGE_PASSWORD = 'UPDATE Users SET salt = :salt, hash = :hash WHERE id = :userId'
 }
 
-
-const assertValidRawUser = devOnly(function(data: any) {
-  console.assert(isValidUsername(data.username), `invalid username ${data.username}`);
-  console.assert(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
-  console.assert(isValidPassword(data.password), `invalid password ${data.password}`);
-  console.assert(isValidTimestamp(data.createdAt), `invalid createdAt ${data.createdAt}`);
-  console.assert(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
-  if (!data.email) {
-    console.assert(isUndefined(data.email) || isNull(data.email), `empty string email`);
+const throwIfInvalidRawUser = function(data: any) {
+  throwIfFalse(isValidUsername(data.username), `invalid username ${data.username}`);
+  throwIfFalse(data.username || data.twitterId, `must have either username or twitterId`);
+  if (data.twitterId) {
+    throwIfFalse(isNumber(data.twitterId), `invalid twitterId ${data.twitterId}`);
   }
-  assertValidSaltHash(data);
+  throwIfFalse(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
+  throwIfFalse(isValidPassword(data.password), `invalid password ${data.password}`);
+  throwIfFalse(isValidTimestamp(data.createdAt), `invalid createdAt ${data.createdAt}`);
+  throwIfFalse(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
+  if (!data.email) {
+    throwIfFalse(isUndefined(data.email) || isNull(data.email), `empty string email`);
+  }
+  if (!data.avatarUrl) {
+    throwIfFalse(isValidURL(data.avatarUrl), `invalid avatarUrl ${data.avatarUrl}`);
+  }
+  if (!data.bannerUrl) {
+    throwIfFalse(isValidURL(data.bannerUrl), `invalid avatarUrl ${data.bannerUrl}`);
+  }
+};
+
+const assertValidRawUserWithSaltHash = devOnly(function(data: any) {
+  throwIfInvalidRawUser(data);
+  throwIfInvalidSaltHash(data);
 });
+
+
+function twitterProfileToRawUser(profile: any): RawUser {
+  const result = {} as RawUser;
+  if (profile.photos && profile.photos[0]) {
+    result.avatarUrl = profile.photos[0].value;
+  }
+  const json = profile._json;
+  result.bannerUrl = json.profile_banner_url;
+  result.username = generateTextSecret(20).substr(0, 24);
+  result.password = generateTextSecret(96);
+  result.twitterId = json.id;
+  result.createdAt = utcTimestamp();
+  result.nickname = json.name;
+  throwIfInvalidRawUser(result);
+  return result;
+}
 
 const assertValidPassword = devOnly(function(password: any) {
   console.assert(isValidPassword(password), `invalid password ${password}`);
@@ -358,19 +408,22 @@ export interface NicknameAvatar extends UserIdNickname {
 
 
 export class UserModel {
-  static async insert(raw: RawUser, drive: DatabaseDriver = db): Promise<number> {
-    assertValidRawUser(raw);
+  static async insert(raw: RawUser, driver: DatabaseDriver = db): Promise<number> {
     [raw.salt, raw.hash] = await generateSaltHashForPassword(raw.password);
-    assertValidRawUser(raw);
-    return insertReturnId(SQLs.INSERT as string, raw, drive);
+    assertValidRawUserWithSaltHash(raw);
+    return insertReturnId(SQLs.INSERT as string, raw, driver);
   }
 
-  static async create(raw: RawUser, drive: DatabaseDriver = db): Promise<UserRecord> {
-    assertValidRawUser(raw);
-    const id = await this.insert(raw, drive);
+  static async create(raw: RawUser, driver: DatabaseDriver = db): Promise<UserRecord> {
+    const id = await this.insert(raw, driver);
     const row = Object.create(raw);
     row.id = id;
+    console.log(raw);
     return fromDatabaseRow(row, UserRecord);
+  }
+
+  static async signUpWithTwitter(profile: any, driver: DatabaseDriver = db): Promise<UserRecord> {
+    return UserModel.create(twitterProfileToRawUser(profile), driver);
   }
 
   static async changePassword(params: ChangePasswordParams, driver: DatabaseDriver = db) {
@@ -405,6 +458,13 @@ export class UserModel {
   static async findUserByUsername(username: string, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
     assertValidUsername(username);
     const [rows] = await driver.query(`SELECT id, username, role, salt, hash FROM Users WHERE userName = :username LIMIT 1`, {username});
+    if (!_.isEmpty(rows)) {
+      return fromDatabaseRow(rows[0], UserRecord);
+    }
+  }
+
+  static async findUserByTwitterId(twitterId: number, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
+    const [rows] = await driver.query(`SELECT id, username, role, salt, hash FROM Users WHERE twitterId = :twitterId LIMIT 1`, {twitterId});
     if (!_.isEmpty(rows)) {
       return fromDatabaseRow(rows[0], UserRecord);
     }

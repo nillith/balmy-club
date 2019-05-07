@@ -2,7 +2,6 @@ import {Router} from 'express';
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import {UserModel} from "../../models/user.model";
-import {returnThis} from "../../../shared/utils";
 
 
 passport.use(new LocalStrategy({
@@ -15,7 +14,7 @@ passport.use(new LocalStrategy({
         return done(null, user);
       } else {
         return done(null, false, {
-          message: 'Username or password is not correct!'
+          message: 'Username or password is incorrect!'
         });
       }
     })

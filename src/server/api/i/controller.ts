@@ -17,6 +17,15 @@ export const changePassword = async function(req: Request, res: Response, next: 
   respondWith(res, 200);
 };
 
+export const getProfile = async function(req: Request, res: Response, next: NextFunction) {
+  const user = getRequestUser(req);
+  if (user) {
+    return res.json(await user.getLoginData());
+  } else {
+    respondWith(res, 401);
+  }
+};
+
 export const getHomeTimelinePosts = async function(req: Request, res: Response, next: NextFunction) {
   const {query} = req;
   const timestamp = Math.floor(parseFloat(query.t));

@@ -1,5 +1,6 @@
 CREATE TABLE Users (
     id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    twitterId BIGINT UNSIGNED UNIQUE,
     username VARCHAR(32) UNIQUE NOT NULL,
     nickname VARCHAR(32) NOT NULL,
     avatarUrl VARCHAR(255),
@@ -12,7 +13,8 @@ CREATE TABLE Users (
     `hash` BLOB(64) NOT NULL,
     ticket BLOB(16) DEFAULT NULL,
     INDEX (username (10)),
-    INDEX (email (10))
+    INDEX (email (10)),
+    INDEX(twitterId)
 );
 
 CREATE TABLE Posts (

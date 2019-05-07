@@ -55,5 +55,6 @@ export const values = {
   [StringIds.PublishedComment]: 'Commented Your Post',
   [StringIds.MentionedYou]: 'Mentioned You',
   [StringIds.CircledYou]: 'Circled You',
+  [StringIds.LoginWithTwitter]: 'Login With Twitter',
 };
 

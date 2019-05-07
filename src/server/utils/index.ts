@@ -54,6 +54,12 @@ export const devOnly = (function() {
   }
 })();
 
+export function throwIfFalse(v?: any, msg?: string) {
+  if (!v) {
+    throw Error(msg || "MyAssertion failed!");
+  }
+}
+
 export const isNumericId = function(id?: any) {
   return INVALID_NUMERIC_ID !== id && id > 0 && Number.isSafeInteger(id);
 };

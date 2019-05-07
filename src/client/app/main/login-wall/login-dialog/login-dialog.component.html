@@ -48,7 +48,8 @@
              (ngModelChange)="onConfirmChange()">
     </mat-form-field>
     <section *ngIf="uiConfig.mainExtra" fxLayout="row" fxLayoutAlign="center center">
-      <mat-checkbox *ngIf="uiConfig.rememberMe" [disabled]="loading" name="rememberMe" [(ngModel)]="dialogModel.rememberMe">
+      <mat-checkbox *ngIf="uiConfig.rememberMe" [disabled]="loading" name="rememberMe"
+                    [(ngModel)]="dialogModel.rememberMe">
         {{StringIds.RememberMe | i18n}}
       </mat-checkbox>
       <div class="app-fill-space"></div>
@@ -77,9 +78,8 @@
       </span>
       </button>
     </div>
-    <div id="login-footer" fxLayout="row" fxLayoutAlign="center center" >
+    <div id="login-footer" fxLayout="row" fxLayoutAlign="center center">
       <app-language-selector></app-language-selector>
-
 
 
       <div class="app-fill-space"></div>
@@ -89,6 +89,11 @@
               [disabled]="loading || togging">
         {{signUpToggleText | i18n}}?
       </button>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center center">
+      <a href="/auth/twitter" class="auth-button" title="{{StringIds.LoginWithTwitter | i18n}}">
+        <img src="assets/twitter.png">
+      </a>
     </div>
   </mat-dialog-actions>
 </form>

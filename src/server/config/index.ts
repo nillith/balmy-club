@@ -60,6 +60,12 @@ export const config = {
     iterations: 10000,
     algorithm: 'sha512',
   },
-  ticketBytes: 16
+  ticketBytes: 16,
+  auth: {
+    twitter: {
+      consumerKey: env.AUTH_TWITTER_CONSUMER_KEY,
+      consumerSecret: env.AUTH_TWITTER_CONSUMER_SECRET
+    }
+  }
 };
 export default config;

@@ -51,4 +51,5 @@ export enum StringIds {
   PublishedComment,
   MentionedYou,
   CircledYou,
+  LoginWithTwitter,
 }

@@ -11,6 +11,7 @@ import _ from 'lodash';
 import {CommentModel} from "../models/comment.model";
 import {NotificationsApiService} from "../api/notifications-api.service";
 import {UserInfoService} from "../modules/user-info/user-info.service";
+import {ACCESS_TOKEN_COOKIE_KEY} from "../../../shared/constants";
 
 const STORAGE_KEYS = {
   USER: 'user',
@@ -41,9 +42,20 @@ export class IService {
       _this.loadCirclesFromStorage();
       _this.notificationsApi.onLogin();
     }
+
     if (!_this.me || !_this.me.id) {
-      _this.logout();
+      if (_this.isLoggedIn()) {
+        _this.fetchProfile();
+      } else {
+        _this.logout();
+      }
     }
+  }
+
+  private async fetchProfile() {
+    const _this = this;
+    const data = await _this.http.get(`${API_URLS.I}`).toPromise();
+    _this.onLogin(data as LoginResponse);
   }
 
   private unpackUserData(data: any) {

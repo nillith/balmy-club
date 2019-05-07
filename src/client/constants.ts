@@ -41,6 +41,7 @@ export const DEFAULT_AVATAR_URL = 'assets/default-avatar.png';
 export const API_URLS = {
   POSTS: 'api/posts',
   DISCOVER: 'api/posts/discover',
+  I: 'api/i',
   CIRCLES: 'api/i/circles',
   SETTINGS: 'api/i/settings',
   NOTIFICATIONS: 'api/i/notifications',
