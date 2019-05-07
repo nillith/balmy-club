@@ -418,7 +418,6 @@ export class UserModel {
     const id = await this.insert(raw, driver);
     const row = Object.create(raw);
     row.id = id;
-    console.log(raw);
     return fromDatabaseRow(row, UserRecord);
   }
 
