@@ -25,10 +25,9 @@ enum DialogTypes {
   ResetPassword,
 }
 
-const DialogUrl = {
-  [DialogTypes.Login]: '/login',
-  [DialogTypes.SignUp]: '/sign-up',
-  [DialogTypes.SignUp]: '/password',
+const DialogUrls = {
+  [DialogTypes.Login]: PagePaths.Login,
+  [DialogTypes.SignUp]: PagePaths.SignUp,
 };
 
 const SubmitButtonTexts = {
@@ -99,6 +98,12 @@ type LoginDialogModel = SignUpRequest | LoginRequest | ForgotPasswordRequest | {
   token?: string;
 };
 
+interface OAuthIcon {
+  url: string;
+  icon: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-login-dialog',
   templateUrl: './login-dialog.component.html',
@@ -106,6 +111,24 @@ type LoginDialogModel = SignUpRequest | LoginRequest | ForgotPasswordRequest | {
 })
 export class LoginDialogComponent implements OnInit {
   StringIds = StringIds;
+
+  oAuthIcons: OAuthIcon[] = [
+    {
+      url: '/auth/twitter',
+      icon: '/assets/logos/twitter.png',
+      name: 'Twitter'
+    },
+    {
+      url: '/auth/github',
+      icon: '/assets/logos/github.png',
+      name: 'GitHub'
+    },
+    {
+      url: '/auth/google',
+      icon: '/assets/logos/google.svg',
+      name: 'Google'
+    }
+  ];
 
   @ViewChild('formRef') formRef: NgForm;
   @ViewChild('passwordConfirm') passwordConfirmModel: NgModel;
@@ -150,7 +173,7 @@ export class LoginDialogComponent implements OnInit {
     });
   }
 
-  onChangeDialogType(t: number) {
+  onChangeDialogType(t: number, updateUrl? = true) {
     const _this = this;
     _this.togging = true;
     setTimeout(() => {
@@ -158,6 +181,12 @@ export class LoginDialogComponent implements OnInit {
       _this.dialogType = t;
       _this.uiConfig = UiConfigs[t];
       _this.error = '';
+      if (updateUrl) {
+        const url = DialogUrls[t];
+        if (url) {
+          _this.location.go(url);
+        }
+      }
     }, 233);
   }
 

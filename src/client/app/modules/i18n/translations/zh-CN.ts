@@ -55,5 +55,5 @@ export const values = {
   [StringIds.PublishedComment]: '评论了你的信息',
   [StringIds.MentionedYou]: '提及你',
   [StringIds.CircledYou]: '圈了你',
-  [StringIds.LoginWithTwitter]: '通过Twitter登录',
+  [StringIds.LoginWithX]: '通过{{name}}登录',
 };

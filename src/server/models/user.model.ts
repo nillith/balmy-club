@@ -12,7 +12,7 @@ import {
   updateOneSucceed,
 } from "./model-base";
 import {authService, JwtSignable} from "../service/auth.service";
-import {devOnly, disableStringify, isNumericId, isValidURL, throwIfFalse} from "../utils/index";
+import {devOnly, disableStringify, isNumericId, isValidURL, throwIfFalsy} from "../utils/index";
 import isEmail from "validator/lib/isEmail";
 import {
   cloneFields,
@@ -22,8 +22,7 @@ import {
   isValidStringId,
   isValidTicketFormat,
   isValidTimestamp,
-  isValidUsername,
-  utcTimestamp
+  isValidUsername
 } from "../../shared/utils";
 import {
   $id,
@@ -36,19 +35,11 @@ import {
 import _ from 'lodash';
 import {CircleModel, CircleRecord} from "./circle.model";
 import {ChangeSettingsRequest, MinimumUser} from "../../shared/contracts";
-import {isNull, isNumber, isUndefined} from "util";
 import config from "../config";
+import {isNull, isNumber, isUndefined} from "util";
 
 export function generateTicket() {
   return crypto.randomBytes(config.ticketBytes);
-}
-
-function generateTextSecret(bytes) {
-  return crypto.randomBytes(bytes)
-    .toString('base64')
-    .replace(/\//g, '')
-    .replace(/\+/g, '')
-    .replace(/=/g, '');
 }
 
 const createSaveSettingsSql = (function() {
@@ -305,8 +296,8 @@ interface ChangePasswordParams {
 
 
 function throwIfInvalidSaltHash(data: any) {
-  throwIfFalse(data.salt && data.salt.length === 32, `invalid salt`);
-  throwIfFalse(data.hash && data.hash.length === 64, `invalid hash`);
+  throwIfFalsy(data.salt && data.salt.length === 32, `invalid salt`);
+  throwIfFalsy(data.hash && data.hash.length === 64, `invalid hash`);
 }
 
 const assertValidSaltHash = devOnly(throwIfInvalidSaltHash);
@@ -316,11 +307,33 @@ const assertValidChangePasswordParams = devOnly(function(data: any) {
   assertValidSaltHash(data);
 });
 
+const InsertUserColumns = [
+  'username',
+  'nickname',
+  'email',
+  'role',
+  'createdAt',
+  'salt',
+  'hash',
+  'avatarUrl',
+  'bannerUrl',
+  'twitterId',
+  'githubId',
+  'googleId',
+];
+
+const SQL_INSERT = `INSERT INTO Users (${InsertUserColumns.join(', ')}) VALUES(${InsertUserColumns.map(col => `:${col}`).join(', ')})`;
+const enum SQLs {
+  CHANGE_PASSWORD = 'UPDATE Users SET salt = :salt, hash = :hash WHERE id = :userId'
+}
+
 export interface RawUser {
   username?: string;
   nickname: string;
   password: string;
   twitterId?: number;
+  githubId?: number;
+  googleId?: string;
   createdAt: number;
   email?: string;
   avatarUrl?: string;
@@ -330,29 +343,29 @@ export interface RawUser {
   salt?: Buffer;
 }
 
-const enum SQLs {
-  INSERT = 'INSERT INTO Users (username, nickname, email, role, createdAt, salt, hash, twitterId, avatarUrl, bannerUrl) VALUES(:username, :nickname, :email, :role, :createdAt, :salt, :hash, :twitterId, :avatarUrl, :bannerUrl)',
-  CHANGE_PASSWORD = 'UPDATE Users SET salt = :salt, hash = :hash WHERE id = :userId'
-}
 
-const throwIfInvalidRawUser = function(data: any) {
-  throwIfFalse(isValidUsername(data.username), `invalid username ${data.username}`);
-  throwIfFalse(data.username || data.twitterId, `must have either username or twitterId`);
+export const throwIfInvalidRawUser = function(data: any) {
+  throwIfFalsy(isValidUsername(data.username), `invalid username ${data.username}`);
+  throwIfFalsy(data.username || data.twitterId, `must have either username or twitterId`);
   if (data.twitterId) {
-    throwIfFalse(isNumber(data.twitterId), `invalid twitterId ${data.twitterId}`);
+    throwIfFalsy(isNumber(data.twitterId), `invalid twitterId ${data.twitterId}`);
   }
-  throwIfFalse(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
-  throwIfFalse(isValidPassword(data.password), `invalid password ${data.password}`);
-  throwIfFalse(isValidTimestamp(data.createdAt), `invalid createdAt ${data.createdAt}`);
-  throwIfFalse(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
-  if (!data.email) {
-    throwIfFalse(isUndefined(data.email) || isNull(data.email), `empty string email`);
+  if (data.githubId) {
+    throwIfFalsy(isNumber(data.githubId), `invalid githubId ${data.githubId}`);
   }
-  if (!data.avatarUrl) {
-    throwIfFalse(isValidURL(data.avatarUrl), `invalid avatarUrl ${data.avatarUrl}`);
+  if (data.googleId) {
+    throwIfFalsy(data.googleId.length === 21, `invalid googleId ${data.googleId}`);
   }
-  if (!data.bannerUrl) {
-    throwIfFalse(isValidURL(data.bannerUrl), `invalid avatarUrl ${data.bannerUrl}`);
+  throwIfFalsy(isValidNickname(data.nickname), `invalid nickname ${data.nickname}`);
+  throwIfFalsy(isValidPassword(data.password), `invalid password ${data.password}`);
+  throwIfFalsy(isValidTimestamp(data.createdAt), `invalid createdAt ${data.createdAt}`);
+  throwIfFalsy(!data.email || (isValidEmailAddress(data.email) && isEmail(data.email)), `invalid email ${data.email}`);
+  throwIfFalsy(isUndefined(data.email) || isNull(data.email), `empty string email`);
+  if (data.avatarUrl) {
+    throwIfFalsy(isValidURL(data.avatarUrl), `invalid avatarUrl ${data.avatarUrl}`);
+  }
+  if (data.bannerUrl) {
+    throwIfFalsy(isValidURL(data.bannerUrl), `invalid avatarUrl ${data.bannerUrl}`);
   }
 };
 
@@ -361,22 +374,6 @@ const assertValidRawUserWithSaltHash = devOnly(function(data: any) {
   throwIfInvalidSaltHash(data);
 });
 
-
-function twitterProfileToRawUser(profile: any): RawUser {
-  const result = {} as RawUser;
-  if (profile.photos && profile.photos[0]) {
-    result.avatarUrl = profile.photos[0].value;
-  }
-  const json = profile._json;
-  result.bannerUrl = json.profile_banner_url;
-  result.username = generateTextSecret(20).substr(0, 24);
-  result.password = generateTextSecret(96);
-  result.twitterId = json.id;
-  result.createdAt = utcTimestamp();
-  result.nickname = json.name;
-  throwIfInvalidRawUser(result);
-  return result;
-}
 
 const assertValidPassword = devOnly(function(password: any) {
   console.assert(isValidPassword(password), `invalid password ${password}`);
@@ -406,12 +403,11 @@ export interface NicknameAvatar extends UserIdNickname {
   avatarUrl?: string;
 }
 
-
 export class UserModel {
   static async insert(raw: RawUser, driver: DatabaseDriver = db): Promise<number> {
     [raw.salt, raw.hash] = await generateSaltHashForPassword(raw.password);
     assertValidRawUserWithSaltHash(raw);
-    return insertReturnId(SQLs.INSERT as string, raw, driver);
+    return insertReturnId(SQL_INSERT as string, raw, driver);
   }
 
   static async create(raw: RawUser, driver: DatabaseDriver = db): Promise<UserRecord> {
@@ -419,10 +415,6 @@ export class UserModel {
     const row = Object.create(raw);
     row.id = id;
     return fromDatabaseRow(row, UserRecord);
-  }
-
-  static async signUpWithTwitter(profile: any, driver: DatabaseDriver = db): Promise<UserRecord> {
-    return UserModel.create(twitterProfileToRawUser(profile), driver);
   }
 
   static async changePassword(params: ChangePasswordParams, driver: DatabaseDriver = db) {
@@ -457,13 +449,6 @@ export class UserModel {
   static async findUserByUsername(username: string, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
     assertValidUsername(username);
     const [rows] = await driver.query(`SELECT id, username, role, salt, hash FROM Users WHERE userName = :username LIMIT 1`, {username});
-    if (!_.isEmpty(rows)) {
-      return fromDatabaseRow(rows[0], UserRecord);
-    }
-  }
-
-  static async findUserByTwitterId(twitterId: number, driver: DatabaseDriver = db): Promise<UserRecord | undefined> {
-    const [rows] = await driver.query(`SELECT id, username, role, salt, hash FROM Users WHERE twitterId = :twitterId LIMIT 1`, {twitterId});
     if (!_.isEmpty(rows)) {
       return fromDatabaseRow(rows[0], UserRecord);
     }

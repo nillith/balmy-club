@@ -91,8 +91,11 @@
       </button>
     </div>
     <div fxLayout="row" fxLayoutAlign="center center">
-      <a href="/auth/twitter" class="auth-button" title="{{StringIds.LoginWithTwitter | i18n}}">
-        <img src="assets/twitter.png">
+      <a *ngFor="let oAuth of oAuthIcons"
+         href="{{oAuth.url}}"
+         class="auth-button"
+         title="{{StringIds.LoginWithX | i18n:oAuth}}">
+        <img src="{{oAuth.icon}}">
       </a>
     </div>
   </mat-dialog-actions>

@@ -5,6 +5,7 @@ import {identity, noop} from "../../shared/utils";
 import {isString, isUndefined} from "util";
 import {MAX_URL_LENGTH} from "../../shared/constants";
 import {INVALID_NUMERIC_ID} from "../service/obfuscator.service";
+import crypto from 'crypto';
 
 export const isAsyncFunction = (() => {
   const AsyncFunction = (async () => {
@@ -54,7 +55,7 @@ export const devOnly = (function() {
   }
 })();
 
-export function throwIfFalse(v?: any, msg?: string) {
+export function throwIfFalsy(v?: any, msg?: string) {
   if (!v) {
     throw Error(msg || "MyAssertion failed!");
   }
@@ -109,3 +110,11 @@ export const trimFields = function(obj: any) {
     }
   }
 };
+
+export function generateTextSecret(bytes) {
+  return crypto.randomBytes(bytes)
+    .toString('base64')
+    .replace(/\//g, '')
+    .replace(/\+/g, '')
+    .replace(/=/g, '');
+}
