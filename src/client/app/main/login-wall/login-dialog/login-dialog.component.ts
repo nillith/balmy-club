@@ -158,14 +158,14 @@ export class LoginDialogComponent implements OnInit {
     const {pathname} = location;
     if (pathname) {
       if (pathname.startsWith(`/${PagePaths.SignUp}`)) {
-        _this.onChangeDialogType(DialogTypes.SignUp);
+        _this.onChangeDialogType(DialogTypes.SignUp, !'updateUrl');
         _this.redirect = '';
       } else if (pathname.startsWith(`/${PagePaths.Login}`)) {
-        _this.onChangeDialogType(DialogTypes.Login);
+        _this.onChangeDialogType(DialogTypes.Login, !'updateUrl');
         _this.redirect = '';
       } else if (pathname.startsWith(`/${PagePaths.ResetPassword}`)) {
         _this.redirect = '';
-        _this.onChangeDialogType(DialogTypes.ResetPassword);
+        _this.onChangeDialogType(DialogTypes.ResetPassword, !'updateUrl');
       }
     }
     _this.activeRoute.queryParams.subscribe(params => {
@@ -173,7 +173,7 @@ export class LoginDialogComponent implements OnInit {
     });
   }
 
-  onChangeDialogType(t: number, updateUrl? = true) {
+  onChangeDialogType(t: number, updateUrl = true) {
     const _this = this;
     _this.togging = true;
     setTimeout(() => {
