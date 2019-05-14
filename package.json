@@ -1,6 +1,6 @@
 {
   "name": "circle-plus",
-  "version": "0.0.101",
+  "version": "0.0.103",
   "scripts": {
     "client:start": "ng serve -o --aot",
     "server:start": "npx nodemon --exec npx ts-node --project src/server/tsconfig.json ./src/server/index.ts",
@@ -16,7 +16,7 @@
     "server:coverage": "nyc report --reporter=text-lcov | coveralls",
     "e2e": "ng e2e",
     "build:docker": "npm run build && node build-scripts/create-docker-image",
-    "update-version": "node build-scripts/update-version"
+    "update-version": "node build-scripts/update-version && git add ."
   },
   "pre-commit": [
     "update-version"
