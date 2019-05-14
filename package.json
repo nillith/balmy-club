@@ -15,7 +15,8 @@
     "server:test": "cross-env TS_NODE_PROJECT=src/server/tsconfig.spec.json nyc mocha --opts src/server/mocha.opts",
     "server:coverage": "nyc report --reporter=text-lcov | coveralls",
     "e2e": "ng e2e",
-    "build:docker": "npm run build && node build-scripts/create-docker-image"
+    "build:docker": "npm run build && node build-scripts/create-docker-image",
+    "pre-commit":""
   },
   "nyc": {
     "lines": 0,
@@ -130,6 +131,7 @@
     "ncp": "^2.0.0",
     "nodemon": "^1.18.10",
     "nyc": "^13.3.0",
+    "pre-commit": "^1.2.2",
     "rxjs": "~6.3.3",
     "ts-node": "~7.0.0",
     "tsconfig-paths": "^3.8.0",

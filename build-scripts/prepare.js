@@ -1,6 +1,8 @@
 const path = require('path')
 const fs = require('fs')
 const crypto = require('crypto')
+const pkg = require('../package.json')
+const {getBuildTsContent} = require('./utils')
 
 const ROOT = path.normalize(`${__dirname}/..`)
 const CLIENT_ENV_DIR = `${ROOT}/src/client/environments`
@@ -10,13 +12,14 @@ const CLIENT_ENV_PROD = `${CLIENT_ENV_DIR}/environment.prod.ts`
 const SERVER_ENV_DIR = `${ROOT}/src/server/env`
 const SERVER_ENV_EXAMPLE = `${SERVER_ENV_DIR}/example.env`
 const SERVER_ENV = `${SERVER_ENV_DIR}/.env`
+const BUILD_TS = `${ROOT}/src/shared/build.ts`
 
 function generateTextSecret () {
-  return crypto.randomBytes(96).toString('base64').replace(/\//g, '').replace(/\+/g, '').replace(/=/g, '');
+  return crypto.randomBytes(96).toString('base64').replace(/\//g, '').replace(/\+/g, '').replace(/=/g, '')
 }
 
 function generateHexSecret () {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString('hex')
 }
 
 const SECRET_NAME_LIST = [
@@ -25,8 +28,6 @@ const SECRET_NAME_LIST = [
   'SESSION_SECRET',
   'RECOVER_PASSWORD_SECRET',
 ]
-
-
 
 const OBFUSCATOR_SECRET_NAME_LIST = [
   'OBFUSCATOR_SECRET_USER',
@@ -56,3 +57,5 @@ if (!fs.existsSync(SERVER_ENV)) {
   }
   fs.writeFileSync(SERVER_ENV, example, 'utf8')
 }
+
+fs.writeFileSync(BUILD_TS, getBuildTsContent(pkg.version), 'utf8')
