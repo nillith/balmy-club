@@ -6,6 +6,7 @@ import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/tes
 import {anchor, matDialogRef} from "../../../test-providers.spec";
 import {I18nModule} from "../../i18n/i18n.module";
 import {WidgetsModule} from "../../widgets/widgets.module";
+import {CommonPipesModule} from "../../common-pipes/common-pipes.module";
 
 describe('MentionSelectionDialogComponent', () => {
   let component: MentionSelectionDialogComponent;
@@ -15,7 +16,7 @@ describe('MentionSelectionDialogComponent', () => {
     TestBed
       .configureTestingModule({
         declarations: [MentionSelectionDialogComponent],
-        imports: [ImportsTestingModule, I18nModule, WidgetsModule],
+        imports: [ImportsTestingModule, I18nModule, WidgetsModule, CommonPipesModule],
         providers: [anchor, matDialogRef]
       })
       .overrideModule(BrowserDynamicTestingModule, {

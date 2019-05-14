@@ -6,6 +6,7 @@ import {MentionSelectionDialogComponent} from "../mention-selection-dialog/menti
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 import {I18nModule} from "../../i18n/i18n.module";
 import {WidgetsModule} from "../../widgets/widgets.module";
+import {CommonPipesModule} from "../../common-pipes/common-pipes.module";
 
 describe('MarkdownEditorComponent', () => {
   let component: MarkdownEditorComponent;
@@ -13,7 +14,7 @@ describe('MarkdownEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ImportsTestingModule, I18nModule, WidgetsModule],
+      imports: [ImportsTestingModule, I18nModule, WidgetsModule, CommonPipesModule],
       declarations: [ MarkdownEditorComponent, MentionSelectionDialogComponent]
     })
       .overrideModule(BrowserDynamicTestingModule, {

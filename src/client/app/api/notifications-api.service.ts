@@ -1,13 +1,14 @@
 import {ApplicationRef, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {API_URLS, SHARED_WORKER_URL} from "../../constants";
-import {MinimumUser, NotificationResponse} from "../../../shared/contracts";
+import {MinimumUser, NotificationResponse, RemoteCommand} from "../../../shared/contracts";
 import {NullaryAsyncAction} from "../../utils/switch-debouncer";
 import _ from 'lodash';
 import {ToastService} from "../services/toast.service";
 import {environment} from "../../environments/environment";
 import {getAccessToken} from "../../utils/auth";
-import {RemoteMessageTypes, PING, PONG} from "../../../shared/constants";
+import {Commands, PING, PONG, RemoteMessageTypes} from "../../../shared/constants";
+import {VERSION} from "../../../shared/build";
 
 declare namespace SharedWorker {
   interface AbstractWorker extends EventTarget {
@@ -33,6 +34,21 @@ export interface NotificationData extends NotificationResponse {
   subject: MinimumUser;
 }
 
+
+function cacheRefresh(version) {
+  const versions = version.split('.');
+  const patch = versions[versions.length - 1];
+  const vQuery = `v=${patch}`;
+  if (location.search) {
+    if (location.search.match(/\bv=\d+(&?)/)) {
+      location.search = location.search.replace(/\bv=\d+(&?)/, `${vQuery}$1`);
+    } else {
+      location.search = `${location.search}&${vQuery}`;
+    }
+  } else {
+    location.search = `?${vQuery}`;
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -146,6 +162,16 @@ export class NotificationsApiService {
     if (notification) {
       notification.isRead = true;
       --_this.unreadCount;
+    }
+  }
+
+  [RemoteMessageTypes.Command](data: RemoteCommand) {
+    switch (data.type) {
+      case Commands.SyncVersion:
+        if (String(data.data) !== String(VERSION)) {
+          cacheRefresh(data.data);
+        }
+        break;
     }
   }
 

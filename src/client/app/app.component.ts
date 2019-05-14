@@ -1,6 +1,7 @@
 import {Component} from '@angular/core';
 import {appConstants} from "./app.constants";
 import {NavEntry} from "../constants";
+import {VERSION} from "../../shared/build"
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,5 @@ import {NavEntry} from "../constants";
 
 export class AppComponent {
   navEntries: NavEntry[] = appConstants.sideNav;
+  version = VERSION;
 }

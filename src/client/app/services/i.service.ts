@@ -11,7 +11,6 @@ import _ from 'lodash';
 import {CommentModel} from "../models/comment.model";
 import {NotificationsApiService} from "../api/notifications-api.service";
 import {UserInfoService} from "../modules/user-info/user-info.service";
-import {ACCESS_TOKEN_COOKIE_KEY} from "../../../shared/constants";
 
 const STORAGE_KEYS = {
   USER: 'user',

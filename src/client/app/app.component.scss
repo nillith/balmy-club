@@ -43,3 +43,10 @@ a:active {
 #router-outlet{
   height: 100%;
 }
+
+#page-footer{
+  text-align: left;
+  position: fixed;
+  bottom: 0;
+  left:0
+}

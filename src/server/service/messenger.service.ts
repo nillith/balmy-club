@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import config from '../config';
 import {authService} from "./auth.service";
 import {$contextExtraId, $contextId, $id, $objectId, $subjectId, INVALID_NUMERIC_ID} from "./obfuscator.service";
-import {AUTH, PING, PONG, RemoteMessageTypes} from "../../shared/constants";
+import {AUTH, Commands, PING, PONG, RemoteMessageTypes} from "../../shared/constants";
 import {
   assertValidRawNotificationMessage,
   FullNotificationRecord,
@@ -13,7 +13,16 @@ import {Activity} from "../../shared/interf";
 import {isValidTimestamp} from "../../shared/utils";
 import {devOnly, isNumericId} from "../utils/index";
 import {UserModel} from "../models/user.model";
+import {VERSION} from "../../shared/build";
 import isValidContextType = Activity.isValidContextType;
+
+const SyncVersionCommand = JSON.stringify({
+  type: RemoteMessageTypes.Command,
+  data: {
+    type: Commands.SyncVersion,
+    data: VERSION
+  }
+});
 
 const $userId = Symbol();
 const $authTimeoutId = Symbol();
@@ -167,6 +176,7 @@ const onMessage = (function() {
       client.on('message', onAuthenticatedClientMessage);
       setHeartbeatInterval(client);
       sendString(client, AUTH);
+      sendString(client, SyncVersionCommand);
     }
   };
 })();

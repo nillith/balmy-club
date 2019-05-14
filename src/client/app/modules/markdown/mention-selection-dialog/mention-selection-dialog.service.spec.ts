@@ -6,12 +6,13 @@ import {BrowserDynamicTestingModule} from "@angular/platform-browser-dynamic/tes
 import {MentionSelectionDialogComponent} from "./mention-selection-dialog.component";
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 import {I18nModule} from "../../i18n/i18n.module";
+import {CommonPipesModule} from "../../common-pipes/common-pipes.module";
 
 describe('MentionSelectionDialogService', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MentionSelectionDialogComponent],
-      imports: [ImportsTestingModule, I18nModule],
+      imports: [ImportsTestingModule, I18nModule, CommonPipesModule],
       providers: [
         {
           provide: MAT_DIALOG_DATA,

@@ -41,6 +41,11 @@ export const RemoteMessageTypes = {
 
   Sync: 100,
   Notification: 101,
+  Command: 102
+};
+
+export const Commands = {
+  SyncVersion: 1
 };
 
 export const PagePaths = {

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { CommentEditorComponent } from './comment-editor.component';
+import {CommentEditorComponent} from './comment-editor.component';
 import {ImportsTestingModule} from "../../imports/imports-testing.module.spec";
 import {MarkdownModule} from "../../markdown/markdown.module";
 import {PostEditorComponent} from "../post-editor/post-editor.component";
@@ -14,10 +14,17 @@ describe('CommentEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CommentEditorComponent, PostEditorComponent ],
+      declarations: [CommentEditorComponent, PostEditorComponent],
       imports: [ImportsTestingModule, MarkdownModule, WidgetsModule, I18nModule, CommonPipesModule],
+      providers: [{
+        provide: PostEditorComponent,
+        useValue: {
+          notifyParent() {
+          }
+        }
+      }]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

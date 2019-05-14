@@ -135,3 +135,9 @@ export interface NotificationResponse {
   contextExtraId?: string;
   isRead?: boolean;
 }
+
+
+export interface RemoteCommand {
+  type: number;
+  data: any;
+}

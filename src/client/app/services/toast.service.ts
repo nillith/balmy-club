@@ -17,7 +17,6 @@ export class ToastService {
     config.verticalPosition = 'bottom';
     config.horizontalPosition = 'center';
     config.duration = duration;
-    // config.extraClasses = this.addExtraClass ? ['test'] : undefined;
     this.snackBar.open(msg, undefined, config);
   }
 }
